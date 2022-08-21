@@ -19,10 +19,10 @@ app.secret_key = str(open("secret_key.txt", 'r').read())
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    else:
-        return render_template('index.html')
+    # if not session.get('logged_in'):
+    #     return redirect(url_for('login'))
+    # else:
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -14,7 +14,7 @@ import Database
 
 app = Flask(__name__)
 
-app.secret_key = str(open("secret_key.txt", 'r').read())
+app.secret_key = "HopKIdf78/*9*PO72xQ89Fg??"
 
 
 @app.route('/', methods=['GET', 'POST'])

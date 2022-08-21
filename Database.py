@@ -1,3 +1,5 @@
+import os
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2 import Error
 import psycopg2
@@ -10,11 +12,11 @@ class Main:
             - read a table in the database
             - delete an entry in a table in the database
     """
-
     def execute_query(self, query_list, commit=False, fetchAll=False, fetchOne=False):
         try:
             credentials = str(open("database_credentials.txt", 'r').read())
-            conn = psycopg2.connect(credentials, sslmode='require')
+            DATABASE_URL = os.environ['DATABASE_URL']
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
             result = None
             if type(query_list) == str:

@@ -3,7 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="\Contact.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\Database.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app.py">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -24,6 +38,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\static\js\contact.js">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\templates\admin_overview.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\templates\blog.html">
           <value>
             <Attribute>
@@ -32,6 +60,13 @@
           </value>
         </entry>
         <entry key="\templates\index.html">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\test2.py">
           <value>
             <Attribute>
               <option name="separator" value="," />

@@ -1,8 +1,12 @@
 import os
+from os.path import exists
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from psycopg2 import Error
+from psycopg2 import Error, sql
 import psycopg2
+from functools import wraps
+
+
 
 
 class Main:
@@ -12,29 +16,25 @@ class Main:
             - read a table in the database
             - delete an entry in a table in the database
     """
-    def execute_query(self, query_list, commit=False, fetchAll=False, fetchOne=False):
+
+    def execute_query(self, query, parameters=(), commit=False, fetchAll=False, fetchOne=False):
         try:
-            credentials = str(open("database_credentials.txt", 'r').read())
-            DATABASE_URL = os.environ['DATABASE_URL']
-            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            if exists('database_credentials.txt'):
+                credentials = str(open("database_credentials.txt", 'r').read())
+                conn = psycopg2.connect(credentials, sslmode='require')
+            else:
+                DATABASE_URL = os.environ['DATABASE_URL']
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
             c = conn.cursor()
             result = None
-            if type(query_list) == str:
-                c.execute(query_list)
-            elif isinstance(query_list, tuple):
-                c.execute(query_list[0], query_list[1])
-            else:
-                for query in query_list:
-                    if isinstance(query, tuple):
-                        c.execute(query[0], query[1])
-                    else:
-                        c.execute(query)
+            c.execute(query, parameters)
             if commit:
                 conn.commit()
             if fetchAll:
                 result = [row for row in c.fetchall()]
             if fetchOne:
-                result = c.fetchone()
+                result = c.fetchone()[0]
             c.close()
             conn.close()
             return result
@@ -42,62 +42,26 @@ class Main:
         except Error as e:
             print(e)
 
-    def read_table(self, table_name):
-        return self.execute_query(query_list=f"SELECT * FROM {table_name}", fetchAll=True)
 
-    def read_columns(self, db_name):
-        return self.execute_query(
-            "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + db_name + "';", fetchAll=True)
+    def read_table(self, cursor, table_name):
+        SQL = "SELECT * from %(table_name)s"
+        parameters = {'table_name': table_name}
+        query = cursor.execute(query=SQL, variables=parameters)
+        return query.fetchall()
 
-    def del_comment(self, id, db_name):
-        self.execute_query(query_list=f'DELETE FROM {db_name} WHERE id = {id}', commit=True)
-
-    def add_column(self, table_name, new_column_name, column_definition):
-        self.execute_query(f"ALTER TABLE {table_name} ADD {new_column_name} {column_definition};", commit=True)
+    def get_row_by_id(self, cursor, id, table_name):
+        SQL = "SELECT * from %(table_name)s where id = %(id)s"
+        parameters = {'table_name': table_name, 'id': id}
+        query = cursor.execute(query=SQL, variables=parameters)
+        return query.fetchOne()
 
     def verify_password(self, email, pwd):
-        retrieved_password = \
-            self.execute_query(query_list=f"SELECT password FROM users where email = '{email}'", fetchAll=True)[0][0]
+        retrieved_password = self.execute_query(query="SELECT value FROM settings where key = %s;", parameters=(email,), fetchOne=True)
         return check_password_hash(retrieved_password, pwd)
 
-    def verify_admin(self, email):
-        role = self.execute_query(query_list=f"SELECT role_name FROM users where email = '{email}'", fetchAll=True)[0][
-            0]
-        if role == "Administrator":
-            return True
-        else:
-            return False
-
-    def generate_hash(self, pwd):
-        return generate_password_hash(pwd)
-
-    def get_user_id(self, email):
-        return self.execute_query(query_list=f"SELECT ID from users where email = '{email}'", fetchOne=True)[0]
-
-    def get_user_email(self, id):
-        global email
-        try:
-            email = self.execute_query(query_list=f"SELECT email from users where id = '{id}'", fetchOne=True)[0]
-        except TypeError as e:
-            email = None
-        finally:
-            return email
-
-    def get_user_data(self, id):
-        return self.execute_query(query_list=f"SELECT * from users where id = '{id}'", fetchAll=True)[0]
-
-    def update_last_login(self, id):
-        self.execute_query(query_list=F"UPDATE users SET last_login = NOW() where id = {id}", commit=True)
-
-    def alter_password(self, email, old_pwd, new_pwd):
-        # "23FvMIs*5cx8fHRv"
-        new_pwd = generate_password_hash(new_pwd)
-        if self.verify_password(email, old_pwd):
-            self.execute_query(query_list=f"UPDATE users SET password = '{new_pwd}' where email = '{email}'",
-                               commit=True)
-            return True
-        else:
-            return False
+    def get_secret_code(self):
+        retrieved_code = self.execute_query(query="SELECT value FROM settings where id=1 ;", fetchOne=True)
+        return retrieved_code
 
 
 class User(Main):
@@ -111,7 +75,23 @@ class User(Main):
         self.last_login = last_login
 
     def register_user(self):
-        self.execute_query(
-            query_list=f"INSERT INTO users (first_name, last_name, nickname, password, role, email, last_login, created_on) VALUES ({self.first_name}, {self.last_name}, {self.nickname}, {self.password}, {self.role_name}, {self.email}, NOW(), NOW());",
-            commit=True)
+        SQL = "INSERT INTO contact_query (first_name, last_name, nickname, password, role_name, email, last_login) VALUES (%s,%s,%s,%s,%s,%s,%s);"
+        parameters = (
+        self.first_name, self.last_name, self.nickname, self.password, self.role_name, self.email, self.last_login)
+        self.execute_query(query=SQL, variables=parameters, commit=True)
 
+
+class Contact(Main):
+    def __init__(self, name, message, date, reason, phone, email, address):
+        self.name = name
+        self.message = message
+        self.date = date
+        self.reason = reason
+        self.phone = phone
+        self.email = email
+        self.address = address
+
+    def register_contact_query(self):
+        SQL = "INSERT INTO contact_query (name, message, date, reason, phone, email, address) VALUES (%s,%s,%s,%s,%s,%s,%s);"
+        parameters = (self.name, self.message, self.date, self.reason, self.phone, self.email, self.address,)
+        self.execute_query(query=SQL, variables=parameters, commit=True)

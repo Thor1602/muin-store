@@ -8,14 +8,17 @@ a Creative Commons Attribution-ShareAlike 3.0 Unported License.
 email: thorbendhaenenstd@gmail.com
 
 """
+import time
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request
 import Database
+import Contact
+import email_validator
 
 app = Flask(__name__)
 
-app.secret_key = "HopKIdf78/*9*PO72xQ89Fg??"
-
+main = Database.Main()
+app.secret_key = main.get_secret_code()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -24,18 +27,65 @@ def index():
     # else:
     return render_template('index.html')
 
+@app.route('/admin_overview', methods=['GET', 'POST'])
+def admin_overview():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('admin_overview.html')
+
+@app.route('/business_plan', methods=['GET', 'POST'])
+def business_plan():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('business_plan.html')
+
+@app.route('/financial_plan', methods=['GET', 'POST'])
+def financial_plan():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        investments = [x.split(',') for x in open('investments.txt', 'r', encoding="utf8").read().split('\n')]
+        minimum = 0
+        maximum = 0
+        edited_fomat = []
+        for row in investments:
+            edited_fomat.append(row)
+            minimum += int(row[2])
+            maximum += int(row[3])
+            row[2] = "{:,}".format(int(row[2]))
+            row[3] = "{:,}".format(int(row[3]))
+        row[2] = "{:,}".format(int(row[2]))
+        row[3] = "{:,}".format(int(row[3]))
+        return render_template('financial_plan.html', investments=investments, minimum=minimum, maximum=maximum)
+
+@app.route('/products', methods=['GET', 'POST'])
+def products():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('products.html')
+
+@app.route("/contact_submission", methods=["GET", "POST"])
+def contact_submission():
+    if request.method == "POST":
+        print(request.form)
+        cform = Contact.contactForm()
+        if cform.validate_on_submit():
+            print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
+    return redirect(url_for('index'))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         session['logged_in'] = False
         return render_template('login.html')
     elif request.method == 'POST':
-        main = Database.Main()
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
             session['logged_in'] = True
             session['current_user'] = request.form['emaillogin']
-            main.update_last_login(main.get_user_id(session['current_user']))
-            return redirect(url_for('index'))
+            return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
 
@@ -43,7 +93,7 @@ def login():
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 
 @app.errorhandler(400)

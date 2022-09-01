@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block content %}
+{% block body %}
 
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
@@ -8,7 +8,7 @@
                     <div class="card-body p-5 text-center">
 
                         <h3 class="mb-5">Sign in</h3>
-                        <form method="POST">
+                        <form method="POST" action="/login">
                             <div class="form-outline mb-4">
                                 <input type="email" name="emaillogin" id="typeEmailX-2"
                                        class="form-control form-control-lg"/>
@@ -35,7 +35,9 @@
                                     </p>
                                 {% endif %}
                             {% endwith %}
-                            <button class="btn btn-login btn-lg btn-block" type="submit">Login</button>
+                            <div class="text-center">
+                                <button class="login" type="submit">Login</button>
+                            </div>
                         </form>
                     </div>
                 </div>

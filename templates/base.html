@@ -1,77 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-
-    <title>Learn Korean</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/static/images/favicon/favicon.ico">
-    <link href="static/main.css" rel="stylesheet" type="text/css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
-            integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.tiny.cloud/1/e52lsm9v4b8tgxosu2ds8c83hb3tf3bjd8u44zoypolktlk7/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
+    <title>Coup De Foudre</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
 
-    {% block head %}
+    <!-- Favicons -->
+    <link href="/static/img/favicon.png" rel="icon">
+    <link href="/static/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-    {% endblock %}
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+          rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/static/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/static/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="/static/css/main.css" rel="stylesheet">
+    {% block head %}{% endblock %}
 </head>
-<body id="body-pd" data-spy="scroll" data-target=".navbar" data-offset="60">
-<header class="header" id="header">
-    <div class="header_toggle"><i class="bx bx-menu fa-solid fa-bars" id="header-toggle"></i></div>
-    <div class="header_img"><img src="https://i.imgur.com/hczKIze.jpg" alt=""></div>
-</header>
-<div class="l-navbar" id="nav-bar">
-    <nav class="nav">
-        <div><a href="#" class="nav_logo"> <i class='fa-solid fa-earth-asia fa-lg'></i> <span class="nav_logo-name">Learn Korean</span>
+
+<body>
+
+<!-- ======= Header ======= -->
+<section id="topbar" class="topbar d-flex align-items-center">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+        <div class="contact-info d-flex align-items-center">
+            <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:thorbendhaenenstd@gmail.com">thorbendhaenenstd@gmail.com</a></i>
+            <i class="bi bi-phone d-flex align-items-center ms-4"><span>010-4887-8249</span></i>
+        </div>
+        {#      <div class="social-links d-none d-md-flex align-items-center">#}
+        {#        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
+        {#        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
+        {#        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
+        {#        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
+        {#      </div>#}
+    </div>
+</section><!-- End Top Bar -->
+
+<header id="header" class="header d-flex align-items-center">
+
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+        <a href="index.html" class="logo d-flex align-items-center">
+            <!-- Uncomment the line below if you also wish to use an image logo -->
+            <h1>Coup De Foudre<span>.</span></h1>
         </a>
-            <div class="nav_list">
-                <a href="/" class="nav_link"> <i class='fa-solid fa-border-all fa-lg'></i> <span class="nav_name">Dashboard</span>
-                </a>
-                <a href="/discussion" class="nav_link"> <i class='fa-solid fa-d fa-lg'></i> <span class="nav_name">Discussion</span>
-                </a>
-                <a href="/quizmenu" class="nav_link"> <i class='fa-solid fa-circle-question fa-lg'></i> <span
-                        class="nav_name">Quizzes</span> </a>
-                <a href="/mypage" class="nav_link"> <i class='fa-solid fa-address-card fa-lg'></i> <span
-                        class="nav_name">My page</span> </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                {% block nav %}
+
+                {% endblock %}
+
+                {#          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>#}
+                {#            <ul>#}
+                {#              <li><a href="#">Drop Down 1</a></li>#}
+                {#              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>#}
+                {#                <ul>#}
+                {#                  <li><a href="#">Deep Drop Down 1</a></li>#}
+                {#                  <li><a href="#">Deep Drop Down 2</a></li>#}
+                {#                  <li><a href="#">Deep Drop Down 3</a></li>#}
+                {#                  <li><a href="#">Deep Drop Down 4</a></li>#}
+                {#                  <li><a href="#">Deep Drop Down 5</a></li>#}
+                {#                </ul>#}
+                {#              </li>#}
+                {#              <li><a href="#">Drop Down 2</a></li>#}
+                {#              <li><a href="#">Drop Down 3</a></li>#}
+                {#              <li><a href="#">Drop Down 4</a></li>#}
+                {#            </ul>#}
+                {#          </li>#}
+            </ul>
+        </nav><!-- .navbar -->
+
+        <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+        <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+
+    </div>
+</header><!-- End Header -->
+<!-- End Header -->
+
+{% block body %}{% endblock %}
+
+    <footer id="footer" class="footer">
+
+       {% block footer %}{% endblock %}
+
+        <div class="container mt-4">
+            <div class="copyright">
+                &copy; Copyright <strong><span>Coup De Foudre</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                Designed by <a href="#">Coup De Foudre</a>
             </div>
         </div>
-        <a href="/logout" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span
-                class="nav_name">Sign Out</span> </a>
-    </nav>
-</div>
-<!--Container Main start-->
-<div class="bg-light">
-    <div class="container title text-center">
-        <h1>{% block title %}{% endblock %}</h1>
-        <p>{% block title_description %}{% endblock %}</p>
-    </div>
-    <div class="container content-body text-center">
-        {% block content %}{% endblock %}
-    </div>
-    <div class="footer bg-blue text-center">
-        <a href="#body-pd" title="To Top">
-            <span><i class="fa fa-angle-up fa-3x" aria-hidden="true"></i></span>
-        </a>
-        {% block footer %}
-        {% endblock %}
-        <p>Copyright TD</p>
-    </div>
-    <div class="clear"></div>
-</div>
 
+    </footer><!-- End Footer -->
+    <!-- End Footer -->
 
-<!--Container Main end-->
+<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+<div id="preloader"></div>
 
-<script src="static/index.js"></script>
-<script src="static/sidebar.js"></script>
-<script src="static/rich_text_editor.js"></script>
-<script src="https://kit.fontawesome.com/4908bed01e.js" crossorigin="anonymous"></script>
-{% block tail %}
-{% endblock %}
+<!-- Vendor JS Files -->
+<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/vendor/aos/aos.js"></script>
+<script src="/static/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/static/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/static/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/static/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/static/vendor/php-email-form/validate.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
+<!-- Template Main JS File -->
+<script src="/static/js/main.js"></script>
+<script src="/static/js/contact.js"></script>
+
 </body>
+
 </html>

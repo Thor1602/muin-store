@@ -43,16 +43,23 @@ class Main:
             print(e)
 
 
-    def read_table(self, cursor, table_name):
-        SQL = "SELECT * from %(table_name)s"
-        parameters = {'table_name': table_name}
-        query = cursor.execute(query=SQL, variables=parameters)
-        return query.fetchall()
+    def show_tables(self):
+        SQL = """SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"""
+        return self.execute_query(query=SQL, fetchAll=True)
+
+    def read_table(self, table_name):
+        SQL = f"SELECT * from {table_name};"
+        return self.execute_query(query=SQL, fetchAll=True)
+
+    def create_table(self, table_name, columns):
+        columns = ", ".join(columns)
+        SQL = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns});"
+        return self.execute_query(query=SQL, commit=True)
 
     def get_row_by_id(self, cursor, id, table_name):
-        SQL = "SELECT * from %(table_name)s where id = %(id)s"
+        SQL = "SELECT * from %(table_name)s where id = %(id)s;"
         parameters = {'table_name': table_name, 'id': id}
-        query = cursor.execute(query=SQL, variables=parameters)
+        query = cursor.execute(query=SQL, parameters=parameters)
         return query.fetchOne()
 
     def verify_password(self, email, pwd):
@@ -78,7 +85,7 @@ class User(Main):
         SQL = "INSERT INTO contact_query (first_name, last_name, nickname, password, role_name, email, last_login) VALUES (%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
         self.first_name, self.last_name, self.nickname, self.password, self.role_name, self.email, self.last_login)
-        self.execute_query(query=SQL, variables=parameters, commit=True)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
 class Contact(Main):
@@ -94,4 +101,19 @@ class Contact(Main):
     def register_contact_query(self):
         SQL = "INSERT INTO contact_query (name, message, date, reason, phone, email, address) VALUES (%s,%s,%s,%s,%s,%s,%s);"
         parameters = (self.name, self.message, self.date, self.reason, self.phone, self.email, self.address,)
-        self.execute_query(query=SQL, variables=parameters, commit=True)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class Investment(Main):
+    def __init__(self, english, korean, min_price, max_price):
+        self.english = english
+        self.korean = korean
+        self.min_price = min_price
+        self.max_price = max_price
+
+    def register_investment(self):
+        SQL = "INSERT INTO investments (english, korean, min_price, max_price) VALUES (%s,%s,%s,%s);"
+        parameters = (self.english, self.korean, self.min_price, self.max_price,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+

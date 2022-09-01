@@ -13,7 +13,6 @@ import time
 from flask import Flask, render_template, session, redirect, url_for, flash, request
 import Database
 import Contact
-import email_validator
 
 app = Flask(__name__)
 
@@ -46,19 +45,22 @@ def financial_plan():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        investments = [x.split(',') for x in open('investments.txt', 'r', encoding="utf8").read().split('\n')]
+        # investments = [x.split(',') for x in open('investments.txt', 'r', encoding="utf8").read().split('\n')]
+        investments = main.read_table('investments')
         minimum = 0
         maximum = 0
         edited_fomat = []
         for row in investments:
-            edited_fomat.append(row)
-            minimum += int(row[2])
-            maximum += int(row[3])
-            row[2] = "{:,}".format(int(row[2]))
+            row = list(row)
+            minimum += int(row[3])
+            maximum += int(row[4])
             row[3] = "{:,}".format(int(row[3]))
-        row[2] = "{:,}".format(int(row[2]))
-        row[3] = "{:,}".format(int(row[3]))
-        return render_template('financial_plan.html', investments=investments, minimum=minimum, maximum=maximum)
+            row[4] = "{:,}".format(int(row[4]))
+            edited_fomat.append(row)
+        minimum = "{:,}".format(int(minimum))
+        maximum = "{:,}".format(int(maximum))
+        print(edited_fomat)
+        return render_template('financial_plan.html', investments=edited_fomat, minimum=minimum, maximum=maximum)
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():

@@ -27,15 +27,17 @@
                     </thead>
                     <tbody>
                     {% for row in investments %}
-                    <tr>
-                        {% for column in row %}
-                        <th class="table-success">{{ column }}</th>
-                        {% endfor %}
-                    </tr>
+                        <tr>
+                            {% for column in row %}
+                                <th class="table-success">{{ column }}</th>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
                     <tr>
                         <th></th>
                         <th></th>
+                        <th></th>
+
                         <th>{{ minimum }}</th>
                         <th>{{ maximum }}</th>
 
@@ -54,7 +56,7 @@
                         <th class="table-warning"></th>
                         <td class="table-warning"></td>
                     </tr>
-                     <tr>
+                    <tr>
                         <th></th>
                         <th></th>
                     </tr>

@@ -7,7 +7,7 @@
 /* Colors */
 :root {
     --color-default: #7E370C;
-    --color-primary: #b62900;
+    --color-primary: #ffc525;
     --color-secondary: #F5E8C7;
 }
 
@@ -2732,7 +2732,8 @@ section {
 }
 /*admin */
 hr{
-        height: 5px;
-        background-color: var(--color-primary);
+        height: 3px;
+        background-color: #ff8800;
         border: none;
+        opacity: 100%;
     }

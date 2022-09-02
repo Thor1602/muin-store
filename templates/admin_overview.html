@@ -10,27 +10,41 @@
 {% block body %}
 
     <section id="about" class="about">
-            <div class="container" data-aos="fade-up">
+        <div class="container" data-aos="fade-up">
 
-                <div class="section-header">
-                    <h2>Admin</h2>
-                    <p>overview</p>
-                </div>
+            <div class="section-header">
+                <h2>Admin</h2>
+                <p>overview</p>
+            </div>
 
-                <div class="row gy-4">
-                    <div class="col-lg-6">
+            <div class="row gy-4">
+                <h3>COMMENTS</h3>
+                <ul class="list-group list-group-flush">
+                    {% for comment in comments %}
 
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="content ps-0 ps-lg-5">
 
+                        <li class="list-group-item">{{ comment[1] }}</li>
+                        <form method="post" action="/admin_overview">
+                            <button class="btn btn-danger" name="btn_delete_comment" value="{{ comment[0] }}" type="submit">
+                                DELETE</button>
+                        </form>
+                    {% endfor %}
+                </ul>
+                <h3>ADD COMMENT</h3>
+                <form action="" method="post">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="comment"
+                               aria-label="Recipient's username" aria-describedby="basic-addon2" name="comment">
+                        <div class="input-group-append">
+                            <button class="btn btn-warning" type="submit" name="btn_comment">ADD</button>
                         </div>
                     </div>
-                </div>
-
+                </form>
             </div>
-        </section><!-- End About Us Section -->
 
-  {% endblock %}
+        </div>
+    </section><!-- End About Us Section -->
+
+{% endblock %}
 
 

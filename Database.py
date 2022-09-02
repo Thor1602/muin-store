@@ -4,7 +4,6 @@ from os.path import exists
 from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2 import Error, sql
 import psycopg2
-from functools import wraps
 
 
 
@@ -61,6 +60,10 @@ class Main:
         parameters = {'table_name': table_name, 'id': id}
         query = cursor.execute(query=SQL, parameters=parameters)
         return query.fetchOne()
+
+    def delete_row_by_id(self, table_name, id):
+        SQL = sql.SQL("""DELETE from {table_name} where id = {id};""").format(table_name=sql.Identifier(table_name), id = sql.Literal(id))
+        self.execute_query(query=SQL,commit=True)
 
     def verify_password(self, email, pwd):
         retrieved_password = self.execute_query(query="SELECT value FROM settings where key = %s;", parameters=(email,), fetchOne=True)
@@ -130,3 +133,11 @@ class FixedCost(Main):
         parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
+class Comment(Main):
+    def __init__(self, name):
+        self.name = name
+
+    def register_comment(self):
+        SQL = "INSERT INTO comments (comment) VALUES (%s);"
+        parameters = (self.name,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)

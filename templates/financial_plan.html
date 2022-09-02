@@ -22,7 +22,11 @@
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
-                        <th scope="col" colspan="2">자산</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Asset</th>
+                        <th scope="col">자산</th>
+                        <th scope="col">최저 가격</th>
+                        <th scope="col">최고 가격</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -63,7 +67,39 @@
                     </tbody>
                 </table>
                 <h4>목표원가계산</h4>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">영어</th>
+                        <th scope="col">한국어</th>
+                        <th scope="col">투자금액</th>
+                        <th scope="col">일시불</th>
+                        <th scope="col">개월/년</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in costs %}
+                        <tr>
+                            <th class="table-success">{{ row[0] }}</th>
+                            <th class="table-success">{{ row[1] }}</th>
+                            <th class="table-success">{{ row[2] }}</th>
+                            <th class="table-success">{{ row[4] }}</th>
+                            <th class="table-success">{{ row[5] }}</th>
+                            <th class="table-success">{{ row[6] }}</th>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
 
+                        <th></th>
+                        <th></th>
+
+                    </tr>
+                    </tbody>
+                </table>
                 <h4>목표영업이익</h4>
 
 

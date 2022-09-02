@@ -45,22 +45,22 @@ def financial_plan():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        # investments = [x.split(',') for x in open('investments.txt', 'r', encoding="utf8").read().split('\n')]
-        investments = main.read_table('investments')
-        minimum = 0
-        maximum = 0
-        edited_fomat = []
-        for row in investments:
+        investments,minimum,maximum = [],0,0
+        for row in main.read_table('investments'):
             row = list(row)
             minimum += int(row[3])
             maximum += int(row[4])
             row[3] = "{:,}".format(int(row[3]))
             row[4] = "{:,}".format(int(row[4]))
-            edited_fomat.append(row)
+            investments.append(row)
         minimum = "{:,}".format(int(minimum))
         maximum = "{:,}".format(int(maximum))
-        print(edited_fomat)
-        return render_template('financial_plan.html', investments=edited_fomat, minimum=minimum, maximum=maximum)
+        fixed_costs = []
+        for row in main.read_table('fixed_costs'):
+            row = list(row)
+            row[4] = "{:,}".format(int(row[4]))
+            fixed_costs.append(row)
+        return render_template('financial_plan.html', investments=investments, minimum=minimum, maximum=maximum, costs=fixed_costs)
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():

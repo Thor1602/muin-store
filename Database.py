@@ -117,3 +117,16 @@ class Investment(Main):
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
+class FixedCost(Main):
+    def __init__(self, english_name, korean_name, cost_per_month, one_time_cost, period_months):
+        self.english_name = english_name
+        self.korean_name = korean_name
+        self.cost_per_month = cost_per_month
+        self.one_time_cost = one_time_cost
+        self.period_months = period_months
+
+    def register_cost(self):
+        SQL = "INSERT INTO fixed_costs (english_name, korean_name, cost_per_month, one_time_cost, period_months) VALUES (%s,%s,%s,%s,%s);"
+        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+

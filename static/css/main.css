@@ -2730,10 +2730,11 @@ section {
 .footer .credits a {
     color: #fff;
 }
+
 /*admin */
-hr{
-        height: 3px;
-        background-color: #ff8800;
-        border: none;
-        opacity: 100%;
-    }
+hr {
+    height: 3px;
+    background-color: #ff8800;
+    border: none;
+    opacity: 100%;
+}

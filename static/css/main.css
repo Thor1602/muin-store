@@ -7,7 +7,7 @@
 /* Colors */
 :root {
     --color-default: #7E370C;
-    --color-primary: #ffc525;
+    --color-primary: #b62900;
     --color-secondary: #F5E8C7;
 }
 
@@ -2730,3 +2730,9 @@ section {
 .footer .credits a {
     color: #fff;
 }
+/*admin */
+hr{
+        height: 5px;
+        background-color: var(--color-primary);
+        border: none;
+    }

@@ -21,9 +21,7 @@ app.secret_key = main.get_secret_code()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # if not session.get('logged_in'):
-    #     return redirect(url_for('login'))
-    # else:
+  
     return render_template('index.html')
 
 @app.route('/admin_overview', methods=['GET', 'POST'])

@@ -30,7 +30,6 @@ def admin_overview():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        DATABASE_URL = os.environ['DATABASE_URL']
         if request.method == 'POST':
             if 'btn_delete_comment' in request.form:
                 main.delete_row_by_id('comments',request.form['btn_delete_comment'])
@@ -39,7 +38,7 @@ def admin_overview():
                 comment = Database.Comment(request.form['comment'])
                 comment.register_comment()
                 redirect(url_for('admin_overview'))
-        return render_template('admin_overview.html', comments=main.read_table('comments'),DATABASE_URL=DATABASE_URL)
+        return render_template('admin_overview.html', comments=main.read_table('comments'))
 
 @app.route('/business_plan', methods=['GET', 'POST'])
 def business_plan():

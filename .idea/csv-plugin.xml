@@ -66,6 +66,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\templates\financial_plan.html">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\templates\index.html">
           <value>
             <Attribute>

@@ -62,7 +62,9 @@ class Main:
         return query.fetchOne()
 
     def delete_row_by_id(self, table_name, id):
-        SQL = sql.SQL("""DELETE from {table_name} where id = {id};""").format(table_name=sql.Identifier(table_name), id = sql.Literal(id))
+        SQL = f"DELETE from {table_name} where id = {id};"
+        print(SQL)
+        # parameters = (table_name, id)
         self.execute_query(query=SQL,commit=True)
 
     def verify_password(self, email, pwd):
@@ -119,6 +121,11 @@ class Investment(Main):
         parameters = (self.english, self.korean, self.min_price, self.max_price,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
+    def update_investment(self, id):
+        SQL = "UPDATE investments SET english = %s, korean = %s, min_price = %s, max_price = %s WHERE id = %s;"
+        parameters = (self.english, self.korean, self.min_price, self.max_price, id)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
 
 class FixedCost(Main):
     def __init__(self, english_name, korean_name, cost_per_month, one_time_cost, period_months):
@@ -131,6 +138,30 @@ class FixedCost(Main):
     def register_cost(self):
         SQL = "INSERT INTO fixed_costs (english_name, korean_name, cost_per_month, one_time_cost, period_months) VALUES (%s,%s,%s,%s,%s);"
         parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update_cost(self, id):
+        SQL = "UPDATE fixed_costs SET english_name = %s, korean_name = %s, cost_per_month = %s, one_time_cost = %s, period_months = %s WHERE id = %s;"
+        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,id,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class VariableCost(Main):
+    def __init__(self, english_name, korean_name, cost_per_month, one_time_cost, period_months):
+        self.english_name = english_name
+        self.korean_name = korean_name
+        self.cost_per_month = cost_per_month
+        self.one_time_cost = one_time_cost
+        self.period_months = period_months
+
+    def register_cost(self):
+        SQL = "INSERT INTO variable_costs (english_name, korean_name, cost_per_month, one_time_cost, period_months) VALUES (%s,%s,%s,%s,%s);"
+        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update_cost(self, id):
+        SQL = "UPDATE variable_costs SET english_name = %s, korean_name = %s, cost_per_month = %s, one_time_cost = %s, period_months = %s WHERE id = %s;"
+        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 class Comment(Main):

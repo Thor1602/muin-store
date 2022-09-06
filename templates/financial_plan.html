@@ -22,6 +22,8 @@
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
                         <th scope="col">ID</th>
                         <th scope="col">Asset</th>
                         <th scope="col">자산</th>
@@ -30,25 +32,43 @@
                     </tr>
                     </thead>
                     <tbody>
+
                     {% for row in investments %}
-                        <tr>
-                            {% for column in row %}
-                                <th class="table-success">{{ column }}</th>
-                            {% endfor %}
+                        <tr class="table-success">
+                            <th>
+                                <button class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#investment_modal_{{ row [0] }}"
+                                        type="button"><i class="bi bi-pencil"></i></button>
+                            </th>
+                            <th>
+                                <form action="/financial_plan" method="post">
+                                    <button class="btn btn-danger" name="btn_delete_investment" value="{{ row[0] }}"
+                                            type="submit"><i class="bi bi-trash-fill"></i></button>
+                                </form>
+                            </th>
+                            <th>{{ row[0] }}</th>
+                            <th>{{ row[1] }}</th>
+                            <th>{{ row[2] }}</th>
+                            <th class="number-format text-end">{{ row[3] }}</th>
+                            <th class="number-format text-end">{{ row[4] }}</th>
                         </tr>
                     {% endfor %}
                     <tr>
                         <th></th>
                         <th></th>
                         <th></th>
-
-                        <th>{{ minimum }}</th>
-                        <th>{{ maximum }}</th>
+                        <th></th>
+                        <th></th>
+                        <th class="number-format">{{ total['minimum'] }}</th>
+                        <th class="number-format">{{ total['maximum'] }}</th>
 
                     </tr>
                     </tbody>
                 </table>
-
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#investment_modal_add"
+                        type="button">ADD INVESTMENT
+                </button>
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
@@ -66,10 +86,13 @@
                     </tr>
                     </tbody>
                 </table>
+
                 <h4>목표원가계산</h4>
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
+                        <th></th>
+                        <th></th>
                         <th scope="col">ID</th>
                         <th scope="col">영어</th>
                         <th scope="col">한국어</th>
@@ -79,29 +102,93 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for row in costs %}
-                        <tr>
-                            <th class="table-success">{{ row[0] }}</th>
-                            <th class="table-success">{{ row[1] }}</th>
-                            <th class="table-success">{{ row[2] }}</th>
-                            <th class="table-success">{{ row[4] }}</th>
-                            <th class="table-success">{{ row[5] }}</th>
-                            <th class="table-success">{{ row[6] }}</th>
+                    {% for row in fixed_costs %}
+                        <tr class="table-success">
+                            <th>
+                                <button class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#fixed_cost_modal_{{ row [0] }}"
+                                        type="button"><i class="bi bi-pencil"></i></button>
+                            </th>
+                            <th>
+                                <form action="/financial_plan" method="post">
+                                    <button class="btn btn-danger" name="btn_delete_fixed_cost" value="{{ row[0] }}"
+                                            type="submit"><i class="bi bi-trash-fill"></i></button>
+                                </form>
+                            </th>
+                            <th>{{ row[0] }}</th>
+                            <th>{{ row[1] }}</th>
+                            <th>{{ row[2] }}</th>
+                            <th class="number-format text-end">{{ row[3] }}</th>
+                            <th>{{ row[4] }}</th>
+                            <th>{{ row[5] }}</th>
                         </tr>
                     {% endfor %}
                     <tr>
                         <th></th>
                         <th></th>
                         <th></th>
-
                         <th></th>
                         <th></th>
-
+                        <th class="number-format">{{ total['total_cost'] }}</th>
+                        <th></th>
+                        <th></th>
                     </tr>
                     </tbody>
                 </table>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#fixed_cost_modal_add"
+                        type="button">ADD FIXED COST
+                </button>
                 <h4>목표영업이익</h4>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Ingredient cost</th>
+                        <th scope="col">Sale price</th>
+                        <th scope="col">Working time (minutes)</th>
 
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in variable_costs %}
+                        <tr class="table-success">
+                            <th>
+                                <button class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#variable_cost_modal_{{ row [0] }}"
+                                        type="button"><i class="bi bi-pencil"></i></button>
+                            </th>
+                            <th>
+                                <form action="/financial_plan" method="post">
+                                    <button class="btn btn-danger" name="btn_delete_variable_cost" value="{{ row[0] }}"
+                                            type="submit"><i class="bi bi-trash-fill"></i></button>
+                                </form>
+                            </th>
+                            <th>{{ row[0] }}</th>
+                            <th>{{ row[1] }}</th>
+                            <th>{{ row[2] }}</th>
+                            <th class="number-format text-end">{{ row[3] }}</th>
+                            <th>{{ row[4] }}</th>
+                            <th>{{ row[5] }}</th>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th class="number-format"></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#variable_cost_modal_add"
+                        type="button">ADD VARIABLE COST
+                </button>
 
                 <h4><a href="/products">제품원가</a></h4>
 
@@ -109,6 +196,324 @@
 
         </div>
     </section><!-- End About Us Section -->
+    {% for row in investments %}
+        <div class="modal fade" id="investment_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="investmentModalLabel{{ row[0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="investmentModalLabel{{ row[0] }}">{{ row [1] }} / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/financial_plan">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputEnglish{{ row[0] }}" class="form-label">English Name</label>
+                                <input type="text" class="form-control" id="inputEnglish{{ row[0] }}" name="english"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputKorean{{ row[0] }}" class="form-label">Korean Name</label>
+                                <input type="text" class="form-control" id="inputKorean{{ row[0] }}" name="korean"
+                                       value="{{ row[2] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputMinimumCost{{ row[0] }}" class="form-label">Minimum Cost</label>
+                                <input type="text" class="form-control" id="inputMinimumCost{{ row[0] }}"
+                                       name="min_price" value="{{ row[3] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputMaximumCost{{ row[0] }}" class="form-label">Maximum Cost</label>
+                                <input type="text" class="form-control" id="inputMaximumCost{{ row[0] }}"
+                                       name="max_price" value="{{ row[4] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="investment_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for row in fixed_costs %}
+        <div class="modal fade" id="fixed_cost_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="fixedCostModalLabel{{ row[0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fixedCostModalLabel{{ row[0] }}">{{ row [1] }} / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/financial_plan">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputEnglish{{ row[0] }}" class="form-label">English Name</label>
+                                <input type="text" class="form-control" id="inputEnglish{{ row[0] }}" name="english"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputKorean{{ row[0] }}" class="form-label">Korean Name</label>
+                                <input type="text" class="form-control" id="inputKorean{{ row[0] }}" name="korean"
+                                       value="{{ row[2] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputCostMonth{{ row[0] }}" class="form-label">Cost per month</label>
+                                <input type="text" class="form-control" id="inputCostMonth{{ row[0] }}"
+                                       name="cost_per_month" value="{{ row[3] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputOneTimeCost{{ row[0] }}" class="form-label">One-time cost</label>
+                                <input type="text" class="form-control" id="inputOneTimeCost{{ row[0] }}"
+                                       name="one_time_cost" value="{{ row[4] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputPeriod{{ row[0] }}" class="form-label">Months Per Year</label>
+                                <input type="text" class="form-control" id="inputPeriod{{ row[0] }}" name="period"
+                                       value="{{ row[5] }}">
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="fixed_cost_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+    {% for row in variable_costs %}
+        <div class="modal fade" id="variable_cost_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="variableCostModalLabel{{ row[0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="variableCostModalLabel{{ row[0] }}">{{ row [1] }} / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/financial_plan">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputEnglish{{ row[0] }}" class="form-label">English Name</label>
+                                <input type="text" class="form-control" id="inputEnglish{{ row[0] }}" name="english"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputKorean{{ row[0] }}" class="form-label">Korean Name</label>
+                                <input type="text" class="form-control" id="inputKorean{{ row[0] }}" name="korean"
+                                       value="{{ row[2] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputCostMonth{{ row[0] }}" class="form-label">Cost per month</label>
+                                <input type="text" class="form-control" id="inputCostMonth{{ row[0] }}"
+                                       name="cost_per_month" value="{{ row[3] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputOneTimeCost{{ row[0] }}" class="form-label">One-time cost</label>
+                                <input type="text" class="form-control" id="inputOneTimeCost{{ row[0] }}"
+                                       name="one_time_cost" value="{{ row[4] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputPeriod{{ row[0] }}" class="form-label">Months Per Year</label>
+                                <input type="text" class="form-control" id="inputPeriod{{ row[0] }}" name="period"
+                                       value="{{ row[5] }}">
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="variable_cost_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal fade" id="investment_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="investmentModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="investmentModalLabelAdd"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/financial_plan">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="inputEnglish" class="form-label">English Name</label>
+                            <input type="text" class="form-control" id="inputEnglish" name="english"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputKorean" class="form-label">Korean Name</label>
+                            <input type="text" class="form-control" id="inputKorean" name="korean"
+                                   value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputMinimumCost" class="form-label">Minimum Cost</label>
+                            <input type="text" class="form-control" id="inputMinimumCost"
+                                   name="min_price" value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputMaximumCost" class="form-label">Maximum Cost</label>
+                            <input type="text" class="form-control" id="inputMaximumCost"
+                                   name="max_price" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="investment_add_button"
+                                value="">Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="fixed_cost_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="fixedCostModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fixedCostModalLabelAdd"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/financial_plan">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="inputEnglish" class="form-label">English Name</label>
+                            <input type="text" class="form-control" id="inputEnglish" name="english"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputKorean" class="form-label">Korean Name</label>
+                            <input type="text" class="form-control" id="inputKorean" name="korean"
+                                   value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputCostMonth" class="form-label">Cost per month</label>
+                            <input type="text" class="form-control" id="inputCostMonth"
+                                   name="cost_per_month" value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputOneTimeCost" class="form-label">One-time cost</label>
+                            <input type="text" class="form-control" id="inputOneTimeCost"
+                                   name="one_time_cost" value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputPeriod" class="form-label">Months Per Year</label>
+                            <input type="text" class="form-control" id="inputPeriod" name="period"
+                                   value="">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="fixed_cost_add_button"
+                                value="">Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="variable_cost_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="variableCostModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="variableCostModalLabelAdd"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/financial_plan">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="inputEnglish" class="form-label">English Name</label>
+                            <input type="text" class="form-control" id="inputEnglish" name="english"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputKorean" class="form-label">Korean Name</label>
+                            <input type="text" class="form-control" id="inputKorean" name="korean"
+                                   value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputCostMonth" class="form-label">Cost per month</label>
+                            <input type="text" class="form-control" id="inputCostMonth"
+                                   name="cost_per_month" value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputOneTimeCost" class="form-label">One-time cost</label>
+                            <input type="text" class="form-control" id="inputOneTimeCost"
+                                   name="one_time_cost" value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputPeriod" class="form-label">Months Per Year</label>
+                            <input type="text" class="form-control" id="inputPeriod" name="period"
+                                   value="">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="variable_cost_add_button"
+                                value="">Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block endbody %}
+    <script src="/static/js/admin.js"></script>
 
 {% endblock %}
 

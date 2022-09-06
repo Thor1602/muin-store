@@ -11,7 +11,7 @@ email: thorbendhaenenstd@gmail.com
 import os
 import time
 
-from flask import Flask, render_template, session, redirect, url_for, flash, request
+from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 import Database
 import Contact
 
@@ -19,6 +19,8 @@ app = Flask(__name__)
 
 main = Database.Main()
 app.secret_key = main.get_secret_code()
+
+# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -52,22 +54,52 @@ def financial_plan():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        investments,minimum,maximum = [],0,0
+        if request.method == "POST":
+            if 'fixed_cost_edit_button' in request.form:
+                fixed_cost = Database.FixedCost(request.form['english'],request.form['korean'],request.form['cost_per_month'],request.form['one_time_cost'],request.form['period'])
+                fixed_cost.update_cost(request.form['fixed_cost_edit_button'])
+            elif 'investment_edit_button' in request.form:
+                investment = Database.Investment(request.form['english'],request.form['korean'],request.form['min_price'],request.form['max_price'])
+                investment.update_investment(request.form['investment_edit_button'])
+            elif 'variable_cost_edit_button' in request.form:
+                variable_cost = Database.VariableCost(request.form['english'], request.form['korean'],
+                                                 request.form['min_price'], request.form['max_price'])
+                variable_cost.update_cost(request.form['variable_cost_edit_button'])
+            elif 'fixed_cost_add_button' in request.form:
+                fixed_cost = Database.FixedCost(request.form['english'], request.form['korean'],
+                                                request.form['cost_per_month'],
+                                                request.form['one_time_cost'], request.form['period'])
+                fixed_cost.register_cost()
+            elif 'investment_add_button' in request.form:
+                investment = Database.Investment(request.form['english'], request.form['korean'],
+                                                 request.form['min_price'], request.form['max_price'])
+                investment.register_investment()
+            elif 'variable_cost_add_button' in request.form:
+                variable_cost = Database.VariableCost(request.form['english'], request.form['korean'],
+                                                 request.form['min_price'], request.form['max_price'])
+                variable_cost.register_cost()
+            elif 'btn_delete_fixed_cost' in request.form:
+                main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
+            elif 'btn_delete_investment' in request.form:
+                main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
+            elif 'btn_delete_variable_cost' in request.form:
+                main.delete_row_by_id('variable_costs', request.form['btn_delete_variable_cost'])
+            else:
+                abort(500)
+        total = {'minimum': 0,'maximum': 0,'total_cost': 0}
+        investments = []
         for row in main.read_table('investments'):
             row = list(row)
-            minimum += int(row[3])
-            maximum += int(row[4])
-            row[3] = "{:,}".format(int(row[3]))
-            row[4] = "{:,}".format(int(row[4]))
+            total['minimum'] += int(row[3])
+            total['maximum'] += int(row[4])
             investments.append(row)
-        minimum = "{:,}".format(int(minimum))
-        maximum = "{:,}".format(int(maximum))
         fixed_costs = []
         for row in main.read_table('fixed_costs'):
-            row = list(row)
-            row[4] = "{:,}".format(int(row[4]))
+            row = [row[0],row[1],row[2],row[4],row[5],row[6]]
+            total['total_cost'] += row[3]
             fixed_costs.append(row)
-        return render_template('financial_plan.html', investments=investments, minimum=minimum, maximum=maximum, costs=fixed_costs)
+        variable_costs = main.read_table('fixed_costs')
+        return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,variable_costs=variable_costs)
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():

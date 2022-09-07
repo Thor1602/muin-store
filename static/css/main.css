@@ -2738,4 +2738,9 @@ hr {
     border: none;
     opacity: 100%;
 }
-
+.keep-all{
+    word-break: keep-all;
+}
+.max-height-table{
+    max-height: 600px;
+}

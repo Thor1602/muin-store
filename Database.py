@@ -6,8 +6,6 @@ from psycopg2 import Error, sql
 import psycopg2
 
 
-
-
 class Main:
     """
         This main class of the database helper is:
@@ -41,10 +39,15 @@ class Main:
         except Error as e:
             print(e)
 
-
     def show_tables(self):
         SQL = """SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"""
         return self.execute_query(query=SQL, fetchAll=True)
+
+    def show_columns(self, table_name):
+        SQL = "SELECT column_name FROM information_schema.columns WHERE table_name = %s;"
+        parameters=(table_name,)
+        return [x[0] for x in self.execute_query(query=SQL, parameters=parameters, fetchAll=True)]
+
 
     def read_table(self, table_name):
         SQL = f"SELECT * from {table_name};"
@@ -63,12 +66,12 @@ class Main:
 
     def delete_row_by_id(self, table_name, id):
         SQL = f"DELETE from {table_name} where id = {id};"
-        print(SQL)
         # parameters = (table_name, id)
-        self.execute_query(query=SQL,commit=True)
+        self.execute_query(query=SQL, commit=True)
 
     def verify_password(self, email, pwd):
-        retrieved_password = self.execute_query(query="SELECT value FROM settings where key = %s;", parameters=(email,), fetchOne=True)
+        retrieved_password = self.execute_query(query="SELECT value FROM settings where key = %s;", parameters=(email,),
+                                                fetchOne=True)
         return check_password_hash(retrieved_password, pwd)
 
     def get_secret_code(self):
@@ -89,7 +92,7 @@ class User(Main):
     def register_user(self):
         SQL = "INSERT INTO contact_query (first_name, last_name, nickname, password, role_name, email, last_login) VALUES (%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
-        self.first_name, self.last_name, self.nickname, self.password, self.role_name, self.email, self.last_login)
+            self.first_name, self.last_name, self.nickname, self.password, self.role_name, self.email, self.last_login)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
@@ -142,27 +145,41 @@ class FixedCost(Main):
 
     def update_cost(self, id):
         SQL = "UPDATE fixed_costs SET english_name = %s, korean_name = %s, cost_per_month = %s, one_time_cost = %s, period_months = %s WHERE id = %s;"
-        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,id,)
+        parameters = (
+        self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
 class VariableCost(Main):
-    def __init__(self, english_name, korean_name, cost_per_month, one_time_cost, period_months):
-        self.english_name = english_name
-        self.korean_name = korean_name
-        self.cost_per_month = cost_per_month
-        self.one_time_cost = one_time_cost
-        self.period_months = period_months
+    def __init__(self, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
+                 selling_price_hv, criteria_hv, unit, work_time_min, image):
+        self.english = english
+        self.korean = korean
+        self.variable_cost = variable_cost
+        self.selling_price_lv = selling_price_lv
+        self.criteria_lv = criteria_lv
+        self.selling_price_mv = selling_price_mv
+        self.criteria_mv = criteria_mv
+        self.selling_price_hv = selling_price_hv
+        self.criteria_hv = criteria_hv
+        self.unit = unit
+        self.work_time_min = work_time_min
+        self.image = image
 
     def register_cost(self):
-        SQL = "INSERT INTO variable_costs (english_name, korean_name, cost_per_month, one_time_cost, period_months) VALUES (%s,%s,%s,%s,%s);"
-        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,)
+        SQL = "INSERT INTO variable_costs (english, korean, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv,unit, work_time_min, image) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        parameters = (
+        self.english, self.korean, self.variable_cost, self.selling_price_lv, self.criteria_lv, self.selling_price_mv,
+        self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update_cost(self, id):
-        SQL = "UPDATE variable_costs SET english_name = %s, korean_name = %s, cost_per_month = %s, one_time_cost = %s, period_months = %s WHERE id = %s;"
-        parameters = (self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months,id,)
+        SQL = "UPDATE variable_costs SET english = %s, korean = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, unit = %s, work_time_min = %s, image = %s WHERE id = %s;"
+        parameters = (
+        self.english, self.korean, self.variable_cost, self.selling_price_lv, self.criteria_lv, self.selling_price_mv,
+        self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
+
 
 class Comment(Main):
     def __init__(self, name):

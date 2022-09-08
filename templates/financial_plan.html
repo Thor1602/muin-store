@@ -22,9 +22,52 @@
                 <p class="number-format">Fixed costs per month: {{ total['total_cost'] }}</p>
                 <hr>
                 <h4>BREAK EVEN CHART</h4>
-                <div>
-                    <canvas id="myChart"></canvas>
+                {#                <div>#}
+                {#                    <canvas id="myChart"></canvas>#}
+                {#                </div>#}
+                <h5>Net Profit</h5>
+                <div class="overflow-scroll max-height-table">
+
+                    <table class="table  table-striped table-hover table-warning">
+                        <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Breakeven</th>
+                            <th scope="col">Selling price</th>
+                            <th scope="col">Net profit/product after VAT</th>
+                            <th scope="col">Net profit/product after Var. Cost</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for product in net_profit %}
+                            <tr>
+                                <th scope="col">{{ product }}</th>
+                                <th scope="col"><input type="number" aria-label="{{ product }}"
+                                                       class="form-control"
+                                                       id="breakevenInput{{ loop.index0 }}" value="100"
+                                                       style="width: 200px">
+                                </th>
+                                <th scope="col" class="change-breakeven" id="breakevenOutput{{ loop.index0 }}"></th>
+                                <th scope="col">{{ net_profit[product][0] }}</th>
+                                <th scope="col">{{ net_profit[product][1] }}</th>
+                                <th scope="col"
+                                    id="breakevenNetProfit{{ loop.index0 }}">{{ net_profit[product][2] }}</th>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col" id="total-breakeven"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
+
                 <hr>
                 <h4>대차대조표</h4>
                 <div class="overflow-scroll max-height-table">
@@ -65,7 +108,6 @@
                             </tr>
                         {% endfor %}
                         <tr>
-                            <th></th>
                             <th></th>
                             <th></th>
                             <th></th>
@@ -142,7 +184,6 @@
                             </tr>
                         {% endfor %}
                         <tr>
-                            <th></th>
                             <th></th>
                             <th></th>
                             <th></th>
@@ -493,7 +534,7 @@
                                 <label for="inputAdd{{ col }}"
                                        class="form-label text-capitalize">{{ col | replace("_"," ") }}</label>
                                 <input type="text" class="form-control" id="inputAdd{{ col }}" name="{{ col }}"
-                                       value="">
+                                       value="{{ variable_costs_prefilled_input [loop.index0] }}">
                             </div>
                         {% endfor %}
                     </div>
@@ -526,6 +567,25 @@
                     tension: 0.1
                 }]
             }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            {% for product in net_profit %}
+                $("#breakevenInput{{ loop.index0 }}").on("input", function () {
+                    var netProfit = parseInt($(this).val()) * parseInt($('#breakevenNetProfit{{ loop.index0 }}').text());
+                    $('#breakevenOutput{{ loop.index0 }}').text(netProfit);
+                    var totalBreakeven = 0;
+                    $(".change-breakeven").each(function () {
+                        var value = $(this).text();
+                        if (!isNaN(value)) {
+                            totalBreakeven += parseInt(value);
+                        }
+                    });
+                    $('#total-breakeven').text(totalBreakeven);
+                });
+            {% endfor %}
         });
     </script>
 

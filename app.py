@@ -108,8 +108,13 @@ def financial_plan():
             fixed_costs.append(row)
         variable_costs = main.read_table('variable_costs')
         variable_costs_columns = main.show_columns('variable_costs')
+        variable_costs_prefilled_input = ('','','','','>=','','>=','','>=','','','.jpg')
+        net_profit ={}
+        for row in variable_costs:
+            net_profit[row[2]]=[row[4], int(row[4]/1.1), int((row[4]/1.1)-row[3])]
+
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
-                               variable_costs=variable_costs, variable_costs_columns=variable_costs_columns)
+                               variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,net_profit=net_profit,variable_costs_prefilled_input=variable_costs_prefilled_input)
 
 
 @app.route('/products', methods=['GET', 'POST'])

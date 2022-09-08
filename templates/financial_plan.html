@@ -19,7 +19,12 @@
             <div class="row gy-4">
                 <p class="number-format">Minimum investment cost: {{ total['minimum'] }}</p>
                 <p class="number-format">Maximum investment cost: {{ total['maximum'] }}</p>
-                <p class="number-format">Fixed costs per month: {{ total['total_cost'] }}</p>
+                <p class="number-format">Fixed costs per month: <span
+                        id="fixedCostTotal">{{ total['total_cost'] }}</span></p>
+                <p>Net profit: <span id="net-profit"></span></p>
+                <p><strong>Net profit After Corporate Tax: <span id="net-profit-after-tax"></span></strong> <br> >>> money that goes to our pocket after everyone did 냠냠냠</p>
+
+
                 <hr>
                 <h4>BREAK EVEN CHART</h4>
                 {#                <div>#}
@@ -49,7 +54,8 @@
                                                        id="breakevenInput{{ loop.index0 }}" value="100"
                                                        style="width: 200px">
                                 </th>
-                                <th scope="col" class="change-breakeven" id="breakevenOutput{{ loop.index0 }}"></th>
+                                <th scope="col" class="change-breakeven"
+                                    id="breakevenOutput{{ loop.index0 }}">{{ net_profit[product][2]*100 }}</th>
                                 <th scope="col">{{ net_profit[product][0] }}</th>
                                 <th scope="col">{{ net_profit[product][1] }}</th>
                                 <th scope="col"
@@ -571,9 +577,33 @@
     </script>
     <script>
         $(document).ready(function () {
+            $.fn.digits = function () {
+                return this.each(function () {
+                    $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                })
+            }
+            var totalBreakeven = 0;
+            $(".change-breakeven").each(function () {
+                var value = $(this).text();
+                if (!isNaN(value)) {
+                    totalBreakeven += parseInt(value);
+                } else {
+                    totalBreakeven += 0;
+                }
+            });
+            $('#total-breakeven').text(totalBreakeven).digits();
+            var netProfit = totalBreakeven -{{ total['total_cost'] }};
+            $('#net-profit').text(netProfit).digits();
+            var netProfitAfterCTax;
+            if (netProfit > 0) {
+                netProfitAfterCTax = netProfit - (netProfit * 0.11);
 
+            } else {
+                netProfitAfterCTax = netProfit;
+            }
+            $('#net-profit-after-tax').text(netProfitAfterCTax).digits();
             {% for product in net_profit %}
-                $("#breakevenInput{{ loop.index0 }}").on("input", function () {
+                $("#breakevenInput{{ loop.index0 }}").change(function () {
                     var netProfit = parseInt($(this).val()) * parseInt($('#breakevenNetProfit{{ loop.index0 }}').text());
                     $('#breakevenOutput{{ loop.index0 }}').text(netProfit);
                     var totalBreakeven = 0;
@@ -581,9 +611,21 @@
                         var value = $(this).text();
                         if (!isNaN(value)) {
                             totalBreakeven += parseInt(value);
+                        } else {
+                            totalBreakeven += 0;
                         }
                     });
-                    $('#total-breakeven').text(totalBreakeven);
+                    $('#total-breakeven').text(totalBreakeven).digits();
+                    netProfit = totalBreakeven -{{ total['total_cost'] }};
+                    $('#net-profit').text(netProfit).digits();
+                    var netProfitAfterCTax;
+                    if (netProfit > 0) {
+                        netProfitAfterCTax = netProfit - (netProfit * 0.11);
+
+                    } else {
+                        netProfitAfterCTax = netProfit;
+                    }
+                    $('#net-profit-after-tax').text(netProfitAfterCTax).digits();
                 });
             {% endfor %}
         });

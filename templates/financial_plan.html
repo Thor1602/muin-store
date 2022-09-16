@@ -17,12 +17,14 @@
                 <p>Financial Plan</p>
             </div>
             <div class="row gy-4">
+
                 <p class="number-format">Minimum investment cost: {{ total['minimum'] }}</p>
                 <p class="number-format">Maximum investment cost: {{ total['maximum'] }}</p>
                 <p class="number-format">Fixed costs per month: <span
                         id="fixedCostTotal">{{ total['total_cost'] }}</span></p>
                 <p>Net profit: <span id="net-profit"></span></p>
-                <p><strong>Net profit After Corporate Tax: <span id="net-profit-after-tax"></span></strong> <br> >>> money that goes to our pocket after everyone did 냠냠냠</p>
+                <p><strong>Net profit After Corporate Tax: <span id="net-profit-after-tax"></span></strong> <br> >>>
+                    money that goes to our pocket after everyone did 냠냠냠</p>
 
 
                 <hr>
@@ -100,10 +102,10 @@
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
                                 <th>
-                                    <form action="/financial_plan" method="post">
-                                        <button class="btn btn-danger" name="btn_delete_investment" value="{{ row[0] }}"
-                                                type="submit"><i class="bi bi-trash-fill"></i></button>
-                                    </form>
+                                    <button class="btn btn-danger" type="button"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModalInvestment{{ row[0] }}">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
                                 </th>
                                 <th>{{ row[1] }}</th>
                                 <th class="keep-all">{{ row[2] }}</th>
@@ -175,10 +177,11 @@
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
                                 <th>
-                                    <form action="/financial_plan" method="post">
-                                        <button class="btn btn-danger" name="btn_delete_fixed_cost" value="{{ row[0] }}"
-                                                type="submit"><i class="bi bi-trash-fill"></i></button>
-                                    </form>
+
+                                    <button class="btn btn-danger" type="button"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModalFixedCost{{ row[0] }}">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
                                 </th>
                                 <th>{{ row[1] }}</th>
                                 <th class="keep-all">{{ row[2] }}</th>
@@ -230,11 +233,10 @@
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
                                 <th>
-                                    <form action="/financial_plan" method="post">
-                                        <button class="btn btn-danger" name="btn_delete_variable_cost"
-                                                value="{{ row[0] }}"
-                                                type="submit"><i class="bi bi-trash-fill"></i></button>
-                                    </form>
+                                    <button class="btn btn-danger" type="button"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModalVariableCost{{ row[0] }}">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
                                 </th>
 
                                 <th>{{ row[1] }}</th>
@@ -422,6 +424,73 @@
         </div>
     {% endfor %}
 
+    {% for row in investments %}
+        <div class="modal fade" id="deleteModalInvestment{{ row[0] }}" tabindex="-1"
+             aria-labelledby="deleteModalInvestmentLabel{{ row[0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalInvestmentLabel{{ row[0] }}">
+                            DELETE {{ row[0] }}: {{ row[1] }}?</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancal</button>
+                        <form action="/financial_plan" method="post">
+                            <button class="btn btn-danger" name="btn_delete_investment" value="{{ row[0] }}"
+                                    type="submit"><i class="bi bi-trash-fill"></i>DELETE
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in fixed_costs %}
+        <div class="modal fade" id="deleteModalFixedCost{{ row[0] }}" tabindex="-1"
+             aria-labelledby="deleteModalFixedCostLabel{{ row[0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalFixedCostLabel{{ row[0] }}">
+                            DELETE {{ row[0] }}: {{ row[1] }}?</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancal</button>
+                        <form action="/financial_plan" method="post">
+                            <button class="btn btn-danger" name="btn_delete_fixed_cost" value="{{ row[0] }}"
+                                    type="submit"><i class="bi bi-trash-fill"></i>DELETE
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in variable_costs %}
+        <div class="modal fade" id="deleteModalVariableCost{{ row[0] }}" tabindex="-1"
+             aria-labelledby="deleteModalVariableCostLabel{{ row[0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalVariableCostLabel{{ row[0] }}">
+                            DELETE {{ row[0] }}: {{ row[1] }}?</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancal</button>
+                        <form action="/financial_plan" method="post">
+                            <button class="btn btn-danger" name="btn_delete_variable_cost"
+                                    value="{{ row[0] }}"
+                                    type="submit"><i class="bi bi-trash-fill"></i>DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
     <div class="modal fade" id="investment_modal_add" tabindex="-1" role="dialog"
          aria-labelledby="investmentModalLabelAdd"
          aria-hidden="true">
@@ -461,7 +530,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="investment_add_button"
-                                value="">Save changes
+                                value="">ADD INVESTMENT
                         </button>
                     </div>
                 </form>
@@ -515,7 +584,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="fixed_cost_add_button"
-                                value="">Save changes
+                                value="">ADD FIXED COST
                         </button>
                     </div>
                 </form>
@@ -547,7 +616,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="variable_cost_add_button"
-                                value="">Save changes
+                                value="">ADD VARIABLE COST
                         </button>
                     </div>
                 </form>

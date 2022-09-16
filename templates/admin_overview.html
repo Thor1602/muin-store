@@ -19,25 +19,28 @@
 
             <div class="row gy-4">
                 <h3>COMMENTS</h3>
-                <table class="table">
-                    <tbody>
-                    {% for comment in comments %}
+                <div class="overflow-scroll max-height-table">
+                    <table class="table">
+                        <tbody>
+                        {% for comment in comments %}
 
-                        <tr>
-                            <th>{{ comment[1] }}</th>
-                            <th>
-                                <form method="post" action="/admin_overview">
-                                    <button class="btn btn-danger" name="btn_delete_comment" value="{{ comment[0] }}"
-                                            type="submit">
-                                        <i class="bi bi-trash-fill"></i></button>
-                                </form>
-                            </th>
+                            <tr>
+                                <th>{{ comment[1] }}</th>
+                                <th>
+                                    <form method="post" action="/admin_overview">
+                                        <button class="btn btn-danger" name="btn_delete_comment"
+                                                value="{{ comment[0] }}"
+                                                type="submit">
+                                            <i class="bi bi-trash-fill"></i></button>
+                                    </form>
+                                </th>
 
-                        </tr>
-                    {% endfor %}
+                            </tr>
+                        {% endfor %}
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
                 <h3>ADD COMMENT</h3>
                 <form action="" method="post">
                     <div class="input-group mb-3">

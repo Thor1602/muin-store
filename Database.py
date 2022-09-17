@@ -151,7 +151,7 @@ class FixedCost(Main):
 
 class VariableCost(Main):
     def __init__(self, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
-                 selling_price_hv, criteria_hv, unit, work_time_min, image):
+                 selling_price_hv, criteria_hv, unit, work_time_min, image, estimated_items):
         self.english = english
         self.korean = korean
         self.variable_cost = variable_cost
@@ -164,21 +164,22 @@ class VariableCost(Main):
         self.unit = unit
         self.work_time_min = work_time_min
         self.image = image
+        self.estimated_items = estimated_items
 
     def register_cost(self):
-        SQL = "INSERT INTO variable_costs (english, korean, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv,unit, work_time_min, image) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        SQL = "INSERT INTO variable_costs (english, korean, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv,unit, work_time_min, image, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
             self.english, self.korean, self.variable_cost, self.selling_price_lv, self.criteria_lv,
             self.selling_price_mv,
-            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image,)
+            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image,self.estimated_items,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update_cost(self, id):
-        SQL = "UPDATE variable_costs SET english = %s, korean = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, unit = %s, work_time_min = %s, image = %s WHERE id = %s;"
+        SQL = "UPDATE variable_costs SET english = %s, korean = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, unit = %s, work_time_min = %s, image = %s, estimated_items = %s WHERE id = %s;"
         parameters = (
             self.english, self.korean, self.variable_cost, self.selling_price_lv, self.criteria_lv,
             self.selling_price_mv,
-            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image, id,)
+            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image, self.estimated_items, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 

@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% block nav %}
-    <li><a href="#hero">Home</a></li>
-    <li><a href="/#about">About</a></li>
-    <li><a href="/#services">Services</a></li>
-    <li><a href="/#portfolio">Products</a></li>
-    <li><a href="/#contact">Contact</a></li>
-
+    {% if session['logged_in'] %}
+        {% for menu_item in nav_menu_admin %}
+            <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+        {% endfor %}
+    {% endif %}
 {% endblock %}
 {% block body %}
     <section id="hero" class="hero">
@@ -15,7 +14,7 @@
                     <h2 class="error"> {{ e }}</h2>
                     <div class="d-flex justify-content-center justify-content-lg-start">
                         <a href="/"
-                           class="btn-watch-video d-flex align-items-center"><span>Go back</span></a>
+                           class="btn-watch-video d-flex align-items-center"><span>Go back to Homepage</span></a>
                     </div>
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2">
@@ -23,60 +22,60 @@
             </div>
         </div>
     </section>
-    {% endblock %}
+{% endblock %}
 
 {% block footer %}
 
- <div class="container">
-            <div class="row gy-4">
-                <div class="col-lg-5 col-md-12 footer-info">
-                    <a href="/" class="logo d-flex align-items-center">
-                        <span>Coup De Foudre</span>
-                    </a>
-                    <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
-                        valies
-                        darta donna mare fermentum iaculis eu non diam phasellus.</p>
-                    {#          <div class="social-links d-flex mt-4">#}
-                    {#            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
-                    {#            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
-                    {#            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
-                    {#            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
-                    {#          </div>#}
-                </div>
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-lg-5 col-md-12 footer-info">
+                <a href="/" class="logo d-flex align-items-center">
+                    <span>Coup De Foudre</span>
+                </a>
+                <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
+                    valies
+                    darta donna mare fermentum iaculis eu non diam phasellus.</p>
+                {#          <div class="social-links d-flex mt-4">#}
+                {#            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
+                {#            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
+                {#            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
+                {#            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
+                {#          </div>#}
+            </div>
 
-                <div class="col-lg-2 col-6 footer-links">
-                    <h4>Useful Links</h4>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About us</a></li>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="#">Terms of service</a></li>
-                        <li><a href="#">Privacy policy</a></li>
-                    </ul>
-                </div>
+            <div class="col-lg-2 col-6 footer-links">
+                <h4>Useful Links</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About us</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Terms of service</a></li>
+                    <li><a href="#">Privacy policy</a></li>
+                </ul>
+            </div>
 
-                <div class="col-lg-2 col-6 footer-links">
-                    <h4>Our Products</h4>
-                    <ul>
-                        <li><a href="#">Eclairs</a></li>
-                        <li><a href="#">Macarons</a></li>
-                        <li><a href="#">Vienoisserie</a></li>
-                        <li><a href="#">Bread</a></li>
-                    </ul>
-                </div>
+            <div class="col-lg-2 col-6 footer-links">
+                <h4>Our Products</h4>
+                <ul>
+                    <li><a href="#">Eclairs</a></li>
+                    <li><a href="#">Macarons</a></li>
+                    <li><a href="#">Vienoisserie</a></li>
+                    <li><a href="#">Bread</a></li>
+                </ul>
+            </div>
 
-                <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-                    <h4>Contact Us</h4>
-                    <p>
-                        101ho, 11-48, Wonsutaek-ro 32beon-gil <br>
-                       Guri-si, Gyeongi-do, 11932<br>
-                        South Korea <br><br>
-                        <strong>Phone:</strong> 010-4887-8249<br>
-                        <strong>Email:</strong> thorbendhaenenstd@gmail.com<br>
-                    </p>
-
-                </div>
+            <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+                <h4>Contact Us</h4>
+                <p>
+                    101ho, 11-48, Wonsutaek-ro 32beon-gil <br>
+                    Guri-si, Gyeongi-do, 11932<br>
+                    South Korea <br><br>
+                    <strong>Phone:</strong> 010-4887-8249<br>
+                    <strong>Email:</strong> thorbendhaenenstd@gmail.com<br>
+                </p>
 
             </div>
+
         </div>
+    </div>
 {% endblock %}

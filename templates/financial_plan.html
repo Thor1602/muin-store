@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
 {% block nav %}
-    <li><a href="/admin_overview">Overview</a></li>
-    <li><a href="/business_plan">Business plan</a></li>
-    <li><a href="/financial_plan">Financial plan</a></li>
-    <li><a href="/products">Products</a></li>
+    {% for menu_item in nav_menu_admin %}
+    <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+    {% endfor %}
 {% endblock %}
 
 {% block body %}
@@ -53,7 +52,7 @@
                                 <th scope="col">{{ product }}</th>
                                 <th scope="col"><input type="number" aria-label="{{ product }}"
                                                        class="form-control"
-                                                       id="breakevenInput{{ loop.index0 }}" value="100"
+                                                       id="breakevenInput{{ loop.index0 }}" value="{{ net_profit[product][3] }}"
                                                        style="width: 200px">
                                 </th>
                                 <th scope="col" class="change-breakeven"

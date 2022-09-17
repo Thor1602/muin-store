@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
 {% block nav %}
-    <li><a href="/admin_overview">Overview</a></li>
-    <li><a href="/business_plan">Business plan</a></li>
-    <li><a href="/financial_plan">Financial plan</a></li>
-    <li><a href="/products">Products</a></li>
+    {% for menu_item in nav_menu_admin %}
+        <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+    {% endfor %}
 {% endblock %}
 
 {% block body %}
@@ -22,7 +21,8 @@
             </div>
             <div class="row gy-4">
                 <h3>Mission</h3>
-                <p>Coup De Foudre brings bakery and technology together. A place where customers can also experience rather than buying. Our products focuses on experiencing unique and delicious tastes.</p>
+                <p>Coup De Foudre brings bakery and technology together. A place where customers can also experience
+                    rather than buying. Our products focuses on experiencing unique and delicious tastes.</p>
             </div>
             <div class="row gy-4">
                 <h3>Vision</h3>

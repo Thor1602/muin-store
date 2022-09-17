@@ -20,14 +20,26 @@ app = Flask(__name__)
 main = Database.Main()
 app.secret_key = main.get_secret_code()
 
-
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
+            '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation', '/invoices': 'Invoices'}
+
+# PUBLIC
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
+@app.route("/contact_submission", methods=["GET", "POST"])
+def contact_submission():
+    if request.method == "POST":
+        print(request.form)
+        cform = Contact.contactForm()
+        if cform.validate_on_submit():
+            print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
+    return redirect(url_for('index'))
 
+# ADMIN
 @app.route('/admin_overview', methods=['GET', 'POST'])
 def admin_overview():
     if not session.get('logged_in'):
@@ -41,7 +53,7 @@ def admin_overview():
                 comment = Database.Comment(request.form['comment'])
                 comment.register_comment()
                 redirect(url_for('admin_overview'))
-        return render_template('admin_overview.html', comments=main.read_table('comments'))
+        return render_template('admin_overview.html', comments=main.read_table('comments'),nav_menu_admin=nav_menu_admin)
 
 
 @app.route('/business_plan', methods=['GET', 'POST'])
@@ -49,7 +61,7 @@ def business_plan():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('business_plan.html')
+        return render_template('business_plan.html',nav_menu_admin=nav_menu_admin)
 
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
@@ -80,7 +92,7 @@ def financial_plan():
                                                       request.form['criteria_lv'], request.form['selling_price_mv'],
                                                       request.form['criteria_mv'], request.form['selling_price_hv'],
                                                       request.form['criteria_hv'], request.form['unit'],
-                                                      request.form['work_time_min'], request.form['image'])
+                                                      request.form['work_time_min'], request.form['image'], request.form['estimated_items'])
                 if 'variable_cost_add_button' in request.form:
                     variable_cost.register_cost()
                 elif 'variable_cost_edit_button' in request.form:
@@ -108,13 +120,14 @@ def financial_plan():
             fixed_costs.append(row)
         variable_costs = main.read_table('variable_costs')
         variable_costs_columns = main.show_columns('variable_costs')
-        variable_costs_prefilled_input = ('','','','','>=','','>=','','>=','','','.jpg')
-        net_profit ={}
+        variable_costs_prefilled_input = ('', '', '', '', '>=', '', '>=', '', '>=', '', '', '.jpg')
+        net_profit = {}
         for row in variable_costs:
-            net_profit[row[2]]=[row[4], int(row[4]/1.1), int((row[4]/1.1)-row[3])]
+            net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[13]]
 
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
-                               variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,net_profit=net_profit,variable_costs_prefilled_input=variable_costs_prefilled_input)
+                               variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
+                               net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,nav_menu_admin=nav_menu_admin)
 
 
 @app.route('/products', methods=['GET', 'POST'])
@@ -122,19 +135,25 @@ def products():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('products.html')
+        return render_template('products.html',nav_menu_admin=nav_menu_admin)
 
 
-@app.route("/contact_submission", methods=["GET", "POST"])
-def contact_submission():
-    if request.method == "POST":
-        print(request.form)
-        cform = Contact.contactForm()
-        if cform.validate_on_submit():
-            print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
-    return redirect(url_for('index'))
+@app.route('/recipes', methods=['GET', 'POST'])
+def recipes():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('recipes.html',nav_menu_admin=nav_menu_admin)
 
 
+@app.route('/cost_calculation', methods=['GET', 'POST'])
+def cost_calculation():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('cost_calculation.html',nav_menu_admin=nav_menu_admin)
+
+# LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -148,38 +167,37 @@ def login():
         else:
             return redirect(url_for('login'))
 
-
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
     return redirect(url_for('index'))
 
-
+# ERROR HANDLING
 @app.errorhandler(400)
 def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"
-    return render_template('error.html', e=e, e_friendly=e_friendly), 400
+    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 400
 
 
 @app.errorhandler(403)
 def forbidden(e):
     e_friendly = "a forbidden resource"
-    return render_template('error.html', e=e, e_friendly=e_friendly), 403
+    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 403
 
 
 @app.errorhandler(404)
 def not_found(e):
     e_friendly = "chap, you made a mistake typing that URL"
-    return render_template('error.html', e=e, e_friendly=e_friendly), 404
+    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 404
 
 
 @app.errorhandler(410)
 def gone(e):
     e_friendly = "The page existed but is deleted and sent to Valhalla for all eternity."
-    return render_template('error.html', e=e, e_friendly=e_friendly), 410
+    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 410
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
     e_friendly = "'server problems' To be overloaded or not to be overloaded. That's the question."
-    return render_template('error.html', e=e, e_friendly=e_friendly), 500
+    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 500

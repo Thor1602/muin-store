@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block nav %}
+    {% for menu_item in nav_menu_admin %}
+        <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+    {% endfor %}
+
+{% endblock %}
+
+{% block body %}
+
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-header">
+                <h2>Admin</h2>
+                <p>Recipes</p>
+            </div>
+
+            <div class="row gy-4">
+            </div>
+
+        </div>
+    </section><!-- End About Us Section -->
+
+{% endblock %}
+
+

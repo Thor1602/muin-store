@@ -30,6 +30,7 @@ nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Pla
 def index():
     return render_template('index.html')
 
+
 @app.route("/contact_submission", methods=["GET", "POST"])
 def contact_submission():
     if request.method == "POST":
@@ -143,7 +144,10 @@ def recipes():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('recipes.html',nav_menu_admin=nav_menu_admin)
+        ingredients = main.read_table('ingredients')
+        products = main.read_table('products')
+        recipes = main.read_table('ingredientproduct')
+        return render_template('recipes.html',nav_menu_admin=nav_menu_admin, recipes=recipes, ingredients=ingredients, products=products)
 
 
 @app.route('/cost_calculation', methods=['GET', 'POST'])
@@ -151,7 +155,45 @@ def cost_calculation():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('cost_calculation.html',nav_menu_admin=nav_menu_admin)
+        if request.method == 'POST':
+            if 'ingredients_add_button' in request.form:
+                ingredient = Database.Ingredients(request.form['english'], request.form['korean'])
+                ingredient.register_ingredient()
+            elif 'packaging_add_button' in request.form:
+                packaging = Database.Packaging(request.form['english'], request.form['korean'])
+                packaging.register()
+            elif 'product_add_button' in request.form:
+                product = Database.Products(request.form['english'], request.form['korean'], request.form['weight_in_gram_per_product'], request.form['unit'])
+                product.register()
+            elif 'price_ingredient_add_button' in request.form:
+                if request.form['date'] == '':
+                    date = None
+                else:
+                    date = request.form['date']
+                price_ingredient = Database.PricesIngredients(request.form['ingredientid'], request.form['price'],
+                                            request.form['weight_in_gram'], date)
+                price_ingredient.register()
+            elif 'price_packaging_add_button' in request.form:
+                if request.form['date'] == '':
+                    date = None
+                else:
+                    date = request.form['date']
+                packaging_price = Database.PricesPackaging(request.form['packagingid'], request.form['price_per_unit'],
+                                                              date)
+                packaging_price.register()
+            elif 'recipe_add_button' in request.form:
+                for item in request.form:
+                    if 'packagingid_' in item:
+                        packaging_recipe = Database.PackagingProduct(request.form['productid'],request.form[item])
+                        packaging_recipe.register()
+                    elif 'ingredientid_' in item:
+                        weight_in_gram = 'weight_in_gram_' + item.replace('ingredientid_', '')
+                        ingredient_recipe = Database.IngredientProduct(request.form['productid'],request.form[item],request.form[weight_in_gram])
+                        ingredient_recipe.register()
+        ingredients = main.read_table('ingredients')
+        products = main.read_table('products')
+        packaging = main.read_table('packaging')
+        return render_template('cost_calculation.html',nav_menu_admin=nav_menu_admin, packaging=packaging, ingredients=ingredients, products=products)
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])

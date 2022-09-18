@@ -80,6 +80,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\templates\cost_calculation.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\templates\financial_plan.html">
           <value>
             <Attribute>
@@ -88,6 +95,13 @@
           </value>
         </entry>
         <entry key="\templates\index.html">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\test.txt">
           <value>
             <Attribute>
               <option name="separator" value="," />

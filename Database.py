@@ -211,19 +211,28 @@ class Ingredients(Main):
 
 
 class PricesIngredients(Main):
-    def __init__(self, packagingID, price_per_unit, date):
-        self.packagingID = packagingID
-        self.price_per_unit = price_per_unit
+    def __init__(self, ingredientID, price, weight_in_gram, date=None):
+        self.ingredientID = ingredientID
+        self.price = price
+        self.weight_in_gram = weight_in_gram
         self.date = date
 
-    def register_price_ingredient(self):
-        SQL = "INSERT INTO prices_ingredients (ingredientID, price, weight_in_gram, date) VALUES (%s,%s,%s,%s);"
-        parameters = (self.packagingID, self.price_per_unit, self.date,)
+    def register(self):
+        if self.date == None:
+            SQL = "INSERT INTO prices_ingredients (ingredientid, price, weight_in_gram, date) VALUES (%s,%s,%s,NOW());"
+            parameters = (self.ingredientID, self.price, self.weight_in_gram,)
+        else:
+            SQL = "INSERT INTO prices_ingredients (ingredientid, price, weight_in_gram, date) VALUES (%s,%s,%s,%s);"
+            parameters = (self.ingredientID, self.price, self.weight_in_gram, self.date,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-    def update_price_ingredient(self, id):
-        SQL = "UPDATE prices_ingredients SET packagingID = %s, price_per_unit = %s, weight_in_gram = %s, date = %s WHERE id = %s;"
-        parameters = (self.packagingID, self.price_per_unit, self.date,)
+    def update(self, id):
+        if self.date == None:
+            SQL = "UPDATE prices_ingredients SET ingredientID = %s, price = %s, weight_in_gram = %s WHERE id = %s;"
+            parameters = (self.ingredientID, self.price, self.weight_in_gram,)
+        else:
+            SQL = "UPDATE prices_ingredients SET ingredientID = %s, price = %s, weight_in_gram = %s WHERE id = %s;"
+            parameters = (self.ingredientID, self.price, self.weight_in_gram, self.date, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
@@ -232,12 +241,12 @@ class Packaging(Main):
         self.english = english
         self.korean = korean
 
-    def register_ingredient(self):
+    def register(self):
         SQL = "INSERT INTO packaging (english, korean) VALUES (%s,%s);"
         parameters = (self.english, self.korean,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-    def update_ingredient(self, id):
+    def update(self, id):
         SQL = "UPDATE packaging SET english = %s, korean = %s WHERE id = %s;"
         parameters = (
             self.english, self.korean, id,)
@@ -245,19 +254,27 @@ class Packaging(Main):
 
 
 class PricesPackaging(Main):
-    def __init__(self, packagingID, price_per_unit, date):
+    def __init__(self, packagingID, price_per_unit, date=None):
         self.packagingID = packagingID
         self.price_per_unit = price_per_unit
         self.date = date
 
-    def register_price_ingredient(self):
-        SQL = "INSERT INTO prices_packaging (packagingID, price_per_unit,date) VALUES (%s,%s,%s);"
-        parameters = (self.packagingID, self.price_per_unit, self.date,)
+    def register(self):
+        if self.date == None:
+            SQL = "INSERT INTO prices_packaging (packagingID, price_per_unit,date) VALUES (%s,%s,now());"
+            parameters = (self.packagingID, self.price_per_unit, )
+        else:
+            SQL = "INSERT INTO prices_packaging (packagingID, price_per_unit,date) VALUES (%s,%s,%s);"
+            parameters = (self.packagingID, self.price_per_unit, self.date,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-    def update_price_ingredient(self, id):
-        SQL = "UPDATE prices_packaging SET packagingID = %s, price_per_unit = %s, date = %s WHERE id = %s;"
-        parameters = (self.packagingID, self.price_per_unit, self.date,)
+    def update(self, id):
+        if self.date == None:
+            SQL = "UPDATE prices_packaging SET packagingID = %s, price_per_unit = %s WHERE id = %s;"
+            parameters = (self.packagingID, self.price_per_unit, id,)
+        else:
+            SQL = "UPDATE prices_packaging SET packagingID = %s, price_per_unit = %s, date = %s WHERE id = %s;"
+            parameters = (self.packagingID, self.price_per_unit, self.date, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
@@ -268,12 +285,12 @@ class Products(Main):
         self.weight_in_gram_per_product = weight_in_gram_per_product
         self.unit = unit
 
-    def register_product(self):
+    def register(self):
         SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit) VALUES (%s,%s,%s,%s);"
         parameters = (self.english, self.korean,self.weight_in_gram_per_product,self.unit,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-    def update_product(self, id):
+    def update(self, id):
         SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s WHERE id = %s;"
         parameters = (
             self.english, self.korean,self.weight_in_gram_per_product,self.unit, id,)
@@ -285,13 +302,13 @@ class IngredientProduct(Main):
         self.ingredientID = ingredientID
         self.weight_in_gram = weight_in_gram
 
-    def register_ingredient_product(self):
-        SQL = "INSERT INTO ingredientProduct (productID, ingredientID, weight_in_gram) VALUES (%s,%s,%s);"
+    def register(self):
+        SQL = "INSERT INTO ingredientproduct (productID, ingredientID, weight_in_gram) VALUES (%s,%s,%s);"
         parameters = (self.productID, self.ingredientID, self.weight_in_gram,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-    def update_ingredient_product(self, id):
-        SQL = "UPDATE ingredientProduct SET productID = %s, ingredientID = %s, weight_in_gram = %s WHERE id = %s;"
+    def update(self, id):
+        SQL = "UPDATE ingredientproduct SET productID = %s, ingredientID = %s, weight_in_gram = %s WHERE id = %s;"
         parameters = (self.productID, self.ingredientID, self.weight_in_gram,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
@@ -300,12 +317,12 @@ class PackagingProduct(Main):
         self.productID = productID
         self.packagingID = packagingID
 
-    def register_packaging_product(self):
-        SQL = "INSERT INTO packagingProduct (productID, packagingID) VALUES (%s,%s);"
+    def register(self):
+        SQL = "INSERT INTO packagingproduct (productID, packagingID) VALUES (%s,%s);"
         parameters = (self.productID, self.packagingID,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-    def update_packaging_product(self, id):
-        SQL = "UPDATE packagingProduct SET productID = %s, packagingID = %s WHERE id = %s;"
+    def update(self, id):
+        SQL = "UPDATE packagingproduct SET productID = %s, packagingID = %s WHERE id = %s;"
         parameters = (self.productID, self.packagingID,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)

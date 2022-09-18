@@ -16,13 +16,323 @@
                 <h2>Admin</h2>
                 <p>Cost Calculation</p>
             </div>
-
+            <!-- Modal view Buttons -->
             <div class="row gy-4">
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#price_ingredient_modal_add"
+                        type="button">ADD PRICE FOR INGREDIENT
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#price_packaging_modal_add"
+                        type="button">ADD PRICE FOR PACKAGING
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#ingredient_modal_add"
+                        type="button">ADD INGREDIENT
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#packaging_modal_add"
+                        type="button">ADD PACKAGING
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#product_modal_add"
+                        type="button">ADD PRODUCT
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#recipe_modal_add"
+                        type="button">ADD RECIPE
+                </button>
             </div>
 
         </div>
-    </section><!-- End About Us Section -->
+    </section>
+    <!-- Modal PriceIngredients Start -->
+    <div class="modal fade" id="price_ingredient_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="priceIngredientModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="priceIngredientModalLabelAdd">ADD PRICE FOR INGREDIENT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/cost_calculation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="ingredient_add" class="form-label">Choose your ingredient from the list:</label>
+                            <input class="form-control" list="ingredients" name="ingredientid" id="ingredient_add">
+                            <datalist id="ingredients">
+                                {% for item in ingredients %}
+                                    <option value="{{ item[0] }}">{{ item[1] }} ({{ item[2] }})</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredientPrice" class="form-label">Price</label>
+                            <input type="text" class="form-control" id="ingredientPrice" name="price"
+                                   value="">
 
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredientWeight" class="form-label">Weight</label>
+                            <input type="text" class="form-control" id="ingredientWeight"
+                                   name="weight_in_gram" value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredientDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="ingredientDate"
+                                   name="date" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="price_ingredient_add_button"
+                                value="">ADD PRICE FOR INGREDIENT
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Price Ingredients End -->
+    <!-- Modal Price Packaging Start -->
+    <div class="modal fade" id="price_packaging_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="pricePackagingModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pricePackagingModalLabelAdd">ADD PRICE FOR PACKAGING</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/cost_calculation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="packaging_add" class="form-label">Choose your packaging from the list:</label>
+                            <input class="form-control" list="packaging" name="packagingid" id="packaging_add">
+                            <datalist id="packaging">
+                                {% for item in packaging %}
+                                    <option value="{{ item[0] }}">{{ item[1] }} ({{ item[2] }})</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packagingUnit" class="form-label">Price Per Unit</label>
+                            <input type="text" class="form-control" id="packagingUnit" name="price_per_unit"
+                                   value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="packagingDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="packagingDate"
+                                   name="date" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="price_packaging_add_button"
+                                value="">ADD PRICE FOR PACKAGING
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Price Packaging End -->
+    <!-- Modal Ingredient Start -->
+    <div class="modal fade" id="ingredient_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="ingredientModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ingredientModalLabelAdd">ADD INGREDIENT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/cost_calculation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="input_english" class="form-label">English</label>
+                            <input type="text" class="form-control" id="input_english" name="english"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="input_korean" class="form-label">Korean</label>
+                            <input type="text" class="form-control" id="input_korean" name="korean"
+                                   value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="ingredients_add_button"
+                                value="">ADD INGREDIENT
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Ingredients End -->
+    <!-- Modal Packaging Start -->
+    <div class="modal fade" id="packaging_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="packagingModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="packagingModalLabelAdd">ADD PACKAGING</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/cost_calculation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="input_english" class="form-label">English</label>
+                            <input type="text" class="form-control" id="input_english" name="english"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="input_korean" class="form-label">Korean</label>
+                            <input type="text" class="form-control" id="input_korean" name="korean"
+                                   value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="packaging_add_button"
+                                value="">ADD PACKAGING
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Packaging End -->
+    <!-- Modal Product Start -->
+    <div class="modal fade" id="product_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="productModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabelAdd">ADD PRODUCT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/cost_calculation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="input_english" class="form-label">English</label>
+                            <input type="text" class="form-control" id="input_english" name="english"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="input_korean" class="form-label">Korean</label>
+                            <input type="text" class="form-control" id="input_korean" name="korean"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="input_weight_in_gram_per_product" class="form-label">Weight</label>
+                            <input type="text" class="form-control" id="input_weight_in_gram_per_product"
+                                   name="weight_in_gram_per_product" value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputUnit" class="form-label">Unit</label>
+                            <input type="text" class="form-control" id="inputUnit"
+                                   name="unit" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="product_add_button"
+                                value="">ADD PRODUCT
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Product End -->
+    <!-- Modal Recipe Start -->
+    <div class="modal fade" id="recipe_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="recipeModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recipeModalLabelAdd">ADD RECIPE</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="/cost_calculation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="productid" class="form-label">Choose your product from the
+                                list:</label>
+                            <input class="form-control" list="productid_list" name="productid" id="productid" required>
+                            <datalist id="productid_list">
+                                {% for item in products %}
+                                    <option value="{{ item[0] }}">{{ item[1] }} ({{ item[2] }})</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <hr>
+
+                        <div class="mb-3">
+                            <label for="ingredientid" class="form-label">Choose an ingredient from the
+                                list:</label>
+                            <input class="form-control" list="ingredientid_list" id="ingredientid">
+                            <datalist id="ingredientid_list">
+                                {% for item in ingredients %}
+                                    <option value="{{ item[0] }}">{{ item[1] }} ({{ item[2] }})</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <div class="mb-3">
+                            <label for="input_weight_in_gram" class="form-label">Weight</label>
+                            <input type="text" class="form-control" id="input_weight_in_gram" value="">
+                        </div>
+                    <button class="btn btn-success" type="button" id="ingredientProductAdd">ADD INGREDIENT TO RECIPE
+                        </button>
+
+                        <div class="mb-3">
+                            <label for="packagingid" class="form-label">Choose a type of packaging from the
+                                list:</label>
+                            <input class="form-control" list="packagingid_list" id="packagingid">
+                            <datalist id="packagingid_list">
+                                {% for item in packaging %}
+                                    <option value="{{ item[0] }}">{{ item[1] }} ({{ item[2] }})</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                    <button class="btn btn-success" type="button" id="packagingProductAdd">ADD PACKAGING TO RECIPE
+                        </button>
+                        <div id="ingredientsList"><h5>INGREDIENTS</h5></div>
+                        <div id="packagingList"><h5>PACKAGING</h5></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="recipe_add_button"
+                                value="">ADD TO RECIPE
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Recipe End -->
 {% endblock %}
+{% block endbody %}
+    <script src="/static/js/admin.js "></script>{% endblock %}
 
 

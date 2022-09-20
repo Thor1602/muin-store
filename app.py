@@ -222,7 +222,9 @@ def invoices():
                 if file and allowed_file(file.filename):
                     filename = request.form['customer_name'] + "_" + request.form['invoice_date'].replace('-','') + f"_{random.randint(1, 100)}." + file.filename.rsplit('.', 1)[1].lower()
                     file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename))
-                    Database.InvoicesCustomer(file = filename, type = request.form['type'], payment_amount = request.form['payment_amount'], payment_method = request.form['payment_method'], customer_name = request.form['customer_name'], invoice_date = request.form['invoice_date']).register()
+                    location = os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename)
+                    flash(location)
+                    Database.InvoicesCustomer(file = filename, type = request.form['type'], payment_amount = request.form['payment_amount'],  payment_method = request.form['payment_method'], customer_name = request.form['customer_name'], invoice_date = request.form['invoice_date']).register()
                     return redirect(url_for('invoices'))
 
         # invoices = main.read_table('invoices')

@@ -18,6 +18,17 @@
             </div>
             <hr>
             <div class="row gy-4">
+                <div>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <ul class=flashes>
+                                {% for message in messages %}
+                                    <li>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                </div>
                 <button class="btn btn-success" data-bs-toggle="modal"
                         data-bs-target="#invoice_supplier_modal_add"
                         type="button">ADD INVOICE SUPPLIER

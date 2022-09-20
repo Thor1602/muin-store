@@ -250,6 +250,14 @@ def recipes():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
+        if request.method == 'POST':
+            if 'btn_edit_recipe' in request.form:
+                data = request.form['btn_edit_recipe'].split(',')
+                ingredient = Database.IngredientProduct(data[1],data[2], request.form['weight'])
+                ingredient.update(data[0])
+            elif 'btn_delete_recipe' in request.form:
+                main.delete_row_by_id('ingredientproduct', request.form['btn_delete_recipe'])
+
         ingredients = main.read_table('ingredients')
         products = main.read_table('products')
         recipes = main.read_table('ingredientproduct')

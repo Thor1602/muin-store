@@ -31,6 +31,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\onedriveFileUpload.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\requirements.txt">
           <value>
             <Attribute>
@@ -105,6 +112,13 @@
           <value>
             <Attribute>
               <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\templates\recipes.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
             </Attribute>
           </value>
         </entry>

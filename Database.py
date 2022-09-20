@@ -315,7 +315,7 @@ class IngredientProduct(Main):
 
     def update(self, id):
         SQL = "UPDATE ingredientproduct SET productID = %s, ingredientID = %s, weight_in_gram = %s WHERE id = %s;"
-        parameters = (self.productID, self.ingredientID, self.weight_in_gram,)
+        parameters = (self.productID, self.ingredientID, self.weight_in_gram, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 

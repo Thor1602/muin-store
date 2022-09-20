@@ -59,6 +59,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\static\js\main.js">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\templates\admin_overview.html">
           <value>
             <Attribute>

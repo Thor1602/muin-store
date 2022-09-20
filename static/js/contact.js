@@ -1,4 +1,17 @@
 $(document).ready(function () {
+    test_kakao
+    $('#test_kakao').click(function () {
+        Kakao.API.request({
+            url: '/v1/api/talk/profile',
+            success: function (response) {
+                alert(response);
+            },
+            fail: function (error) {
+                alert(error);
+            }
+        });
+    })
+
     $('#contact_submit_button').click(function () {
         $("#contact_form").validate({
             errorPlacement: function ($error, $element) {

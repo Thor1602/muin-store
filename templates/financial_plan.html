@@ -2,7 +2,7 @@
 
 {% block nav %}
     {% for menu_item in nav_menu_admin %}
-    <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+        <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
     {% endfor %}
 {% endblock %}
 
@@ -19,6 +19,9 @@
 
                 <p class="number-format">Minimum investment cost: {{ total['minimum'] }}</p>
                 <p class="number-format">Maximum investment cost: {{ total['maximum'] }}</p>
+                <p class="number-format">Turnover: <span id="total-turnover"></span></p>
+                <p class="number-format">Turnover - VAT: <span id="turnover-after-vat"></span></p>
+                <p class="number-format">Variable costs: <span id="variable-costs"></span></p>
                 <p class="number-format">Fixed costs per month: <span
                         id="fixedCostTotal">{{ total['total_cost'] }}</span></p>
                 <p>Net profit: <span id="net-profit"></span></p>
@@ -52,14 +55,15 @@
                                 <th scope="col">{{ product }}</th>
                                 <th scope="col"><input type="number" aria-label="{{ product }}"
                                                        class="form-control"
-                                                       id="breakevenInput{{ loop.index0 }}" value="{{ net_profit[product][3] }}"
+                                                       id="breakevenInput{{ loop.index0 }}"
+                                                       value="{{ net_profit[product][3] }}"
                                                        style="width: 200px">
                                 </th>
                                 <th scope="col" class="change-breakeven"
-                                    id="breakevenOutput{{ loop.index0 }}">{{ net_profit[product][2]*100 }}</th>
-                                <th scope="col">{{ net_profit[product][0] }}</th>
-                                <th scope="col">{{ net_profit[product][1] }}</th>
-                                <th scope="col"
+                                    id="breakevenOutput{{ loop.index0 }}">{{ net_profit[product][2] * net_profit[product][3] }}</th>
+                                <th scope="col" class="turnover-total">{{ net_profit[product][0] }}</th>
+                                <th scope="col" class="turnover-after-vat">{{ net_profit[product][1] }}</th>
+                                <th scope="col" class="variable-costs"
                                     id="breakevenNetProfit{{ loop.index0 }}">{{ net_profit[product][2] }}</th>
                             </tr>
                         {% endfor %}
@@ -233,7 +237,8 @@
                                 </th>
                                 <th>
                                     <button class="btn btn-danger" type="button"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModalVariableCost{{ row[0] }}">
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModalVariableCost{{ row[0] }}">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </th>
@@ -482,7 +487,8 @@
                         <form action="/financial_plan" method="post">
                             <button class="btn btn-danger" name="btn_delete_variable_cost"
                                     value="{{ row[0] }}"
-                                    type="submit"><i class="bi bi-trash-fill"></i>DELETE</button>
+                                    type="submit"><i class="bi bi-trash-fill"></i>DELETE
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -659,6 +665,36 @@
                     totalBreakeven += 0;
                 }
             });
+            var turnoverTotal = 0;
+            $(".turnover-total").each(function () {
+                var value = $(this).text();
+                if (!isNaN(value)) {
+                    turnoverTotal += parseInt(value);
+                } else {
+                    turnoverTotal += 0;
+                }
+            });
+            var turnoverAfterVat = 0;
+            $(".turnover-after-vat").each(function () {
+                var value = $(this).text();
+                if (!isNaN(value)) {
+                    turnoverAfterVat += parseInt(value);
+                } else {
+                    turnoverAfterVat += 0;
+                }
+            });
+            var variableCosts = 0;
+            $(".variable-costs").each(function () {
+                var value = $(this).text();
+                if (!isNaN(value)) {
+                    variableCosts += parseInt(value);
+                } else {
+                    variableCosts += 0;
+                }
+            });
+            $('#turnover-after-vat').text(turnoverAfterVat).digits();
+            $('#variable-costs').text(variableCosts).digits();
+            $('#total-turnover').text(turnoverTotal).digits();
             $('#total-breakeven').text(totalBreakeven).digits();
             var netProfit = totalBreakeven -{{ total['total_cost'] }};
             $('#net-profit').text(netProfit).digits();
@@ -670,6 +706,7 @@
                 netProfitAfterCTax = netProfit;
             }
             $('#net-profit-after-tax').text(netProfitAfterCTax).digits();
+            var turnover = 0;
             {% for product in net_profit %}
                 $("#breakevenInput{{ loop.index0 }}").change(function () {
                     var netProfit = parseInt($(this).val()) * parseInt($('#breakevenNetProfit{{ loop.index0 }}').text());
@@ -683,7 +720,38 @@
                             totalBreakeven += 0;
                         }
                     });
+                    var turnoverTotal = 0;
+                    $(".turnover-total").each(function () {
+                        var value = $(this).text();
+                        if (!isNaN(value)) {
+                            turnoverTotal += parseInt(value);
+                        } else {
+                            turnoverTotal += 0;
+                        }
+                    });
+                    var turnoverAfterVat = 0;
+                    $(".turnover-after-vat").each(function () {
+                        var value = $(this).text();
+                        if (!isNaN(value)) {
+                            turnoverAfterVat += parseInt(value);
+                        } else {
+                            turnoverAfterVat += 0;
+                        }
+                    });
+                    var variableCosts = 0;
+                    $(".variable-costs").each(function () {
+                        var value = $(this).text();
+                        if (!isNaN(value)) {
+                            variableCosts += parseInt(value);
+                        } else {
+                            variableCosts += 0;
+                        }
+                    });
+                    $('#turnover-after-vat').text(turnoverAfterVat).digits();
+                    $('#variable-costs').text(variableCosts).digits();
+                    $('#total-turnover').text(turnoverTotal).digits();
                     $('#total-breakeven').text(totalBreakeven).digits();
+                    alert(turnoverTotal)
                     netProfit = totalBreakeven -{{ total['total_cost'] }};
                     $('#net-profit').text(netProfit).digits();
                     var netProfitAfterCTax;

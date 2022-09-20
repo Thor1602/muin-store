@@ -9,26 +9,35 @@ email: thorbendhaenenstd@gmail.com
 
 """
 import os
-import time
+import pathlib
+import random
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 import Database
 import Contact
 
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
-
 main = Database.Main()
 app.secret_key = main.get_secret_code()
+app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
+app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
 
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
-            '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation', '/invoices': 'Invoices'}
+                  '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
+                  '/invoices': 'Invoices'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # PUBLIC
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    api_kakao_js = main.get_kakao_api_js()
+    return render_template('index.html', api_kakao_js=api_kakao_js)
 
 
 @app.route("/contact_submission", methods=["GET", "POST"])
@@ -39,6 +48,7 @@ def contact_submission():
         if cform.validate_on_submit():
             print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
     return redirect(url_for('index'))
+
 
 # ADMIN
 @app.route('/admin_overview', methods=['GET', 'POST'])
@@ -54,7 +64,8 @@ def admin_overview():
                 comment = Database.Comment(request.form['comment'])
                 comment.register_comment()
                 redirect(url_for('admin_overview'))
-        return render_template('admin_overview.html', comments=main.read_table('comments'),nav_menu_admin=nav_menu_admin)
+        return render_template('admin_overview.html', comments=main.read_table('comments'),
+                               nav_menu_admin=nav_menu_admin)
 
 
 @app.route('/business_plan', methods=['GET', 'POST'])
@@ -62,7 +73,56 @@ def business_plan():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('business_plan.html',nav_menu_admin=nav_menu_admin)
+        return render_template('business_plan.html', nav_menu_admin=nav_menu_admin)
+
+
+@app.route('/cost_calculation', methods=['GET', 'POST'])
+def cost_calculation():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        if request.method == 'POST':
+            if 'ingredients_add_button' in request.form:
+                ingredient = Database.Ingredients(request.form['english'], request.form['korean'])
+                ingredient.register_ingredient()
+            elif 'packaging_add_button' in request.form:
+                packaging = Database.Packaging(request.form['english'], request.form['korean'])
+                packaging.register()
+            elif 'product_add_button' in request.form:
+                product = Database.Products(request.form['english'], request.form['korean'],
+                                            request.form['weight_in_gram_per_product'], request.form['unit'])
+                product.register()
+            elif 'price_ingredient_add_button' in request.form:
+                if request.form['date'] == '':
+                    date = None
+                else:
+                    date = request.form['date']
+                price_ingredient = Database.PricesIngredients(request.form['ingredientid'], request.form['price'],
+                                                              request.form['weight_in_gram'], date)
+                price_ingredient.register()
+            elif 'price_packaging_add_button' in request.form:
+                if request.form['date'] == '':
+                    date = None
+                else:
+                    date = request.form['date']
+                packaging_price = Database.PricesPackaging(request.form['packagingid'], request.form['price_per_unit'],
+                                                           date)
+                packaging_price.register()
+            elif 'recipe_add_button' in request.form:
+                for item in request.form:
+                    if 'packagingid_' in item:
+                        packaging_recipe = Database.PackagingProduct(request.form['productid'], request.form[item])
+                        packaging_recipe.register()
+                    elif 'ingredientid_' in item:
+                        weight_in_gram = 'weight_in_gram_' + item.replace('ingredientid_', '')
+                        ingredient_recipe = Database.IngredientProduct(request.form['productid'], request.form[item],
+                                                                       request.form[weight_in_gram])
+                        ingredient_recipe.register()
+        ingredients = main.read_table('ingredients')
+        products = main.read_table('products')
+        packaging = main.read_table('packaging')
+        return render_template('cost_calculation.html', nav_menu_admin=nav_menu_admin, packaging=packaging,
+                               ingredients=ingredients, products=products)
 
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
@@ -93,7 +153,8 @@ def financial_plan():
                                                       request.form['criteria_lv'], request.form['selling_price_mv'],
                                                       request.form['criteria_mv'], request.form['selling_price_hv'],
                                                       request.form['criteria_hv'], request.form['unit'],
-                                                      request.form['work_time_min'], request.form['image'], request.form['estimated_items'])
+                                                      request.form['work_time_min'], request.form['image'],
+                                                      request.form['estimated_items'])
                 if 'variable_cost_add_button' in request.form:
                     variable_cost.register_cost()
                 elif 'variable_cost_edit_button' in request.form:
@@ -128,7 +189,48 @@ def financial_plan():
 
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
-                               net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,nav_menu_admin=nav_menu_admin)
+                               net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,
+                               nav_menu_admin=nav_menu_admin)
+
+
+@app.route('/invoices', methods=['GET', 'POST'])
+def invoices():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        if request.method == 'POST':
+            print(request.form)
+            if 'invoice_supplier_add_button' in request.form:
+                if 'file' not in request.files:
+                    return redirect(request.url)
+                file = request.files['file']
+                if file.filename == '':
+                    return redirect(request.url)
+                if file and allowed_file(file.filename):
+                    filename = request.form['supplier_name'] + "_" + request.form['invoice_date'].replace('-','') + f"_{random.randint(1, 100)}." + file.filename.rsplit('.', 1)[1].lower()
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'], filename))
+                    Database.InvoicesSupplier(file = filename, type = request.form['type'], payment_amount = request.form['payment_amount'], payment_method = request.form['payment_method'], supplier_name = request.form['supplier_name'], invoice_date = request.form['invoice_date']).register()
+                    return redirect(url_for('invoices'))
+            elif 'invoice_customer_add_button' in request.form:
+                if 'file' not in request.files:
+                    return redirect(request.url)
+                file = request.files['file']
+                if file.filename == '':
+                    return redirect(request.url)
+                if file and allowed_file(file.filename):
+                    filename = request.form['customer_name'] + "_" + request.form['invoice_date'].replace('-','') + f"_{random.randint(1, 100)}." + file.filename.rsplit('.', 1)[1].lower()
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename))
+                    Database.InvoicesCustomer(file = filename, type = request.form['type'], payment_amount = request.form['payment_amount'], payment_method = request.form['payment_method'], customer_name = request.form['customer_name'], invoice_date = request.form['invoice_date']).register()
+                    return redirect(url_for('invoices'))
+
+        # invoices = main.read_table('invoices')
+        invoices_customer = main.read_table('invoices_customers')
+        invoices_supplier = main.read_table('invoices_suppliers')
+        invoices_supplier_columns = main.show_columns('invoices_suppliers')
+        invoices_customer_columns = main.show_columns('invoices_customers')
+        return render_template('invoices.html', nav_menu_admin=nav_menu_admin, invoices_supplier=invoices_supplier,
+                               invoices_customer=invoices_customer, invoices_supplier_columns=invoices_supplier_columns,
+                               invoices_customer_columns=invoices_customer_columns)
 
 
 @app.route('/products', methods=['GET', 'POST'])
@@ -136,7 +238,7 @@ def products():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('products.html',nav_menu_admin=nav_menu_admin)
+        return render_template('products.html', nav_menu_admin=nav_menu_admin)
 
 
 @app.route('/recipes', methods=['GET', 'POST'])
@@ -147,53 +249,9 @@ def recipes():
         ingredients = main.read_table('ingredients')
         products = main.read_table('products')
         recipes = main.read_table('ingredientproduct')
-        return render_template('recipes.html',nav_menu_admin=nav_menu_admin, recipes=recipes, ingredients=ingredients, products=products)
+        return render_template('recipes.html', nav_menu_admin=nav_menu_admin, recipes=recipes, ingredients=ingredients,
+                               products=products)
 
-
-@app.route('/cost_calculation', methods=['GET', 'POST'])
-def cost_calculation():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    else:
-        if request.method == 'POST':
-            if 'ingredients_add_button' in request.form:
-                ingredient = Database.Ingredients(request.form['english'], request.form['korean'])
-                ingredient.register_ingredient()
-            elif 'packaging_add_button' in request.form:
-                packaging = Database.Packaging(request.form['english'], request.form['korean'])
-                packaging.register()
-            elif 'product_add_button' in request.form:
-                product = Database.Products(request.form['english'], request.form['korean'], request.form['weight_in_gram_per_product'], request.form['unit'])
-                product.register()
-            elif 'price_ingredient_add_button' in request.form:
-                if request.form['date'] == '':
-                    date = None
-                else:
-                    date = request.form['date']
-                price_ingredient = Database.PricesIngredients(request.form['ingredientid'], request.form['price'],
-                                            request.form['weight_in_gram'], date)
-                price_ingredient.register()
-            elif 'price_packaging_add_button' in request.form:
-                if request.form['date'] == '':
-                    date = None
-                else:
-                    date = request.form['date']
-                packaging_price = Database.PricesPackaging(request.form['packagingid'], request.form['price_per_unit'],
-                                                              date)
-                packaging_price.register()
-            elif 'recipe_add_button' in request.form:
-                for item in request.form:
-                    if 'packagingid_' in item:
-                        packaging_recipe = Database.PackagingProduct(request.form['productid'],request.form[item])
-                        packaging_recipe.register()
-                    elif 'ingredientid_' in item:
-                        weight_in_gram = 'weight_in_gram_' + item.replace('ingredientid_', '')
-                        ingredient_recipe = Database.IngredientProduct(request.form['productid'],request.form[item],request.form[weight_in_gram])
-                        ingredient_recipe.register()
-        ingredients = main.read_table('ingredients')
-        products = main.read_table('products')
-        packaging = main.read_table('packaging')
-        return render_template('cost_calculation.html',nav_menu_admin=nav_menu_admin, packaging=packaging, ingredients=ingredients, products=products)
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])
@@ -209,10 +267,12 @@ def login():
         else:
             return redirect(url_for('login'))
 
+
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
     return redirect(url_for('index'))
+
 
 # ERROR HANDLING
 @app.errorhandler(400)

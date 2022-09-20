@@ -20,9 +20,11 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
 app.secret_key = main.get_secret_code()
-app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
-app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
+app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '/static/invoices/supplier'
+app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
 
+# app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
+# app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',

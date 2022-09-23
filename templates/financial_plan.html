@@ -19,13 +19,13 @@
 
                 <p class="number-format">Minimum investment cost: {{ total['minimum'] }}</p>
                 <p class="number-format">Maximum investment cost: {{ total['maximum'] }}</p>
-                <p>Turnover: <span id="total-turnover"></span></p>
-                <p>Turnover after VAT deduction: <span id="turnover-after-vat"></span> (Total VAT = <span id="total-vat"></span>)</p>
-                <p>Variable costs: <span id="variable-costs"></span></p>
+                <p>Turnover (all sold products * units): <span id="total-turnover"></span></p>
+                <p>Turnover after VAT deduction: <span class="total-turnover-after-vat"></span> (Total VAT = <span id="total-vat"></span>)</p>
+                <p>Variable costs: <span class="total-variable-costs"></span></p>
                 <p>Fixed costs per month: <span class="number-format"> <span
                         id="fixedCostTotal">{{ total['total_cost'] }}</span></span></p>
-                <p>Net profit: <span id="net-profit"></span></p>
-                <p><strong>Net profit After Corporate Tax: <span id="net-profit-after-tax"></span></strong> <br> >>>
+                <p>Net profit: <span id="net-profit"></span> >> (<span class="total-turnover-after-vat"> </span> - (<span class="total-variable-costs"> </span> + <span class="number-format"> {{ total['total_cost'] }} </span>))</p>
+                <p><strong>Net profit After Corporate Tax: <span id="net-profit-after-tax"></span></strong> (-11%) <br> >>>
                     money that goes to our pocket after everyone did 냠냠냠</p>
 
 
@@ -34,8 +34,8 @@
                 {#                <div>#}
                 {#                    <canvas id="myChart"></canvas>#}
                 {#                </div>#}
-                <h5>Net Profit after variable cost (breakeven) = money leftover to pay fixed costs. If I exceed the fixed costs, I make profit, if not I lose</h5>
-                <div class="">
+                <h6>Margin after variable cost (breakeven) = money leftover to pay fixed costs. If I exceed the fixed costs, I make profit, if not I lose</h6>
+                <div class="overflow-scroll max-height-table">
                     <table class="table table-striped table-hover table-warning" id="break-even-table">
                         <thead>
                         <tr class="table-secondary table-bordered">
@@ -89,7 +89,7 @@
 
                 <hr>
                 <h4>대차대조표</h4>
-                <div class="">
+                <div class="overflow-scroll max-height-table">
 
                     <table class="table  table-striped table-hover">
                         <thead>
@@ -142,7 +142,7 @@
                         data-bs-target="#investment_modal_add"
                         type="button">ADD INVESTMENT
                 </button>
-                <div class="">
+                <div class="overflow-scroll max-height-table">
 
                     <table class="table  table-striped table-hover">
                         <thead>
@@ -164,7 +164,7 @@
                 </div>
                 <hr>
                 <h4>목표원가계산</h4>
-                <div class="">
+                <div class="overflow-scroll max-height-table">
 
                     <table class="table table-striped table-hover">
                         <thead>
@@ -222,7 +222,7 @@
                 </button>
                 <hr>
                 <h4>목표영업이익</h4>
-                <div class="">
+                <div class="overflow-scroll max-height-table">
 
                     <table class="table table-striped table-hover">
                         <thead>
@@ -664,12 +664,6 @@
                     $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                 })
             }
-            $.fn.undigit = function () {
-                return this.each(function () {
-                    $(this).text($(this).text().replace(",", ""));
-                })
-            }
-
             function changeTable() {
                 var totalBreakeven = 0;
                 var turnoverTotal = 0;
@@ -703,8 +697,8 @@
                         totalVariableCosts += subTotalVariableCosts;
                     }
                 });
-                $('#turnover-after-vat').text(parseInt(turnoverAfterVat)).digits();
-                $('#variable-costs').text(parseInt(totalVariableCosts)).digits();
+                $('.total-turnover-after-vat').text(parseInt(turnoverAfterVat)).digits();
+                $('.total-variable-costs').text(parseInt(totalVariableCosts)).digits();
                 $('#total-turnover').text(parseInt(turnoverTotal)).digits();
                 $('#total-vat').text(parseInt(totalVAT)).digits();
 

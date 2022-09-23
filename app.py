@@ -31,9 +31,11 @@ nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Pla
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
                   '/invoices': 'Invoices'}
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # PUBLIC
 @app.route('/', methods=['GET', 'POST'])
@@ -150,11 +152,10 @@ def financial_plan():
                 elif 'investment_edit_button' in request.form:
                     investment.update_investment(request.form['investment_edit_button'])
             elif 'variable_cost_edit_button' in request.form or 'variable_cost_add_button' in request.form:
-                variable_cost = Database.VariableCost(request.form['english'], request.form['korean'],
-                                                      request.form['variable_cost'], request.form['selling_price_lv'],
-                                                      request.form['criteria_lv'], request.form['selling_price_mv'],
-                                                      request.form['criteria_mv'], request.form['selling_price_hv'],
-                                                      request.form['criteria_hv'], request.form['unit'],
+                variable_cost = Database.VariableCost(request.form['productid'], request.form['variable_cost'],
+                                                      request.form['selling_price_lv'], request.form['criteria_lv'],
+                                                      request.form['selling_price_mv'], request.form['criteria_mv'],
+                                                      request.form['selling_price_hv'], request.form['criteria_hv'],
                                                       request.form['work_time_min'], request.form['image'],
                                                       request.form['estimated_items'])
                 if 'variable_cost_add_button' in request.form:
@@ -182,6 +183,8 @@ def financial_plan():
             row = [row[0], row[1], row[2], row[4], row[5], row[6]]
             total['total_cost'] += row[3]
             fixed_costs.append(row)
+        variable_costs_edit = main.read_table('variable_costs')
+        variable_costs_edit_col = main.show_columns('variable_costs')
         variable_costs = main.fetch_variable_costs()[0]
         variable_costs_columns = main.fetch_variable_costs()[1]
         variable_costs_prefilled_input = ('', '', '', '', '>=', '', '>=', '', '>=', '', '', '.jpg')
@@ -192,7 +195,7 @@ def financial_plan():
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
                                net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,
-                               nav_menu_admin=nav_menu_admin)
+                               nav_menu_admin=nav_menu_admin,variable_costs_edit_col=variable_costs_edit_col,variable_costs_edit=variable_costs_edit)
 
 
 @app.route('/invoices', methods=['GET', 'POST'])
@@ -209,9 +212,15 @@ def invoices():
                 if file.filename == '':
                     return redirect(request.url)
                 if file and allowed_file(file.filename):
-                    filename = request.form['supplier_name'] + "_" + request.form['invoice_date'].replace('-','') + f"_{random.randint(1, 100)}." + file.filename.rsplit('.', 1)[1].lower()
+                    filename = request.form['supplier_name'] + "_" + request.form['invoice_date'].replace('-',
+                                                                                                          '') + f"_{random.randint(1, 100)}." + \
+                               file.filename.rsplit('.', 1)[1].lower()
                     file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'], filename))
-                    Database.InvoicesSupplier(file = filename, type = request.form['type'], payment_amount = request.form['payment_amount'], payment_method = request.form['payment_method'], supplier_name = request.form['supplier_name'], invoice_date = request.form['invoice_date']).register()
+                    Database.InvoicesSupplier(file=filename, type=request.form['type'],
+                                              payment_amount=request.form['payment_amount'],
+                                              payment_method=request.form['payment_method'],
+                                              supplier_name=request.form['supplier_name'],
+                                              invoice_date=request.form['invoice_date']).register()
                     return redirect(url_for('invoices'))
             elif 'invoice_customer_add_button' in request.form:
                 if 'file' not in request.files:
@@ -220,11 +229,17 @@ def invoices():
                 if file.filename == '':
                     return redirect(request.url)
                 if file and allowed_file(file.filename):
-                    filename = request.form['customer_name'] + "_" + request.form['invoice_date'].replace('-','') + f"_{random.randint(1, 100)}." + file.filename.rsplit('.', 1)[1].lower()
+                    filename = request.form['customer_name'] + "_" + request.form['invoice_date'].replace('-',
+                                                                                                          '') + f"_{random.randint(1, 100)}." + \
+                               file.filename.rsplit('.', 1)[1].lower()
                     file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename))
                     location = os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename)
                     flash(location)
-                    Database.InvoicesCustomer(file = filename, type = request.form['type'], payment_amount = request.form['payment_amount'],  payment_method = request.form['payment_method'], customer_name = request.form['customer_name'], invoice_date = request.form['invoice_date']).register()
+                    Database.InvoicesCustomer(file=filename, type=request.form['type'],
+                                              payment_amount=request.form['payment_amount'],
+                                              payment_method=request.form['payment_method'],
+                                              customer_name=request.form['customer_name'],
+                                              invoice_date=request.form['invoice_date']).register()
                     return redirect(url_for('invoices'))
 
         # invoices = main.read_table('invoices')
@@ -253,7 +268,7 @@ def recipes():
         if request.method == 'POST':
             if 'btn_edit_recipe' in request.form:
                 data = request.form['btn_edit_recipe'].split(',')
-                ingredient = Database.IngredientProduct(data[1],data[2], request.form['weight'])
+                ingredient = Database.IngredientProduct(data[1], data[2], request.form['weight'])
                 ingredient.update(data[0])
             elif 'btn_delete_recipe' in request.form:
                 main.delete_row_by_id('ingredientproduct', request.form['btn_delete_recipe'])

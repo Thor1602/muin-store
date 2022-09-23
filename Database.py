@@ -81,9 +81,11 @@ class Main:
         return self.execute_query(query="SELECT value FROM settings where key = 'kakao_javascript';", fetchOne=True)
 
     def fetch_variable_costs(self):
-        col = ('id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv', 'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'image', 'estimated_items')
+        col = ('id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
+               'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'image', 'estimated_items')
         SQL = "SELECT variable_costs.id, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, unit, work_time_min, image, estimated_items FROM products JOIN variable_costs ON variable_costs.productID = products.id;"
-        return (self.execute_query(SQL, fetchAll=True),col)
+        return (self.execute_query(SQL, fetchAll=True), col)
+
 
 class User(Main):
     def __init__(self, nickname, password, role, first_name, last_name, email, last_login):
@@ -115,7 +117,8 @@ class Contact(Main):
 
     def register_contact_query(self):
         SQL = "INSERT INTO contact_query (name, message, date, reason, phone, email, address, form_type) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);"
-        parameters = (self.name, self.message, self.date, self.reason, self.phone, self.email, self.address,self.form_type,)
+        parameters = (
+            self.name, self.message, self.date, self.reason, self.phone, self.email, self.address, self.form_type,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
@@ -158,10 +161,9 @@ class FixedCost(Main):
 
 
 class VariableCost(Main):
-    def __init__(self, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
-                 selling_price_hv, criteria_hv, unit, work_time_min, image, estimated_items):
-        self.english = english
-        self.korean = korean
+    def __init__(self, productid, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
+                 selling_price_hv, criteria_hv, work_time_min, image, estimated_items):
+        self.productid = productid
         self.variable_cost = variable_cost
         self.selling_price_lv = selling_price_lv
         self.criteria_lv = criteria_lv
@@ -169,26 +171,24 @@ class VariableCost(Main):
         self.criteria_mv = criteria_mv
         self.selling_price_hv = selling_price_hv
         self.criteria_hv = criteria_hv
-        self.unit = unit
         self.work_time_min = work_time_min
         self.image = image
         self.estimated_items = estimated_items
 
     def register_cost(self):
-        SQL = "INSERT INTO variable_costs (english, korean, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv,unit, work_time_min, image, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        SQL = "INSERT INTO variable_costs (productid, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv, work_time_min, image, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
-            self.english, self.korean, self.variable_cost, self.selling_price_lv, self.criteria_lv,
-            self.selling_price_mv,
-            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image,
+            self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv, self.selling_price_mv,
+            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min, self.image,
             self.estimated_items,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update_cost(self, id):
-        SQL = "UPDATE variable_costs SET english = %s, korean = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, unit = %s, work_time_min = %s, image = %s, estimated_items = %s WHERE id = %s;"
+        SQL = "UPDATE variable_costs SET productid = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, work_time_min = %s, image = %s, estimated_items = %s WHERE id = %s;"
         parameters = (
-            self.english, self.korean, self.variable_cost, self.selling_price_lv, self.criteria_lv,
+            self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv,
             self.selling_price_mv,
-            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.unit, self.work_time_min, self.image,
+            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min, self.image,
             self.estimated_items, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
@@ -336,7 +336,7 @@ class PackagingProduct(Main):
 
     def update(self, id):
         SQL = "UPDATE packagingproduct SET productID = %s, packagingID = %s WHERE id = %s;"
-        parameters = (self.productID, self.packagingID,id,)
+        parameters = (self.productID, self.packagingID, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
@@ -351,13 +351,16 @@ class InvoicesSupplier(Main):
 
     def register(self):
         SQL = "INSERT INTO invoices_suppliers (file, type, payment_amount, payment_method, supplier_name, invoice_date) VALUES (%s,%s,%s,%s,%s,%s);"
-        parameters = (self.file, self.type, self.payment_amount, self.payment_method, self.supplier_name, self.invoice_date,)
+        parameters = (
+            self.file, self.type, self.payment_amount, self.payment_method, self.supplier_name, self.invoice_date,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update(self, id):
         SQL = "UPDATE invoices_suppliers SET file = %s, type = %s, payment_amount = %s, payment_method = %s, supplier_name = %s , invoice_date = %s WHERE id = %s;"
-        parameters = (self.file, self.type, self.payment_amount, self.payment_method, self.supplier_name, self.invoice_date,id,)
+        parameters = (
+            self.file, self.type, self.payment_amount, self.payment_method, self.supplier_name, self.invoice_date, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
+
 
 class InvoicesCustomer(Main):
     def __init__(self, file, type, payment_amount, payment_method, customer_name, invoice_date):
@@ -370,10 +373,12 @@ class InvoicesCustomer(Main):
 
     def register(self):
         SQL = "INSERT INTO invoices_customers (file, type, payment_amount, payment_method, customer_name, invoice_date) VALUES (%s,%s,%s,%s,%s,%s);"
-        parameters = (self.file, self.type, self.payment_amount, self.payment_method, self.customer_name, self.invoice_date,)
+        parameters = (
+            self.file, self.type, self.payment_amount, self.payment_method, self.customer_name, self.invoice_date,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update(self, id):
         SQL = "UPDATE invoices_customers SET file = %s, type = %s, payment_amount = %s, payment_method = %s, customer_name = %s , invoice_date = %s WHERE id = %s;"
-        parameters = (self.file, self.type, self.payment_amount, self.payment_method, self.customer_name, self.invoice_date,id,)
+        parameters = (
+            self.file, self.type, self.payment_amount, self.payment_method, self.customer_name, self.invoice_date, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)

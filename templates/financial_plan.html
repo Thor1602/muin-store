@@ -399,7 +399,7 @@
     {% endfor %}
 
 
-    {% for row in variable_costs %}
+    {% for row in variable_costs_edit %}
         <div class="modal fade" id="variable_cost_modal_{{ row [0] }}" tabindex="-1" role="dialog"
              aria-labelledby="variableCostModalLabel{{ row[0] }}"
              aria-hidden="true">
@@ -417,9 +417,9 @@
                             {% for col in row %}
                                 <div class="mb-3">
                                     <label for="input{{ col }}{{ row[0] }}"
-                                           class="form-label text-capitalize">{{ variable_costs_columns[loop.index0] | replace("_", " ") }}</label>
+                                           class="form-label text-capitalize">{{ variable_costs_edit_col[loop.index0] | replace("_", " ") }}</label>
                                     <input type="text" class="form-control" id="input{{ col }}{{ row[0] }}"
-                                           name="{{ variable_costs_columns[loop.index0] }}"
+                                           name="{{ variable_costs_edit_col[loop.index0] }}"
                                            value="{{ col }}">
                                 </div>
                             {% endfor %}

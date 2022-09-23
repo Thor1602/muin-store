@@ -19,12 +19,12 @@
 
                 <p class="number-format">Minimum investment cost: {{ total['minimum'] }}</p>
                 <p class="number-format">Maximum investment cost: {{ total['maximum'] }}</p>
-                <p>Turnover (all sold products * units): <span id="total-turnover"></span></p>
+                <p>Turnover (all sold products): <span id="total-turnover"></span></p>
                 <p>Turnover after VAT deduction: <span class="total-turnover-after-vat"></span> (Total VAT = <span id="total-vat"></span>)</p>
                 <p>Variable costs: <span class="total-variable-costs"></span></p>
                 <p>Fixed costs per month: <span class="number-format"> <span
                         id="fixedCostTotal">{{ total['total_cost'] }}</span></span></p>
-                <p>Net profit: <span id="net-profit"></span> >> (<span class="total-turnover-after-vat"> </span> - (<span class="total-variable-costs"> </span> + <span class="number-format"> {{ total['total_cost'] }} </span>))</p>
+                <p>Net profit: <span id="net-profit"></span> >> (<span class="total-turnover-after-vat"> </span> - (<span class="total-variable-costs"> </span> + <span class="number-format"> {{ total['total_cost'] }}</span>))</p>
                 <p><strong>Net profit After Corporate Tax: <span id="net-profit-after-tax"></span></strong> (-11%) <br> >>>
                     money that goes to our pocket after everyone did 냠냠냠</p>
 

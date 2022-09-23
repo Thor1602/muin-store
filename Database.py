@@ -80,6 +80,11 @@ class Main:
     def get_kakao_api_js(self):
         return self.execute_query(query="SELECT value FROM settings where key = 'kakao_javascript';", fetchOne=True)
 
+    def fetch_variable_costs(self):
+        col = ('id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv', 'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'image', 'estimated_items')
+        SQL = "SELECT variable_costs.id, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, unit, work_time_min, image, estimated_items FROM products JOIN variable_costs ON variable_costs.productID = products.id;"
+        return (self.execute_query(SQL, fetchAll=True),col)
+
 class User(Main):
     def __init__(self, nickname, password, role, first_name, last_name, email, last_login):
         self.first_name = first_name

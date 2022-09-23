@@ -182,8 +182,8 @@ def financial_plan():
             row = [row[0], row[1], row[2], row[4], row[5], row[6]]
             total['total_cost'] += row[3]
             fixed_costs.append(row)
-        variable_costs = main.read_table('variable_costs')
-        variable_costs_columns = main.show_columns('variable_costs')
+        variable_costs = main.fetch_variable_costs()[0]
+        variable_costs_columns = main.fetch_variable_costs()[1]
         variable_costs_prefilled_input = ('', '', '', '', '>=', '', '>=', '', '>=', '', '', '.jpg')
         net_profit = {}
         for row in variable_costs:

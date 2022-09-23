@@ -187,7 +187,7 @@ def financial_plan():
         variable_costs_prefilled_input = ('', '', '', '', '>=', '', '>=', '', '>=', '', '', '.jpg')
         net_profit = {}
         for row in variable_costs:
-            net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[13]]
+            net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[13], row[3]]
 
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,

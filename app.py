@@ -7,6 +7,10 @@ a Creative Commons Attribution-ShareAlike 3.0 Unported License.
 ©Thorben, 2021
 email: thorbendhaenenstd@gmail.com
 
+TODO add file handler cloud
+TODO add kakao alert messaging
+TODO add email alert messaging
+TODO add editing list for product, ingredient, recipe, etc
 """
 import os
 import pathlib
@@ -94,7 +98,7 @@ def cost_calculation():
                 packaging.register()
             elif 'product_add_button' in request.form:
                 product = Database.Products(request.form['english'], request.form['korean'],
-                                            request.form['weight_in_gram_per_product'], request.form['unit'])
+                                            request.form['weight_in_gram_per_product'], request.form['unit'], request.form['image'])
                 product.register()
             elif 'price_ingredient_add_button' in request.form:
                 if request.form['date'] == '':
@@ -156,13 +160,12 @@ def financial_plan():
                                                       request.form['selling_price_lv'], request.form['criteria_lv'],
                                                       request.form['selling_price_mv'], request.form['criteria_mv'],
                                                       request.form['selling_price_hv'], request.form['criteria_hv'],
-                                                      request.form['work_time_min'], request.form['image'],
+                                                      request.form['work_time_min'],
                                                       request.form['estimated_items'])
                 if 'variable_cost_add_button' in request.form:
                     variable_cost.register_cost()
                 elif 'variable_cost_edit_button' in request.form:
                     variable_cost.update_cost(request.form['variable_cost_edit_button'])
-
             elif 'btn_delete_fixed_cost' in request.form:
                 main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
             elif 'btn_delete_investment' in request.form:
@@ -184,10 +187,11 @@ def financial_plan():
             total['total_cost'] += row[3]
             fixed_costs.append(row)
         variable_costs_edit = main.read_table('variable_costs')
+        products = main.read_table('products')
         variable_costs_edit_col = main.show_columns('variable_costs')
         variable_costs = main.fetch_variable_costs()[0]
         variable_costs_columns = main.fetch_variable_costs()[1]
-        variable_costs_prefilled_input = ('', '', '', '', '>=', '', '>=', '', '>=', '', '', '.jpg')
+        variable_costs_prefilled_input = ('', '','>=', '', '>=', '', '>=', '', '','', '')
         net_profit = {}
         for row in variable_costs:
             net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[13], row[3]]
@@ -195,7 +199,7 @@ def financial_plan():
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
                                net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,
-                               nav_menu_admin=nav_menu_admin,variable_costs_edit_col=variable_costs_edit_col,variable_costs_edit=variable_costs_edit)
+                               nav_menu_admin=nav_menu_admin,variable_costs_edit_col=variable_costs_edit_col,variable_costs_edit=variable_costs_edit,products=products)
 
 
 @app.route('/invoices', methods=['GET', 'POST'])

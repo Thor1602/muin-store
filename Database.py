@@ -81,9 +81,9 @@ class Main:
         return self.execute_query(query="SELECT value FROM settings where key = 'kakao_javascript';", fetchOne=True)
 
     def fetch_variable_costs(self):
-        col = ('id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
-               'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'image', 'estimated_items')
-        SQL = "SELECT variable_costs.id, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, unit, work_time_min, image, estimated_items FROM products JOIN variable_costs ON variable_costs.productID = products.id;"
+        col = ('cost_id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
+               'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'estimated_items', 'product_ID')
+        SQL = "SELECT variable_costs.id, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, unit, work_time_min, estimated_items, productid FROM products JOIN variable_costs ON variable_costs.productID = products.id;"
         return (self.execute_query(SQL, fetchAll=True), col)
 
 
@@ -162,7 +162,7 @@ class FixedCost(Main):
 
 class VariableCost(Main):
     def __init__(self, productid, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
-                 selling_price_hv, criteria_hv, work_time_min, image, estimated_items):
+                 selling_price_hv, criteria_hv, work_time_min, estimated_items):
         self.productid = productid
         self.variable_cost = variable_cost
         self.selling_price_lv = selling_price_lv
@@ -172,23 +172,22 @@ class VariableCost(Main):
         self.selling_price_hv = selling_price_hv
         self.criteria_hv = criteria_hv
         self.work_time_min = work_time_min
-        self.image = image
         self.estimated_items = estimated_items
 
     def register_cost(self):
-        SQL = "INSERT INTO variable_costs (productid, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv, work_time_min, image, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        SQL = "INSERT INTO variable_costs (productid, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv, work_time_min, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
             self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv, self.selling_price_mv,
-            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min, self.image,
+            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min,
             self.estimated_items,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update_cost(self, id):
-        SQL = "UPDATE variable_costs SET productid = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, work_time_min = %s, image = %s, estimated_items = %s WHERE id = %s;"
+        SQL = "UPDATE variable_costs SET productid = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, work_time_min = %s, estimated_items = %s WHERE id = %s;"
         parameters = (
             self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv,
             self.selling_price_mv,
-            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min, self.image,
+            self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min,
             self.estimated_items, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
@@ -289,21 +288,22 @@ class PricesPackaging(Main):
 
 
 class Products(Main):
-    def __init__(self, english, korean, weight_in_gram_per_product, unit):
+    def __init__(self, english, korean, weight_in_gram_per_product, unit, image):
         self.english = english
         self.korean = korean
         self.weight_in_gram_per_product = weight_in_gram_per_product
         self.unit = unit
+        self.image = image
 
     def register(self):
-        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit) VALUES (%s,%s,%s,%s);"
-        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit,)
+        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit ,image) VALUES (%s,%s,%s,%s,%s);"
+        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit,self.image,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update(self, id):
-        SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s WHERE id = %s;"
+        SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s, image = %s WHERE id = %s;"
         parameters = (
-            self.english, self.korean, self.weight_in_gram_per_product, self.unit, id,)
+            self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 

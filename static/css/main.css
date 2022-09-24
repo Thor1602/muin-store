@@ -43,6 +43,24 @@ h6 {
     font-family: var(--font-primary);
 }
 
+
+.full-screen {
+    display: inline;
+}
+
+.short-screen {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .full-screen {
+        display: none;
+    }
+
+    .short-screen {
+        display: inline;
+    }
+}
 /*--------------------------------------------------------------
 # Sections & Section Header
 --------------------------------------------------------------*/
@@ -284,6 +302,9 @@ section {
 
 .topbar .social-links a:hover {
     color: #fff;
+}
+.topbar .margin-right-8 {
+    margin-right: 8px;
 }
 
 .header {
@@ -2738,9 +2759,12 @@ hr {
     border: none;
     opacity: 100%;
 }
-.keep-all{
+
+.keep-all {
     word-break: keep-all;
 }
-.max-height-table{
+
+.max-height-table {
     max-height: 600px;
 }
+

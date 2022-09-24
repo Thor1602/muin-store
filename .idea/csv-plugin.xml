@@ -80,6 +80,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\templates\base.html">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\templates\blog.html">
           <value>
             <Attribute>

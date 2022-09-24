@@ -17,6 +17,8 @@ import pathlib
 import random
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
+from flask_babel import Babel, gettext
+
 import Database
 import Contact
 
@@ -26,7 +28,9 @@ main = Database.Main()
 app.secret_key = main.get_secret_code()
 app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '/static/invoices/supplier'
 app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
-
+app.config['BABEL_DEFAULT_LOCALE'] = 'ko'
+app.config['LANGUAGES'] = ('ko', 'en')
+babel = Babel(app)
 # app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
 # app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -40,11 +44,17 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# BABEL CONFIG
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 # PUBLIC
 @app.route('/', methods=['GET', 'POST'])
 def index():
     api_kakao_js = main.get_kakao_api_js()
+    slogan = gettext('I like cake')
+    # <b>{{ gettext('Free Trial') }}</b>  use _() as a shortcut for gettext().
     return render_template('index.html', api_kakao_js=api_kakao_js)
 
 
@@ -194,7 +204,7 @@ def financial_plan():
         variable_costs_prefilled_input = ('', '','>=', '', '>=', '', '>=', '', '','', '')
         net_profit = {}
         for row in variable_costs:
-            net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[13], row[3]]
+            net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[12], row[3]]
 
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,

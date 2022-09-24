@@ -53,6 +53,7 @@ try {
     window.kakaoDemoException && window.kakaoDemoException(e)
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
     "use strict";
 

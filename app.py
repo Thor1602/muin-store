@@ -21,7 +21,6 @@ from flask_babel import Babel, gettext, ngettext, lazy_gettext
 from flask_mail import Mail, Message
 
 import Database
-import Contact
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
@@ -31,14 +30,15 @@ app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__
 app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
 app.config['BABEL_DEFAULT_LOCALE'] = 'ko'
 app.config['LANGUAGES'] = ('ko', 'en')
+mail_cred = main.get_smtp()
 app.config.update(dict(
     DEBUG = True,
     MAIL_SERVER = 'smtp.gmail.com',
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'thorbendhaenenstd@gmail.com',
-    MAIL_PASSWORD = 'ejkprlxysssymdgc',
+    MAIL_USERNAME = mail_cred[0],
+    MAIL_PASSWORD = mail_cred[1],
 ))
 
 babel = Babel(app)
@@ -79,7 +79,7 @@ def contact_submission():
         admin_msg = Message("Coup De Foudre: Customer Contact Submit Website",
                             sender="from@example.com",
                             recipients=["to@example.com"])
-        admin_msg.recipients = ["rlatnals3020@naver.com"]
+        admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
         admin_msg.html = f"<b>Hello Sumin. {request.form['name']} contacted us on our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>"
         mail.send(admin_msg)
         # cust_msg = Message("Coup De Foudre Customer Service",

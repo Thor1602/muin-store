@@ -86,6 +86,12 @@ class Main:
         SQL = "SELECT variable_costs.id, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, unit, work_time_min, estimated_items, productid FROM products JOIN variable_costs ON variable_costs.productID = products.id;"
         return (self.execute_query(SQL, fetchAll=True), col)
 
+    def add_setting(self, name, key, value):
+        self.execute_query("INSERT INTO settings (name, key, value) VALUES (%s,%s,%s)",
+                           (name, key, value,), commit=True)
+    def get_smtp(self):
+        return self.execute_query(query="SELECT key, value FROM settings where name = 'main_gmail';", fetchAll=True)[0]
+
 
 class User(Main):
     def __init__(self, nickname, password, role, first_name, last_name, email, last_login):

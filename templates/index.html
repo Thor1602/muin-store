@@ -16,7 +16,7 @@
         <div class="container position-relative">
             <div class="row gy-5" data-aos="fade-in">
                 <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center text-center text-lg-start">
-                    <h2><span>Coup De Foudre</span></h2>
+                    <h2><span>{{ gettext('Coup De Foudre') }}</span></h2>
                     <p></p>
                     <div class="d-flex justify-content-center justify-content-lg-start">
                         <a href="https://www.youtube.com/watch?v=9i1G8i_Q-Lk&ab_channel=DessertsbyDesign"
@@ -346,9 +346,9 @@
                                 <div class="sent-message">Your message has been sent. Thank you!</div>
                             </div>
                             <div class="text-center">
-                                <input type="button" onClick="sendLinkCustom();" value="Custom"/>
-                                <input type="button" onClick="sendLinkDefault();" value="Default"/>
-                                <button type="button" id="contact_submit_button">Send Message</button>
+{#                                <input type="button" onClick="sendLinkCustom();" value="Custom"/>#}
+{#                                <input type="button" onClick="sendLinkDefault();" value="Default"/>#}
+                                <button type="submit" id="contact_submit_button">Send Message</button>
                             </div>
                         </form>
                     </div><!-- End Contact Form -->
@@ -383,7 +383,7 @@
             <div class="col-lg-2 col-6 footer-links">
                 <h4>Useful Links</h4>
                 <ul>
-                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
                     <li><a href="#">About us</a></li>
                     <li><a href="#">Services</a></li>
                     <li><a href="#">Terms of service</a></li>

@@ -17,6 +17,8 @@ import pathlib
 import random
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
+from flask_babel import Babel, gettext, ngettext, lazy_gettext
+from flask_mail import Mail, Message
 
 import Database
 import Contact
@@ -29,6 +31,19 @@ app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__
 app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
 app.config['BABEL_DEFAULT_LOCALE'] = 'ko'
 app.config['LANGUAGES'] = ('ko', 'en')
+app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'thorbendhaenenstd@gmail.com',
+    MAIL_PASSWORD = 'ejkprlxysssymdgc',
+))
+
+babel = Babel(app)
+mail = Mail(app)
+
 # app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
 # app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -42,21 +57,40 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# BABEL CONFIG
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 # PUBLIC
 @app.route('/', methods=['GET', 'POST'])
 def index():
     api_kakao_js = main.get_kakao_api_js()
+    title = lazy_gettext('I like cake')
+    # <b>{{ gettext('Free Trial') }}</b>  use _() as a shortcut for gettext().
+
     return render_template('index.html', api_kakao_js=api_kakao_js)
 
 
 @app.route("/contact_submission", methods=["GET", "POST"])
 def contact_submission():
     if request.method == "POST":
-        print(request.form)
-        cform = Contact.contactForm()
-        if cform.validate_on_submit():
-            print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
+        # msg.recipients = ["rlatnals3020@naver.com"]
+        admin_msg = Message("Coup De Foudre: Customer Contact Submit Website",
+                            sender="from@example.com",
+                            recipients=["to@example.com"])
+        admin_msg.recipients = ["rlatnals3020@naver.com"]
+        admin_msg.html = f"<b>Hello Sumin. {request.form['name']} contacted us on our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>"
+        mail.send(admin_msg)
+        # cust_msg = Message("Coup De Foudre Customer Service",
+        #                    sender="from@example.com",
+        #                    recipients=["to@example.com"])
+        # cust_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+        # cust_msg.html = f"<b>Thank you for contacting us, {request.form['name']}. We will reply ASAP.</b>"
+        # cust_msg.send(cust_msg)
+        # cform = Contact.contactForm()
+        # if cform.validate_on_submit():
+        #     print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
     return redirect(url_for('index'))
 
 

@@ -9,15 +9,12 @@ email: thorbendhaenenstd@gmail.com
 
 TODO add file handler cloud
 TODO add kakao alert messaging
-TODO add email alert messaging
-TODO add editing list for product, ingredient, recipe, etc
 """
 import os
 import pathlib
 import random
 
-from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
-from flask_babel import Babel, gettext, ngettext, lazy_gettext
+from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response
 from flask_mail import Mail, Message
 
 import Database
@@ -28,20 +25,19 @@ main = Database.Main()
 app.secret_key = main.get_secret_code()
 app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '/static/invoices/supplier'
 app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
-app.config['BABEL_DEFAULT_LOCALE'] = 'ko'
-app.config['LANGUAGES'] = ('ko', 'en')
+app.config['BABEL_DEFAULT_LOCALE'] = 'ko_KR'
+app.config['LANGUAGES'] = ('ko_KR', 'en')
 mail_cred = main.get_smtp()
 app.config.update(dict(
-    DEBUG = True,
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_USE_SSL = False,
-    MAIL_USERNAME = mail_cred[0],
-    MAIL_PASSWORD = mail_cred[1],
+    DEBUG=True,
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=mail_cred[0],
+    MAIL_PASSWORD=mail_cred[1],
 ))
 
-babel = Babel(app)
 mail = Mail(app)
 
 # app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
@@ -50,30 +46,41 @@ mail = Mail(app)
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
-                  '/invoices': 'Invoices'}
+                  '/invoices': 'Invoices', '/homepage_admin': 'homepage_admin'}
+web_translations = main.read_table('web_translations')
+korean_translation = {}
+english_translation = {}
+for x in web_translations:
+    key = x[1]
+    korean_translation[key] = x[2]
+    english_translation[key] = x[3]
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# BABEL CONFIG
-@babel.localeselector
+
+@app.context_processor
 def get_locale():
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    if session["preferred_language"] == 'ko_KR' or session["preferred_language"] == None:
+        return dict(msgid=korean_translation)
+    else:
+        return dict(msgid=english_translation)
+
 
 # PUBLIC
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/lang_<lang>", methods=['GET', 'POST'])
+def set_language(lang):
+    session["preferred_language"] = lang
+    return redirect(session['url'])
+
+
+@app.route("/", methods=['GET', 'POST'])
 def index():
+    session['url'] = request.url
     api_kakao_js = main.get_kakao_api_js()
-    title = lazy_gettext('I like cake')
     # <b>{{ gettext('Free Trial') }}</b>  use _() as a shortcut for gettext().
-
-    return render_template('index.html', api_kakao_js=api_kakao_js)
-
-
-@app.route("/contact_submission", methods=["GET", "POST"])
-def contact_submission():
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
         admin_msg = Message("Coup De Foudre: Customer Contact Submit Website",
@@ -91,7 +98,7 @@ def contact_submission():
         # cform = Contact.contactForm()
         # if cform.validate_on_submit():
         #     print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
-    return redirect(url_for('index'))
+    return render_template('index.html', api_kakao_js=api_kakao_js)
 
 
 # ADMIN
@@ -134,7 +141,8 @@ def cost_calculation():
                 packaging.register()
             elif 'product_add_button' in request.form:
                 product = Database.Products(request.form['english'], request.form['korean'],
-                                            request.form['weight_in_gram_per_product'], request.form['unit'], request.form['image'])
+                                            request.form['weight_in_gram_per_product'], request.form['unit'],
+                                            request.form['image'])
                 product.register()
             elif 'price_ingredient_add_button' in request.form:
                 if request.form['date'] == '':
@@ -227,7 +235,7 @@ def financial_plan():
         variable_costs_edit_col = main.show_columns('variable_costs')
         variable_costs = main.fetch_variable_costs()[0]
         variable_costs_columns = main.fetch_variable_costs()[1]
-        variable_costs_prefilled_input = ('', '','>=', '', '>=', '', '>=', '', '','', '')
+        variable_costs_prefilled_input = ('', '', '>=', '', '>=', '', '>=', '', '', '', '')
         net_profit = {}
         for row in variable_costs:
             net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[12], row[3]]
@@ -235,7 +243,8 @@ def financial_plan():
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
                                net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,
-                               nav_menu_admin=nav_menu_admin,variable_costs_edit_col=variable_costs_edit_col,variable_costs_edit=variable_costs_edit,products=products)
+                               nav_menu_admin=nav_menu_admin, variable_costs_edit_col=variable_costs_edit_col,
+                               variable_costs_edit=variable_costs_edit, products=products)
 
 
 @app.route('/invoices', methods=['GET', 'POST'])
@@ -320,6 +329,26 @@ def recipes():
                                products=products)
 
 
+@app.route('/homepage_admin', methods=['GET', 'POST'])
+def homepage_admin():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        web_translations_col = main.show_columns('web_translations')
+        if request.method == 'POST':
+            translation_object = Database.WebTranslations(request.form[web_translations_col[1]],
+                                                          request.form[web_translations_col[2]],
+                                                          request.form[web_translations_col[3]])
+            print(request.form)
+            if 'translation_modal_add_button' in request.form:
+                translation_object.register()
+            elif 'translation_modal_edit_button' in request.form:
+                translation_object.update(request.form['translation_modal_edit_button'])
+                global web_translations
+                web_translations = main.read_table('web_translations')
+        return render_template('homepage_admin.html', web_translations=web_translations,
+                               web_translations_col=web_translations_col)
+
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -334,12 +363,10 @@ def login():
         else:
             return redirect(url_for('login'))
 
-
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
     return redirect(url_for('index'))
-
 
 # ERROR HANDLING
 @app.errorhandler(400)
@@ -347,24 +374,20 @@ def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 400
 
-
 @app.errorhandler(403)
 def forbidden(e):
     e_friendly = "a forbidden resource"
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 403
-
 
 @app.errorhandler(404)
 def not_found(e):
     e_friendly = "chap, you made a mistake typing that URL"
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 404
 
-
 @app.errorhandler(410)
 def gone(e):
     e_friendly = "The page existed but is deleted and sent to Valhalla for all eternity."
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 410
-
 
 @app.errorhandler(500)
 def internal_server_error(e):

@@ -2768,3 +2768,10 @@ hr {
     max-height: 600px;
 }
 
+.kakao-icon {
+    height: 55px;
+}
+
+.textarea-translations{
+    height: 100%;
+}

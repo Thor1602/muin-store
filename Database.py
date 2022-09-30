@@ -82,13 +82,15 @@ class Main:
 
     def fetch_variable_costs(self):
         col = ('cost_id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
-               'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'estimated_items', 'product_ID')
+               'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'estimated_items',
+               'product_ID')
         SQL = "SELECT variable_costs.id, english, korean, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, unit, work_time_min, estimated_items, productid FROM products JOIN variable_costs ON variable_costs.productID = products.id;"
         return (self.execute_query(SQL, fetchAll=True), col)
 
     def add_setting(self, name, key, value):
         self.execute_query("INSERT INTO settings (name, key, value) VALUES (%s,%s,%s)",
                            (name, key, value,), commit=True)
+
     def get_smtp(self):
         return self.execute_query(query="SELECT key, value FROM settings where name = 'main_gmail';", fetchAll=True)[0]
 
@@ -303,7 +305,7 @@ class Products(Main):
 
     def register(self):
         SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit ,image) VALUES (%s,%s,%s,%s,%s);"
-        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit,self.image,)
+        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update(self, id):
@@ -387,4 +389,37 @@ class InvoicesCustomer(Main):
         SQL = "UPDATE invoices_customers SET file = %s, type = %s, payment_amount = %s, payment_method = %s, customer_name = %s , invoice_date = %s WHERE id = %s;"
         parameters = (
             self.file, self.type, self.payment_amount, self.payment_method, self.customer_name, self.invoice_date, id,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class WebTranslations(Main):
+    def __init__(self, msgid, english, korean):
+        self.msgid = msgid
+        self.english = english
+        self.korean = korean
+
+    def register(self):
+        SQL = "INSERT INTO web_translations (msgid, korean, english) VALUES (%s,%s,%s);"
+        parameters = (self.msgid, self.korean, self.english, )
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update(self, id):
+        SQL = "UPDATE web_translations SET msgid = %s, korean = %s, english = %s WHERE id = %s;"
+        parameters = (self.msgid, self.korean, self.english, id,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+class RecipeComments(Main):
+    def __init__(self, productid, comment):
+        self.productid = productid
+        self.comment = comment
+
+    def register(self):
+        SQL = "INSERT INTO recipe_comments (productid, comment) VALUES (%s,%s);"
+        parameters = (self.productid, self.comment,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update(self, id):
+        SQL = "UPDATE recipe_comments SET productid = %s, comment = %s WHERE id = %s;"
+        parameters = (
+            self.productid, self.comment, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)

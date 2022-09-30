@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block nav %}
+    {% for menu_item in nav_menu_admin %}
+        <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+    {% endfor %}
+
+{% endblock %}
+
+{% block body %}
+    <!-- Start main content Section -->
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-header">
+                <h2>Admin</h2>
+                <p>Modify Home Page</p>
+            </div>
+            <hr>
+            <div class="row gy-4">
+                <div>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <ul class=flashes>
+                                {% for message in messages %}
+                                    <li>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#translation_modal_add"
+                        type="button">ADD TRANSLATION
+                </button>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table  table-striped table-hover">
+                        <thead>
+                        <tr class="keep-all">
+                            <th scope="col"></th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Korean</th>
+                            <th scope="col">English</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for row in web_translations %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#translation_modal_edit_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+
+                                <th>{{ row[1] }}</th>
+                                <th>{{ row[2] }}</th>
+                                <th>{{ row[3] }}</th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- End main content Section -->
+    <!-- Start add translation modal -->
+
+    <div class="modal fade" id="translation_modal_add" tabindex="-1" role="dialog"
+         aria-labelledby="invoiceTranslationModalLabelAdd"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceTranslationModalLabelAdd">ADD TRANSLATION</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form enctype="multipart/form-data" method="post" action="/homepage_admin">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="id"
+                                   class="form-label">Message ID</label>
+                            <input type="text" class="form-control" id="id"
+                                   name="{{ web_translations_col[1] }}"
+                                   value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Korean"
+                                   class="form-label">Korean</label>
+                            <textarea type="text" class="form-control" id="Korean"
+                                      name="{{ web_translations_col[2] }}" rows="10" style="height: 100%"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="English"
+                                   class="form-label">English</label>
+                            <textarea type="text" class="form-control" id="English"
+                                   name="{{ web_translations_col[3] }}" rows="10" style="height: 100%"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="translation_modal_add_button"
+                                value="">ADD TRANSLATION
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End add translation  modal -->
+    <!-- Start edit translation modals -->
+    {% for row in web_translations %}
+    <div class="modal fade" id="translation_modal_edit_{{ row[0] }}" tabindex="-1" role="dialog"
+         aria-labelledby="invoiceTranslationModalLabelEdit{{ row[0] }}"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceTranslationModalLabelEdit{{ row[0] }}">EDIT TRANSLATION</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form enctype="multipart/form-data" method="post" action="/homepage_admin">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="id"
+                                   class="form-label">Message ID (don't change)</label>
+                            <input type="text" class="form-control" id="id"
+                                   name="{{ web_translations_col[1] }}"
+                                   value="{{ row[1] }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Korean"
+                                   class="form-label">Korean</label>
+                            <textarea type="text" class="form-control textarea-translations" id="Korean"
+                                      name="{{ web_translations_col[2] }}" rows="10">{{ row[2] }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="English"
+                                   class="form-label">English</label>
+                            <textarea type="text" class="form-control textarea-translations" id="English"
+                                   name="{{ web_translations_col[3] }}" rows="10">{{ row[3] }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="translation_modal_edit_button"
+                                value="{{ row[0] }}">EDIT TRANSLATION
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- End edit translation modals -->
+{% endblock %}
+
+

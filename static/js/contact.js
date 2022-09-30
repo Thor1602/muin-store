@@ -1,17 +1,4 @@
 $(document).ready(function () {
-    test_kakao
-    $('#test_kakao').click(function () {
-        Kakao.API.request({
-            url: '/v1/api/talk/profile',
-            success: function (response) {
-                alert(response);
-            },
-            fail: function (error) {
-                alert(error);
-            }
-        });
-    })
-
     $('#contact_submit_button').click(function () {
         $("#contact_form").validate({
             errorPlacement: function ($error, $element) {
@@ -52,12 +39,18 @@ $(document).ready(function () {
             $('.loading').delay(300).fadeOut(100);
         });
         $.ajax({
-            url: '/contact_submission',
+            url: '/',
             type: 'POST',
             data: $('#contact_form').serialize(),
             datatype: 'json'
         })
             .done(function (data) {
+                $("#name").val('');
+                $("#email").val('');
+                $("#address").val('');
+                $("#phone").val('');
+                $("#subject").val('');
+                $("#message").val('');
                 $('.sent-message').fadeIn(2000);
                 $('.sent-message').delay(8000).fadeOut(500);
 

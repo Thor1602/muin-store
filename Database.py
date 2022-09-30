@@ -393,7 +393,7 @@ class InvoicesCustomer(Main):
 
 
 class WebTranslations(Main):
-    def __init__(self, msgid, english, korean):
+    def __init__(self, msgid, korean, english):
         self.msgid = msgid
         self.english = english
         self.korean = korean

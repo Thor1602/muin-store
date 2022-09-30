@@ -339,7 +339,6 @@ def homepage_admin():
             translation_object = Database.WebTranslations(request.form[web_translations_col[1]],
                                                           request.form[web_translations_col[2]],
                                                           request.form[web_translations_col[3]])
-            print(request.form)
             if 'translation_modal_add_button' in request.form:
                 translation_object.register()
             elif 'translation_modal_edit_button' in request.form:

@@ -48,8 +48,13 @@ class Main:
         parameters = (table_name,)
         return [x[0] for x in self.execute_query(query=SQL, parameters=parameters, fetchAll=True)]
 
-    def read_table(self, table_name):
-        SQL = f"SELECT * from {table_name};"
+    def read_table(self, table_name, order_asc="", order_desc=""):
+        argument = ""
+        if order_asc != "":
+            argument = f"order by {order_asc} asc"
+        if order_desc != "":
+            argument = f"order by {order_desc} desc"
+        SQL = f"SELECT * from {table_name} {argument};"
         return self.execute_query(query=SQL, fetchAll=True)
 
     def create_table(self, table_name, columns):

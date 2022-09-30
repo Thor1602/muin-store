@@ -61,6 +61,7 @@ def allowed_file(filename):
 @app.context_processor
 def get_locale():
     session_name = session.get("preferred_language", default='ko_KR')
+    session['url'] = request.url
     if session_name == 'ko_KR':
         return dict(msgid=korean_translation)
     else:
@@ -76,7 +77,6 @@ def set_language(lang):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    session['url'] = request.url
     api_kakao_js = main.get_kakao_api_js()
     # <b>{{ gettext('Free Trial') }}</b>  use _() as a shortcut for gettext().
     if request.method == "POST":
@@ -332,6 +332,7 @@ def homepage_admin():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
+        sorted_web_translations = main.read_table('web_translations', order_asc="msgid")
         web_translations_col = main.show_columns('web_translations')
         if request.method == 'POST':
             translation_object = Database.WebTranslations(request.form[web_translations_col[1]],
@@ -343,7 +344,7 @@ def homepage_admin():
                 translation_object.update(request.form['translation_modal_edit_button'])
                 global web_translations
                 web_translations = main.read_table('web_translations')
-        return render_template('homepage_admin.html', web_translations=web_translations,
+        return render_template('homepage_admin.html', web_translations=sorted_web_translations,
                                web_translations_col=web_translations_col)
 
 # LOGIN LOGOUT

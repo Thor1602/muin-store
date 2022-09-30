@@ -25,8 +25,7 @@ main = Database.Main()
 app.secret_key = main.get_secret_code()
 app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '/static/invoices/supplier'
 app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
-app.config['BABEL_DEFAULT_LOCALE'] = 'ko_KR'
-app.config['LANGUAGES'] = ('ko_KR', 'en')
+app.config['DEFAULT_LOCALE'] = 'ko_KR'
 mail_cred = main.get_smtp()
 app.config.update(dict(
     DEBUG=True,
@@ -55,15 +54,14 @@ for x in web_translations:
     korean_translation[key] = x[2]
     english_translation[key] = x[3]
 
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 @app.context_processor
 def get_locale():
-    if session["preferred_language"] == 'ko_KR' or session["preferred_language"] == None:
+    session_name = session.get("preferred_language", default='ko_KR')
+    if session_name == 'ko_KR':
         return dict(msgid=korean_translation)
     else:
         return dict(msgid=english_translation)

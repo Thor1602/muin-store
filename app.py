@@ -10,14 +10,17 @@ email: thorbendhaenenstd@gmail.com
 TODO add file handler cloud
 TODO add kakao alert messaging
 """
+import datetime
 import os
 import pathlib
 import random
 
 from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response
 from flask_mail import Mail, Message
+import googledrive_connector
 
 import Database
+
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
@@ -41,11 +44,11 @@ mail = Mail(app)
 
 # app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
 # app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
-# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
-                  '/invoices': 'Invoices', '/homepage_admin': 'homepage_admin'}
+                  '/invoices': 'Invoices', '/homepage_admin': 'homepage_admin', '/images': 'images'}
 web_translations = main.read_table('web_translations')
 korean_translation = {}
 english_translation = {}
@@ -251,7 +254,6 @@ def invoices():
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
-            print(request.form)
             if 'invoice_supplier_add_button' in request.form:
                 if 'file' not in request.files:
                     return redirect(request.url)
@@ -298,6 +300,55 @@ def invoices():
                                invoices_customer=invoices_customer, invoices_supplier_columns=invoices_supplier_columns,
                                invoices_customer_columns=invoices_customer_columns)
 
+@app.route('/images', methods=['GET', 'POST'])
+def images():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        if request.method == 'POST':
+            if 'images_add_button' in request.form:
+                if 'file' not in request.files:
+                    flash('No file part')
+                    return redirect(request.url)
+                files = request.files.getlist("file")
+                for file in files:
+                    if file.filename == '':
+                        flash('File has no filename')
+                        break
+                    if request.form['new_filename'] != "":
+                        if allowed_file(request.form['new_filename']):
+                            file.filename = request.form['new_filename']
+                    if file.filename in googledrive_connector.list_all_files(return_id=False, parent='images'):
+                        new_filename = file.filename.rsplit('.', 1)[0] + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + '.' +file.filename.rsplit('.', 1)[1]
+                        file.filename = new_filename
+                        flash('File name already exists. Name is changed to: ' + file.filename)
+                    if file and allowed_file(file.filename):
+                        googledrive_connector.upload_image(file)
+                        flash('File name: ' + file.filename + ' is uploaded.')
+                    else:
+                        flash('File name: ' + file.filename + ' is not allowed.')
+                return redirect(url_for('images'))
+            elif 'images_edit_button' in request.form:
+                file_id = request.form['images_edit_button']
+                new_filename = request.form['new_filename']
+                old_filename = googledrive_connector.search_file_by_id(file_id)
+                googledrive_connector.change_name_from_id(file_id=file_id, new_filename=new_filename)
+                if (isinstance(new_filename, str) and isinstance(old_filename, str)):
+                    flash('File name: ' + old_filename + ' is changed to ' + new_filename + '.')
+                else:
+                    flash('File name has changed.')
+            elif 'btn_delete_image' in request.form:
+                file_id = request.form['btn_delete_image']
+                deleted_filename = googledrive_connector.search_file_by_id(file_id)
+                googledrive_connector.delete_file(file_id=file_id)
+                if isinstance(deleted_filename, str):
+                    flash('File name: ' + deleted_filename + ' is deleted.')
+                else:
+                    flash('File is deleted.')
+        cloud_images = googledrive_connector.list_all_files(parent='images')
+        return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=cloud_images)
+
+
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():
@@ -332,7 +383,6 @@ def homepage_admin():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        sorted_web_translations = main.read_table('web_translations', order_asc="msgid")
         web_translations_col = main.show_columns('web_translations')
         if request.method == 'POST':
             translation_object = Database.WebTranslations(request.form[web_translations_col[1]],
@@ -344,8 +394,9 @@ def homepage_admin():
                 translation_object.update(request.form['translation_modal_edit_button'])
                 global web_translations
                 web_translations = main.read_table('web_translations')
+        sorted_web_translations = main.read_table('web_translations', order_asc="msgid")
         return render_template('homepage_admin.html', web_translations=sorted_web_translations,
-                               web_translations_col=web_translations_col)
+                               web_translations_col=web_translations_col, nav_menu_admin=nav_menu_admin)
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])
@@ -357,7 +408,7 @@ def login():
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
             session['logged_in'] = True
             session['current_user'] = request.form['emaillogin']
-            return redirect(url_for('admin_overview'))
+            return redirect(session['url'])
         else:
             return redirect(url_for('login'))
 

@@ -29,4 +29,8 @@ $(document).ready(function () {
         $('#packagingid').val('');
     });
 
+    $("#addImage").click(function () {
+        $( "#image-registration" ).clone().appendTo( "#image-list" );
+    });
+
 });

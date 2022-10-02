@@ -7,3 +7,5 @@ eventlet==0.25.1
 Flask-Mail==0.9.1
 blinker==1.5
 google==3.0.0
+google-auth-oauthlib==0.5.3
+google-api-python-client==2.63.0

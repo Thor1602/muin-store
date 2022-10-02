@@ -305,48 +305,48 @@ def images():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        if request.method == 'POST':
-            if 'images_add_button' in request.form:
-                if 'file' not in request.files:
-                    flash('No file part')
-                    return redirect(request.url)
-                files = request.files.getlist("file")
-                for file in files:
-                    if file.filename == '':
-                        flash('File has no filename')
-                        break
-                    if request.form['new_filename'] != "":
-                        if allowed_file(request.form['new_filename']):
-                            file.filename = request.form['new_filename']
-                    if file.filename in googledrive_connector.list_all_files(return_id=False, parent='images'):
-                        new_filename = file.filename.rsplit('.', 1)[0] + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + '.' +file.filename.rsplit('.', 1)[1]
-                        file.filename = new_filename
-                        flash('File name already exists. Name is changed to: ' + file.filename)
-                    if file and allowed_file(file.filename):
-                        googledrive_connector.upload_image(file)
-                        flash('File name: ' + file.filename + ' is uploaded.')
-                    else:
-                        flash('File name: ' + file.filename + ' is not allowed.')
-                return redirect(url_for('images'))
-            elif 'images_edit_button' in request.form:
-                file_id = request.form['images_edit_button']
-                new_filename = request.form['new_filename']
-                old_filename = googledrive_connector.search_file_by_id(file_id)
-                googledrive_connector.change_name_from_id(file_id=file_id, new_filename=new_filename)
-                if (isinstance(new_filename, str) and isinstance(old_filename, str)):
-                    flash('File name: ' + old_filename + ' is changed to ' + new_filename + '.')
-                else:
-                    flash('File name has changed.')
-            elif 'btn_delete_image' in request.form:
-                file_id = request.form['btn_delete_image']
-                deleted_filename = googledrive_connector.search_file_by_id(file_id)
-                googledrive_connector.delete_file(file_id=file_id)
-                if isinstance(deleted_filename, str):
-                    flash('File name: ' + deleted_filename + ' is deleted.')
-                else:
-                    flash('File is deleted.')
-        cloud_images = googledrive_connector.list_all_files(parent='images')
-        return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=cloud_images)
+        # if request.method == 'POST':
+        #     if 'images_add_button' in request.form:
+        #         if 'file' not in request.files:
+        #             flash('No file part')
+        #             return redirect(request.url)
+        #         files = request.files.getlist("file")
+        #         for file in files:
+        #             if file.filename == '':
+        #                 flash('File has no filename')
+        #                 break
+        #             if request.form['new_filename'] != "":
+        #                 if allowed_file(request.form['new_filename']):
+        #                     file.filename = request.form['new_filename']
+        #             if file.filename in googledrive_connector.list_all_files(return_id=False, parent='images'):
+        #                 new_filename = file.filename.rsplit('.', 1)[0] + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + '.' +file.filename.rsplit('.', 1)[1]
+        #                 file.filename = new_filename
+        #                 flash('File name already exists. Name is changed to: ' + file.filename)
+        #             if file and allowed_file(file.filename):
+        #                 googledrive_connector.upload_image(file)
+        #                 flash('File name: ' + file.filename + ' is uploaded.')
+        #             else:
+        #                 flash('File name: ' + file.filename + ' is not allowed.')
+        #         return redirect(url_for('images'))
+        #     elif 'images_edit_button' in request.form:
+        #         file_id = request.form['images_edit_button']
+        #         new_filename = request.form['new_filename']
+        #         old_filename = googledrive_connector.search_file_by_id(file_id)
+        #         googledrive_connector.change_name_from_id(file_id=file_id, new_filename=new_filename)
+        #         if (isinstance(new_filename, str) and isinstance(old_filename, str)):
+        #             flash('File name: ' + old_filename + ' is changed to ' + new_filename + '.')
+        #         else:
+        #             flash('File name has changed.')
+        #     elif 'btn_delete_image' in request.form:
+        #         file_id = request.form['btn_delete_image']
+        #         deleted_filename = googledrive_connector.search_file_by_id(file_id)
+        #         googledrive_connector.delete_file(file_id=file_id)
+        #         if isinstance(deleted_filename, str):
+        #             flash('File name: ' + deleted_filename + ' is deleted.')
+        #         else:
+        #             flash('File is deleted.')
+        # cloud_images = googledrive_connector.list_all_files(parent='images')
+        return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=[])
 
 
 

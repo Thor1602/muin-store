@@ -6,5 +6,3 @@ psycopg2-binary==2.9.3
 eventlet==0.25.1
 Flask-Mail==0.9.1
 blinker==1.5
-Flask-Babel==2.0.0
-google==2.0.3

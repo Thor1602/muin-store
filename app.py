@@ -48,7 +48,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
-                  '/invoices': 'Invoices', '/homepage_admin': 'homepage_admin', '/images': 'images'}
+                  '/invoices': 'Invoices', '/homepage_admin': 'Homepage Admin', '/images': 'Images'}
 web_translations = main.read_table('web_translations')
 korean_translation = {}
 english_translation = {}
@@ -61,10 +61,12 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 @app.context_processor
 def get_locale():
     session_name = session.get("preferred_language", default='ko_KR')
-    session['url'] = request.url
+    if '/login' not in request.url or '/logout' not in request.url:
+        session['url'] = request.url
     if session_name == 'ko_KR':
         return dict(msgid=korean_translation)
     else:
@@ -337,6 +339,13 @@ def images():
                     flash('File name: ' + old_filename + ' is changed to ' + new_filename + '.')
                 else:
                     flash('File name has changed.')
+
+            elif 'images_edit_all_button' in request.form:
+                file_id = request.form['images_edit_all_button']
+                for key in request.form:
+                    if 'new_filename' in key:
+                        googledrive_connector.change_name_from_id(file_id=file_id, new_filename=request.form[key])
+                flash('File names has changed.')
             elif 'btn_delete_image' in request.form:
                 file_id = request.form['btn_delete_image']
                 deleted_filename = googledrive_connector.search_file_by_id(file_id)
@@ -345,6 +354,7 @@ def images():
                     flash('File name: ' + deleted_filename + ' is deleted.')
                 else:
                     flash('File is deleted.')
+
         cloud_images = googledrive_connector.list_all_files(parent='images')
         return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=cloud_images)
 
@@ -402,20 +412,23 @@ def homepage_admin():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
+        flash('This is only for admins.')
         session['logged_in'] = False
         return render_template('login.html')
     elif request.method == 'POST':
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
             session['logged_in'] = True
             session['current_user'] = request.form['emaillogin']
-            return redirect(session['url'])
+            flash('Logged in')
+            return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
 
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
-    return redirect(url_for('index'))
+    flash('This is only for admins.')
+    return redirect(url_for('login'))
 
 # ERROR HANDLING
 @app.errorhandler(400)

@@ -46,6 +46,10 @@
                         data-bs-target="#image_modal_add"
                         type="button">ADD IMAGE
                 </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#image_modal_edit_all"
+                        type="button">EDIT ALL IMAGES
+                </button>
                 <div class="overflow-scroll max-height-table">
                     <table class="table  table-striped table-hover">
                         <thead>
@@ -64,9 +68,9 @@
                                             data-bs-target="#image_modal_edit_{{ row['id'] }}"
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
-                                <th><img style="height: 100px"
-                                         src="https://drive.google.com/uc?export=view&id={{ row['id'] }}"
-                                         alt="{{ row['name'].split('.')[0] | replace('_', ' ') }}"/>
+                                <th>
+                                    <img src="https://drive.google.com/file/d/{{ row['id'] }}/view" alt="{{ row['name'] }}" />
+
                                 </th>
                                 <th>{{ row['name'] }}</th>
                                 <th>{{ row['id'] }}</th>
@@ -124,12 +128,12 @@
     <!-- Start edit images modal -->
     {% for row in cloud_images %}
         <div class="modal fade" id="image_modal_edit_{{ row['id'] }}" tabindex="-1" role="dialog"
-             aria-labelledby="imageModalLabelEdit"
+             aria-labelledby="imageModalLabelEdit{{ row['id'] }}"
              aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="imageModalLabelEdit">EDIT IMAGE</h5>
+                        <h5 class="modal-title" id="imageModalLabelEdit{{ row['id'] }}">EDIT IMAGE</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -160,7 +164,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="modal fade" id="deleteModalImage{{ row['id'] }}" tabindex="-1"
              aria-labelledby="deleteModalImageLabel{{ row['id'] }}"
              aria-hidden="true">
@@ -183,9 +187,43 @@
         </div>
     {% endfor %}
     <!-- End edit images modal -->
+    <!-- Start edit all images modal -->
 
+    <div class="modal fade" id="image_modal_edit_all" tabindex="-1" role="dialog"
+         aria-labelledby="imageModalLabelEditAll"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabelEditAll">EDIT IMAGE</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form enctype="multipart/form-data" method="post" action="/images">
+                    <div class="modal-body">
+                        {% for row in cloud_images %}
+                            <div class="mb-3">
+                                <input type="text" class="form-control" name="new_filename{{ loop.index }}"
+                                       value="{{ row['name'] }}" aria-label="New Filename">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="images_edit_all_button"
+                                value="">SUBMIT ALL EDITED IMAGES
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
 {% endblock %}
 
+{% block endbody %}
+
+{% endblock %}
 

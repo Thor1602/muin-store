@@ -49,15 +49,6 @@
                                 <input class="form-check-input" type="checkbox" value="" id="form1Example3"/>
                                 <label class="form-check-label" for="form1Example3"> Remember password </label>
                             </div>
-                            {% with messages = get_flashed_messages() %}
-                                {% if messages %}
-                                    <p class="flashes" id="login_error">
-                                        {% for message in messages %}
-                                            {{ message }}<br>
-                                        {% endfor %}
-                                    </p>
-                                {% endif %}
-                            {% endwith %}
                             <div class="text-center">
                                 <button class="login" type="submit">Login</button>
                             </div>

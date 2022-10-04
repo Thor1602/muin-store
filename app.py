@@ -26,8 +26,6 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
 app.secret_key = main.get_secret_code()
-app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '/static/invoices/supplier'
-app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '/static/invoices/customer'
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 mail_cred = main.get_smtp()
 app.config.update(dict(
@@ -42,8 +40,6 @@ app.config.update(dict(
 
 mail = Mail(app)
 
-# app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\supplier'
-# app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'] = pathlib.Path().resolve().__str__() + '\\static\\invoices\\customer'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
@@ -258,42 +254,56 @@ def invoices():
         if request.method == 'POST':
             if 'invoice_supplier_add_button' in request.form:
                 if 'file' not in request.files:
+                    flash('No file part')
                     return redirect(request.url)
-                file = request.files['file']
-                if file.filename == '':
-                    return redirect(request.url)
-                if file and allowed_file(file.filename):
-                    filename = request.form['supplier_name'] + "_" + request.form['invoice_date'].replace('-',
-                                                                                                          '') + f"_{random.randint(1, 100)}." + \
-                               file.filename.rsplit('.', 1)[1].lower()
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_SUPPLIER'], filename))
-                    Database.InvoicesSupplier(file=filename, type=request.form['type'],
-                                              payment_amount=request.form['payment_amount'],
-                                              payment_method=request.form['payment_method'],
-                                              supplier_name=request.form['supplier_name'],
-                                              invoice_date=request.form['invoice_date']).register()
+                files = request.files.getlist("file")
+                for file in files:
+                    if file.filename == '':
+                        flash('File has no filename')
+                        break
+                    extension = file.filename.rsplit('.', 1)[1]
+                    if request.form['invoice_date'] == "":
+                        date = datetime.datetime.now().strftime("%Y-%m-%d")
+                    else:
+                        date = request.form['invoice_date']
+                    file.filename = request.form['supplier_name'] + "_" + date + "." + extension
+                    if file and allowed_file(file.filename):
+                        googledrive_connector.upload_invoice(file)
+                        Database.InvoicesSupplier(file=file.filename, type=request.form['type'],
+                                                  payment_amount=request.form['payment_amount'],
+                                                  payment_method=request.form['payment_method'],
+                                                  supplier_name=request.form['supplier_name'],
+                                                  invoice_date=date).register()
+                        flash('File name: ' + file.filename + ' is uploaded.')
+                    else:
+                        flash('File name: ' + file.filename + ' is not allowed.')
                     return redirect(url_for('invoices'))
             elif 'invoice_customer_add_button' in request.form:
                 if 'file' not in request.files:
+                    flash('No file part')
                     return redirect(request.url)
-                file = request.files['file']
-                if file.filename == '':
-                    return redirect(request.url)
-                if file and allowed_file(file.filename):
-                    filename = request.form['customer_name'] + "_" + request.form['invoice_date'].replace('-',
-                                                                                                          '') + f"_{random.randint(1, 100)}." + \
-                               file.filename.rsplit('.', 1)[1].lower()
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename))
-                    location = os.path.join(app.config['UPLOAD_FOLDER_INVOICES_CUSTOMER'], filename)
-                    flash(location)
-                    Database.InvoicesCustomer(file=filename, type=request.form['type'],
-                                              payment_amount=request.form['payment_amount'],
-                                              payment_method=request.form['payment_method'],
-                                              customer_name=request.form['customer_name'],
-                                              invoice_date=request.form['invoice_date']).register()
+                files = request.files.getlist("file")
+                for file in files:
+                    if file.filename == '':
+                        flash('File has no filename')
+                        break
+                    extension = file.filename.rsplit('.', 1)[1]
+                    if request.form['invoice_date'] == "":
+                        date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    else:
+                        date = request.form['invoice_date']
+                    file.filename = request.form['customer_name'] + "_" + date + "." + extension
+                    if file and allowed_file(file.filename):
+                        googledrive_connector.upload_invoice(file)
+                        Database.InvoicesSupplier(file=file.filename, type=request.form['type'],
+                                                  payment_amount=request.form['payment_amount'],
+                                                  payment_method=request.form['payment_method'],
+                                                  supplier_name=request.form['customer_name'],
+                                                  invoice_date=date).register()
+                        flash('File name: ' + file.filename + ' is uploaded.')
+                    else:
+                        flash('File name: ' + file.filename + ' is not allowed.')
                     return redirect(url_for('invoices'))
-
-        # invoices = main.read_table('invoices')
         invoices_customer = main.read_table('invoices_customers')
         invoices_supplier = main.read_table('invoices_suppliers')
         invoices_supplier_columns = main.show_columns('invoices_suppliers')

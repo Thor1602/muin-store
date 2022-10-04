@@ -50,9 +50,10 @@ def list_all_files(return_name=True, return_id=True, parent=''):
     """
     Returns the names and ids of all files the user has access to.
     """
-    query = ''
-    if parent == 'images':
-        query = "parents = '1aIwPpPQdBoqdOQO-IIhwXOIrEi_kyqSs'"
+    query=''
+    if parent != '':
+        file_id = search_file_by_name(parent)
+        query = f"parents = '{file_id}'"
     files = []
     page_token = None
     while True:
@@ -98,19 +99,23 @@ def upload_invoice(file):
     """Insert new file.
     Returns : Id's of the file uploaded
     """
-    invoices_folder_id = "1xD0ulrlmgMu8SJCIA-MBOXkErzBYlmz0"
+    # if parent == 'supplier':
+    #     invoices_folder_id = "1-0pXc_fS8B6y50rarljtG9InVEWFSnq3"
+    # elif parent == 'customer':
+    #     invoices_folder_id = "1k9Qt-HGc4rYgainpOp2gx5f2weSGezwZ"
+    # else:
+    #     invoices_folder_id = "1xD0ulrlmgMu8SJCIA-MBOXkErzBYlmz0"
     file_metadata = {
         'name': file.filename,
-        'parents': [invoices_folder_id]
+        'parents': ['1-0pXc_fS8B6y50rarljtG9InVEWFSnq3']
     }
     m_type = mimetypes.guess_type(file.filename)
     media = MediaIoBaseUpload(file,
                               mimetype=m_type[0],
                               resumable=True)
-    upload_image.service.files().create(body=file_metadata,
+    upload_invoice.service.files().create(body=file_metadata,
                                         media_body=media,
                                         fields='id').execute()
-    return file.get('id')
 
 
 @google_drive_connect

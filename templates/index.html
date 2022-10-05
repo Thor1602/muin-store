@@ -4,7 +4,7 @@
     <li><a href="#hero">Home</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#clients">Our Suppliers</a></li>
-    <li><a href="#portfolio">Products</a></li>
+    <li><a href="#portfolio">{{ msgid['product_title'] }}</a></li>
     <li><a href="#contact">Contact</a></li>
 
 {% endblock %}
@@ -46,7 +46,7 @@
                 <div class="row gy-4">
                     <div class="col-lg-6">
                         <h3>{{ msgid['about_subtitle_one'] }}</h3>
-                        <img src="/static/img/about.jpg" class="img-fluid rounded-4 mb-4" alt="">
+                        <img src="/img/products/about.jpg" class="img-fluid rounded-4 mb-4" alt="">
                         <p>{{ msgid['about_subcontent_one'] }} </p>
                         <p>{{ msgid['about_subcontent_two'] }}</p>
                     </div>
@@ -81,7 +81,7 @@
                             </p>
 
                             <div class="position-relative mt-4">
-                                <img src="/static/img/about-2.jpg" class="img-fluid rounded-4" alt="">
+                                <img src="/img/products/about-2.jpg" class="img-fluid rounded-4" alt="">
                                 <a href="https://www.youtube.com/watch?v=9i1G8i_Q-Lk&ab_channel=DessertsbyDesign"
                                    class="glightbox play-btn"></a>
                             </div>
@@ -96,10 +96,8 @@
             <div class="container" data-aos="fade-up">
 
                 <div class="section-header">
-                    <h2>Products</h2>
-                    <p>Quam sed id excepturi ccusantium dolorem ut quis dolores nisi llum nostrum enim velit qui ut et
-                        autem
-                        uia reprehenderit sunt deleniti</p>
+                    <h2>{{ msgid['product_title'] }}</h2>
+                    <p>{{ msgid['product_intro'] }}</p>
                 </div>
 
                 <div class="portfolio-isotope" data-portfolio-filter="*" data-portfolio-layout="masonry"
@@ -143,9 +141,9 @@
 
                         <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
                             <div class="portfolio-wrap">
-                                <a href="/static/img/eclair2.jpg" data-gallery="portfolio-gallery-app"
+                                <a href="/img/products/eclair2.jpg" data-gallery="portfolio-gallery-app"
                                    class="glightbox"><img
-                                        src="/static/img/eclair2.jpg" class="img-fluid" alt=""></a>
+                                        src="/img/products/eclair2.jpg" class="img-fluid" alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>_{{ "Eclair" }}</h4>
                                     <p>_{{ "Delicious French eclair with fresh cream"}}</p>
@@ -155,8 +153,8 @@
 
                         <div class="col-xl-4 col-md-6 portfolio-item filter-books">
                             <div class="portfolio-wrap">
-                                <a href="/static/img/macaron.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/macaron.jpg" class="img-fluid" alt=""></a>
+                                <a href="/img/products/macaron.jpg" data-gallery="portfolio-gallery-app"
+                                   class="glightbox"><img src="/img/products/macaron.jpg" class="img-fluid" alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>_{{ "Macaron" }}</h4>
                                     <p>_{{ "Macarons in various colors and tastes"}}</p>
@@ -166,8 +164,8 @@
 
                         <div class="col-xl-4 col-md-6 portfolio-item filter-books">
                             <div class="portfolio-wrap">
-                                <a href="/static/img/choco-macaron-1.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/choco-macaron-2.jpg" class="img-fluid"
+                                <a href="/img/products/choco-macaron-1.jpg" data-gallery="portfolio-gallery-app"
+                                   class="glightbox"><img src="/img/products/choco-macaron-2.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>{{ "Choco Macaron"}}</h4>
@@ -178,8 +176,8 @@
 
                         <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
                             <div class="portfolio-wrap">
-                                <a href="/static/img/strawberry-bavarois.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/strawberry-bavarois.jpg" class="img-fluid"
+                                <a href="/img/products/strawberry-bavarois.jpg" data-gallery="portfolio-gallery-app"
+                                   class="glightbox"><img src="/img/products/strawberry-bavarois.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>_{{ "Strawberry bavarois"}}
@@ -190,8 +188,8 @@
                         </div><!-- End Portfolio Item -->
                         <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
                             <div class="portfolio-wrap">
-                                <a href="/static/img/choco-cake-3.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/choco-cake-2.jpg" class="img-fluid"
+                                <a href="/img/products/choco-cake-3.jpg" data-gallery="portfolio-gallery-app"
+                                   class="glightbox"><img src="/img/products/choco-cake-2.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>_{{ "Choco cake"}}
@@ -202,8 +200,8 @@
                         </div><!-- End Portfolio Item -->
                         <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
                             <div class="portfolio-wrap">
-                                <a href="/static/img/rollcake-piece.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/rollcake-2.jpg" class="img-fluid"
+                                <a href="/img/products/rollcake-piece.jpg" data-gallery="portfolio-gallery-app"
+                                   class="glightbox"><img src="/img/products/rollcake-2.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>Roll cake
@@ -266,8 +264,8 @@
                             <div class="info-item d-flex">
                                 <i class="bi bi-geo-alt flex-shrink-0"></i>
                                 <div>
-                                    <h4>Location:</h4>
-                                    <p>101ho, 11-48, Wonsutaek-ro 32beon-gil, Guri-si, Gyeongi-do, 11932 </p>
+                                    <h4>{{ msgid['address_title'] }}:</h4>
+                                    <p>{{ msgid['address'] }}</p>
                                 </div>
                             </div><!-- End Info Item -->
 
@@ -315,7 +313,7 @@
                             <div class="row">
                                 <div class="col-md-6 form-group">
                                     <input type="text" name="address" class="form-control" id="address"
-                                           placeholder="{{ msgid['address'] }}"><span></span>
+                                           placeholder="{{ msgid['address_title'] }}"><span></span>
                                 </div>
                                 <div class="col-md-6 form-group mt-3 mt-md-0">
                                     <input type="tel" class="form-control" name="phone" id="phone"
@@ -332,14 +330,14 @@
                                       required></textarea><span></span>
                             </div>
                             <div class="my-3">
-                                <div class="loading">Loading</div>
-                                <div class="error-message">An error occurred</div>
-                                <div class="sent-message">Your message has been sent. Thank you!</div>
+                                <div class="loading">{{ msgid['loading'] }}Loading</div>
+                                <div class="error-message">{{ msgid['contact-form-error'] }}</div>
+                                <div class="sent-message">{{ msgid['success_contact_submission'] }}</div>
                             </div>
                             <div class="text-center">
 {#                                <input type="button" onClick="sendLinkCustom();" value="Custom"/>#}
 {#                                <input type="button" onClick="sendLinkDefault();" value="Default"/>#}
-                                <button type="button" id="contact_submit_button">Send Message</button>
+                                <button type="button" id="contact_submit_button">{{ msgid['send_message_button'] }}</button>
                             </div>
                         </form>
                     </div><!-- End Contact Form -->
@@ -383,7 +381,7 @@
             </div>
 
             <div class="col-lg-2 col-6 footer-links">
-                <h4>Our Products</h4>
+                <h4>{{ msgid['product_title'] }}</h4>
                 <ul>
                     <li><a href="#">Eclairs</a></li>
                     <li><a href="#">Macarons</a></li>

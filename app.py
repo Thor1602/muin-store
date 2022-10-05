@@ -45,13 +45,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
                   '/invoices': 'Invoices', '/homepage_admin': 'Homepage Admin', '/images': 'Images'}
-web_translations = main.read_table('web_translations')
-korean_translation = {}
-english_translation = {}
-for x in web_translations:
-    key = x[1]
-    korean_translation[key] = x[2]
-    english_translation[key] = x[3]
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -63,6 +57,13 @@ def get_locale():
     session_name = session.get("preferred_language", default='ko_KR')
     if '/login' not in request.url or '/logout' not in request.url:
         session['url'] = request.url
+    web_translations = main.read_table('web_translations')
+    korean_translation = {}
+    english_translation = {}
+    for x in web_translations:
+        key = x[1]
+        korean_translation[key] = x[2]
+        english_translation[key] = x[3]
     if session_name == 'ko_KR':
         return dict(msgid=korean_translation)
     else:
@@ -351,11 +352,11 @@ def images():
                     flash('File name has changed.')
 
             elif 'images_edit_all_button' in request.form:
-                file_id = request.form['images_edit_all_button']
                 for key in request.form:
                     if 'new_filename' in key:
-                        googledrive_connector.change_name_from_id(file_id=file_id, new_filename=request.form[key])
-                flash('File names has changed.')
+                        name_id = key.split('___')
+                        googledrive_connector.change_name_from_id(file_id=name_id[1], new_filename=request.form[key])
+                flash('File names have changed.')
             elif 'btn_delete_image' in request.form:
                 file_id = request.form['btn_delete_image']
                 deleted_filename = googledrive_connector.search_file_by_id(file_id)
@@ -366,6 +367,8 @@ def images():
                     flash('File is deleted.')
 
         cloud_images = googledrive_connector.list_all_files(parent='images')
+        if cloud_images is None:
+            cloud_images = []
         return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=cloud_images)
 
 

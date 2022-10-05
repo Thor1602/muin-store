@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2 import Error, sql
 import psycopg2
 
+import googledrive_connector
+
 
 class Main:
     """
@@ -98,6 +100,9 @@ class Main:
 
     def get_smtp(self):
         return self.execute_query(query="SELECT key, value FROM settings where name = 'main_gmail';", fetchAll=True)[0]
+
+    def get_cloud_images(self):
+        return googledrive_connector.list_all_files(parent='images')
 
 
 class User(Main):

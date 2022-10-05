@@ -61,7 +61,7 @@ def list_all_files(return_name=True, return_id=True, parent=''):
         response = list_all_files.service.files().list(q=query,
                                         spaces='drive',
                                         fields='nextPageToken, '
-                                               'files(id, name, webViewLink)',
+                                               'files(id, name, webViewLink, webContentLink)',
                                         pageToken=page_token).execute()
         files.extend(response.get('files', []))
         page_token = response.get('nextPageToken', None)

@@ -69,7 +69,7 @@
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
                                 <th>
-                                    <img src="https://drive.google.com/file/d/{{ row['id'] }}/view" alt="{{ row['name'] }}" />
+                                    <img src="{{ row['name'] }}" />
 
                                 </th>
                                 <th>{{ row['name'] }}</th>
@@ -204,7 +204,7 @@
                     <div class="modal-body">
                         {% for row in cloud_images %}
                             <div class="mb-3">
-                                <input type="text" class="form-control" name="new_filename{{ loop.index }}"
+                                <input type="text" class="form-control" name="new_filename___{{ row['id'] }}"
                                        value="{{ row['name'] }}" aria-label="New Filename">
                             </div>
                         {% endfor %}

@@ -1943,7 +1943,7 @@ section {
 .hero {
     width: 100%;
     position: relative;
-    background-image: url("/static/img/macaron.jpg");
+    background-image: url("/static/img/products/macaron.jpg");
     background-repeat: no-repeat;
     padding: 60px 0 0 0;
     background-size: cover;

@@ -101,9 +101,6 @@ $(document).ready(function () {
         } else {
             $(document).ajaxStart(function () {
                 $('.spinner-get-verification').addClass('spinner-border spinner-border-sm');
-                $("#first_name").attr("disabled", "disabled");
-                $("#last_name").attr("disabled", "disabled");
-                $("#phone_number").attr("disabled", "disabled");
             });
             $(document).ajaxStop(function () {
                 $('.spinner-get-verification').removeClass('spinner-border spinner-border-sm');

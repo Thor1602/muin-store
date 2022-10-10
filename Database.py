@@ -101,8 +101,18 @@ class Main:
     def get_membership_points(self, phone_number):
         SQL = "SELECT points from memberships where phone_number = %(phone_number)s;"
         parameters = {'phone_number': phone_number}
-        query = self.execute_query(query=SQL, parameters=parameters)
-        return query.fetchOne()
+        query = self.execute_query(query=SQL, parameters=parameters,fetchOne=True)
+        return query
+
+    def phone_number_exists(self, phone_number):
+        SQL = "SELECT phone_number from memberships;"
+        query = self.execute_query(query=SQL, fetchAll=True)
+        if phone_number in [x[0] for x in query]:
+            return True
+        else:
+            return False
+
+
 
 
 class User(Main):

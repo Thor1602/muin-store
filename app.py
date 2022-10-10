@@ -14,6 +14,7 @@ import datetime
 import random
 import string
 from datetime import timedelta
+import pytz
 
 from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response, \
     jsonify
@@ -103,26 +104,34 @@ def index():
 @app.route("/register_membership", methods=['GET', 'POST'])
 def add_membership():
     if request.method == "POST":
-        if session.get('verification_code'):
-            if session['verification_code'][1] < (datetime.datetime.now() - timedelta(minutes=5)):
-                session.pop('verification_code')
         if "get_verification" in request.form:
+            if session.get('verification_code'):
+                time_now = pytz.utc.localize(datetime.datetime.now() - timedelta(minutes=5))
+                time_verification = session['verification_code'][1]
+                if time_now > time_verification:
+                    session.pop('verification_code')
             if not session.get('verification_code'):
                 session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
             phone_number = request.form['phone_number']
             for char in string.punctuation:
                 phone_number = phone_number.replace(char, '')
             phone_number = phone_number.replace(' ', '')
-            session['member_registration'] = {'first_name': request.form['first_name'],'last_name': request.form['last_name'],'phone_number': phone_number}
-            print(session['verification_code'])
-            # naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0], language=session["preferred_language"])
-            return make_response(jsonify({'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}), 201)
+            if main.phone_number_exists(phone_number):
+                flash("Phone number exists")
+                return redirect(url_for('index'))
+            else:
+                session['member_registration'] = {'first_name': request.form['first_name'],'last_name': request.form['last_name'],'phone_number': phone_number}
+                naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0], language=session["preferred_language"])
+                return make_response(jsonify({'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}), 201)
         elif "check_verification" in request.form:
             if session.get('verification_code'):
                 if request.form['verification_code'] == str(session['verification_code'][0]):
-                    # Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=0).register()
-                    session.pop('member_registration')
-                    return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),201)
+                    if main.phone_number_exists(session['member_registration']['phone_number']):
+                        return make_response(jsonify({'message': 'Error: Phone Number Exists', 'code': 'ERROR'}), 201)
+                    else:
+                        Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=0).register()
+                        session.pop('member_registration')
+                        return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),412)
                 else:
                     return make_response(jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 412)
             else:

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block body %}
+
+    <section id="contact" class="membership sections-bg">
+        <div class="container" data-aos="fade-up">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                    <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
+                    </symbol>
+                </svg>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-warning d-flex align-items-center alert-dismissible fade show"
+                                 role="alert">
+                                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
+                                     aria-label="Info:">
+                                    <use xlink:href="#info-fill"></use>
+                                </svg>
+                                <div> {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="section-header">
+                <h2>Member Registration</h2>
+                <p></p>
+            </div>
+            <div class="row gx-lg-0 gy-4">
+                <div class="col-lg-6 mx-auto">
+                    <form action="/register_membership" method="post" role="form" class="registration-form" id="get_verification_form">
+                        <div class="row">
+                            <div class="form-outline mb-4">
+                                <input type="text" name="first_name" id="first_name"
+                                       class="form-control form-control-lg" placeholder="{{ msgid['first_name'] }}"
+                                       aria-label=""/><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-outline mb-4">
+                                <input type="text" name="last_name" id="last_name"
+                                       class="form-control form-control-lg" placeholder="{{ msgid['last_name'] }}"
+                                       aria-label=""/><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-outline mb-4">
+                                <input type="tel" name="phone_number" id="phone_number"
+                                       class="form-control form-control-lg" placeholder="{{ msgid['phone_number'] }}"
+                                       aria-label=""/><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-outline mb-4">
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control"
+                                           placeholder="{{ msgid['verification_code'] }}"
+                                           aria-label="" aria-describedby="verification_code" name="verification_code"
+                                           id="verification_code">
+                                    <div class="input-group-append">
+                                        <button id="get_verification" type="button" name="get_verification">
+                                            <span class="spinner-get-verification" role="status"
+                                                  aria-hidden="true"></span>
+                                            <span> GET</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button id="check_verification" type="button" name="check_verification" disabled>Verify</button>
+                        </div>
+                        <div class="my-3">
+                            <div class="loading-add-membership">{{ msgid['loading'] }}</div>
+                            <div class="error-message-add-membership">{{ msgid['contact-form-error'] }}</div>
+                            <div class="sent-message-add-membership">{{ msgid['success_contact_submission'] }}</div>
+                        </div>
+                    </form>
+                </div><!-- End Contact Form -->
+
+            </div>
+
+        </div>
+    </section><!-- End Contact Section -->
+
+{% endblock %}

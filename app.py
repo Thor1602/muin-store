@@ -11,23 +11,24 @@ TODO add file handler cloud
 TODO add kakao alert messaging
 """
 import datetime
-import os
-import pathlib
 import random
+import string
+from datetime import timedelta
 
-from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response
+from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response, \
+    jsonify
 from flask_mail import Mail, Message
 import googledrive_connector
+import naver_setup
 
 import Database
-
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
-app.secret_key = main.get_secret_code()
+app.secret_key = main.get_setting_by_name('secret_key')[1]
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
-mail_cred = main.get_smtp()
+mail_cred = main.get_setting_by_name('main_gmail')
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',
@@ -45,7 +46,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
                   '/invoices': 'Invoices', '/homepage_admin': 'Homepage Admin', '/images': 'Images'}
-
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -79,7 +79,7 @@ def set_language(lang):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    api_kakao_js = main.get_kakao_api_js()
+    api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
     # <b>{{ gettext('Free Trial') }}</b>  use _() as a shortcut for gettext().
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
@@ -100,6 +100,82 @@ def index():
         #     print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
     return render_template('index.html', api_kakao_js=api_kakao_js)
 
+@app.route("/register_membership", methods=['GET', 'POST'])
+def add_membership():
+    if request.method == "POST":
+        if session.get('verification_code'):
+            if session['verification_code'][1] < (datetime.datetime.now() - timedelta(minutes=5)):
+                session.pop('verification_code')
+        if "get_verification" in request.form:
+            if not session.get('verification_code'):
+                session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
+            phone_number = request.form['phone_number']
+            for char in string.punctuation:
+                phone_number = phone_number.replace(char, '')
+            phone_number = phone_number.replace(' ', '')
+            session['member_registration'] = {'first_name': request.form['first_name'],'last_name': request.form['last_name'],'phone_number': phone_number}
+            print(session['verification_code'])
+            # naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0], language=session["preferred_language"])
+            return make_response(jsonify({'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}), 201)
+        elif "check_verification" in request.form:
+            if session.get('verification_code'):
+                if request.form['verification_code'] == str(session['verification_code'][0]):
+                    # Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=0).register()
+                    session.pop('member_registration')
+                    return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),201)
+                else:
+                    return make_response(jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 412)
+            else:
+                return make_response(jsonify({'message': 'Verification code can be expired.', 'code': 'ERROR'}), 412)
+
+    return render_template("add_membership.html")
+
+@app.route("/membership", methods=['GET', 'POST'])
+def check_membership():
+    membership_data = main.read_table('memberships')
+    if request.method == "POST":
+        if "verification_request" in request.form:
+            if request.form['phone_number'] not in [x[1] for x in membership_data]:
+                flash("Phone number is not registered yet.")
+                redirect(url_for('add_membership'))
+            elif session.get('verification_code'):
+                if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
+                    session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
+                    flash("Verification code expired. A new code has been sent.")
+                    naver_setup.send_notification_code(to_no=request.form['phone_number'], code=session['verification_code'][0], language=session["preferred_language"] )
+                else:
+                    flash("Verification code is not expired yet. The code has been resent.")
+                    naver_setup.send_notification_code(to_no=request.form['phone_number'], code=session['verification_code'][0], language=session["preferred_language"])
+            else:
+                session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
+
+        elif "verification_validation" in request.form:
+            if session.get('verification_code'):
+                if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
+                    flash("Verification code is not correct.")
+                    redirect(url_for('check_membership'))
+
+                    if session['verification_code'][1] == request.form['given_verification_code']:
+                        flash("Verification code has been verified.")
+                        redirect(url_for('check_membership'))
+                else:
+                    flash("Verification code expired. Send a new code. ")
+            else:
+                flash("Verification code is not created yet.")
+
+        elif "request_membership_points" in request.form:
+            if request.form["verification_code"] == session['verification_code'][0] and session['verification_code'][1] + datetime.timedelta(minutes=5) >= datetime.datetime.now():
+                flash("Verification succeeded")
+            else:
+                if request.form["verification_code"] != session['verification_code'][0]:
+                    flash("Verification failed: code doesn't match")
+                elif session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
+                    flash("Verification failed: code has expired. Try again.")
+                else:
+                    abort(500)
+            redirect(url_for('add_membership'))
+        redirect(url_for("add_membership"))
+    return render_template("check_membership.html")
 
 # ADMIN
 @app.route('/admin_overview', methods=['GET', 'POST'])
@@ -313,6 +389,7 @@ def invoices():
                                invoices_customer=invoices_customer, invoices_supplier_columns=invoices_supplier_columns,
                                invoices_customer_columns=invoices_customer_columns)
 
+
 @app.route('/images', methods=['GET', 'POST'])
 def images():
     if not session.get('logged_in'):
@@ -332,7 +409,8 @@ def images():
                         if allowed_file(request.form['new_filename']):
                             file.filename = request.form['new_filename']
                     if file.filename in googledrive_connector.list_all_files(return_id=False, parent='images'):
-                        new_filename = file.filename.rsplit('.', 1)[0] + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + '.' +file.filename.rsplit('.', 1)[1]
+                        new_filename = file.filename.rsplit('.', 1)[0] + datetime.datetime.now().strftime(
+                            "%Y%m%d_%H%M%S") + '.' + file.filename.rsplit('.', 1)[1]
                         file.filename = new_filename
                         flash('File name already exists. Name is changed to: ' + file.filename)
                     if file and allowed_file(file.filename):
@@ -370,7 +448,6 @@ def images():
         if cloud_images is None:
             cloud_images = []
         return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=cloud_images)
-
 
 
 @app.route('/products', methods=['GET', 'POST'])
@@ -421,6 +498,7 @@ def homepage_admin():
         return render_template('homepage_admin.html', web_translations=sorted_web_translations,
                                web_translations_col=web_translations_col, nav_menu_admin=nav_menu_admin)
 
+
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -437,11 +515,13 @@ def login():
         else:
             return redirect(url_for('login'))
 
+
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
     flash('This is only for admins.')
     return redirect(url_for('login'))
+
 
 # ERROR HANDLING
 @app.errorhandler(400)
@@ -449,22 +529,26 @@ def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 400
 
+
 @app.errorhandler(403)
 def forbidden(e):
     e_friendly = "a forbidden resource"
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 403
+
 
 @app.errorhandler(404)
 def not_found(e):
     e_friendly = "chap, you made a mistake typing that URL"
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 404
 
+
 @app.errorhandler(410)
 def gone(e):
     e_friendly = "The page existed but is deleted and sent to Valhalla for all eternity."
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 410
 
+
 @app.errorhandler(500)
 def internal_server_error(e):
-    e_friendly = "'server problems' To be overloaded or not to be overloaded. That's the question."
+    e_friendly = "'server problems' To be or not being overloaded. That's the question."
     return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 500

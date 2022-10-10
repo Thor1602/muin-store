@@ -1938,6 +1938,152 @@ section {
 }
 
 /*--------------------------------------------------------------
+# membership Section
+--------------------------------------------------------------*/
+.membership .info-container {
+    background-color: var(--color-primary);
+    height: 100%;
+    padding: 20px;
+    border-radius: 10px 0 0 10px;
+    box-shadow: 0px 2px 25px rgba(0, 0, 0, 0.1);
+}
+
+.membership .info-item {
+    width: 100%;
+    background-color: #a83f17;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+}
+
+.membership .info-item:last-child {
+    margin-bottom: 0;
+}
+
+.membership .info-item i {
+    font-size: 20px;
+    color: #fff;
+    float: left;
+    width: 44px;
+    height: 44px;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    transition: all 0.3s ease-in-out;
+    margin-right: 15px;
+}
+
+.membership .info-item h4 {
+    padding: 0;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.membership .info-item p {
+    padding: 0;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.membership .info-item:hover i {
+    background: #fff;
+    color: var(--color-primary);
+}
+
+.membership .registration-form {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    box-shadow: 0px 2px 25px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 0 10px 10px 0;
+}
+
+.membership .registration-form .form-group {
+    padding-bottom: 8px;
+}
+
+.membership .registration-form .error-message-add-membership {
+    display: none;
+    color: #fff;
+    background: #d54c0e;
+    text-align: left;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.membership .registration-form .error-message-add-membership br + br {
+    margin-top: 25px;
+}
+
+.membership .registration-form .sent-message-add-membership {
+    display: none;
+    color: #fff;
+    background: #fdd642;
+    text-align: center;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.membership .registration-form .loading-add-membership {
+    display: none;
+    background: #fff;
+    text-align: center;
+    padding: 15px;
+}
+
+.membership .registration-form .loading-add-membership:before {
+    content: "";
+    display: inline-block;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin: 0 10px -6px 0;
+    border: 3px solid #ffd64b;
+    border-top-color: #fff;
+    -webkit-animation: animate-loading 1s linear infinite;
+    animation: animate-loading 1s linear infinite;
+}
+
+.membership .registration-form input,
+.membership .registration-form textarea {
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 14px;
+}
+
+.membership .registration-form input[type=text],
+.membership .registration-form input[type=email],
+.membership .registration-form input[type=tel],
+.membership .registration-form textarea {
+    padding: 12px 15px;
+}
+
+.membership .registration-form input[type=text]:focus,
+.membership .registration-form input[type=email]:focus,
+.membership .registration-form input[type=tel]:focus,
+.membership .registration-form textarea:focus {
+    border-color: var(--color-primary);
+}
+
+.membership .registration-form button[type=button] {
+    background: var(--color-primary);
+    border: 0;
+    padding: 14px 45px;
+    color: #fff;
+    transition: 0.4s;
+    border-radius: 50px;
+}
+
+.membership .registration-form button[type=button]:hover {
+    background: rgb(253, 217, 108);
+}
+
+/*--------------------------------------------------------------
 # Hero Section
 --------------------------------------------------------------*/
 .hero {
@@ -2774,4 +2920,16 @@ hr {
 
 .textarea-translations{
     height: 100%;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }

@@ -80,13 +80,6 @@ class Main:
                                                 fetchOne=True)
         return check_password_hash(retrieved_password, pwd)
 
-    def get_secret_code(self):
-        retrieved_code = self.execute_query(query="SELECT value FROM settings where id=1 ;", fetchOne=True)
-        return retrieved_code
-
-    def get_kakao_api_js(self):
-        return self.execute_query(query="SELECT value FROM settings where key = 'kakao_javascript';", fetchOne=True)
-
     def fetch_variable_costs(self):
         col = ('cost_id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
                'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'estimated_items',
@@ -98,11 +91,18 @@ class Main:
         self.execute_query("INSERT INTO settings (name, key, value) VALUES (%s,%s,%s)",
                            (name, key, value,), commit=True)
 
-    def get_smtp(self):
-        return self.execute_query(query="SELECT key, value FROM settings where name = 'main_gmail';", fetchAll=True)[0]
+    def get_setting_by_name(self, name):
+        return \
+        self.execute_query(query="SELECT key, value FROM settings where name = '{}';".format(name), fetchAll=True)[0]
 
     def get_cloud_images(self):
         return googledrive_connector.list_all_files(parent='images')
+
+    def get_membership_points(self, phone_number):
+        SQL = "SELECT points from memberships where phone_number = %(phone_number)s;"
+        parameters = {'phone_number': phone_number}
+        query = self.execute_query(query=SQL, parameters=parameters)
+        return query.fetchOne()
 
 
 class User(Main):
@@ -119,6 +119,29 @@ class User(Main):
         SQL = "INSERT INTO contact_query (first_name, last_name, nickname, password, role_name, email, last_login) VALUES (%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
             self.first_name, self.last_name, self.nickname, self.password, self.role_name, self.email, self.last_login)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class Membership(Main):
+    def __init__(self, first_name, last_name, phone_number, points):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.phone_number = phone_number
+        self.points = points
+
+    def register(self):
+        SQL = "INSERT INTO memberships (first_name, last_name, phone_number, points) VALUES (%s,%s,%s,%s);"
+        parameters = (self.first_name,self.last_name, self.phone_number, self.points,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update_points(self, inserted_phone_number, points_of_current_sale):
+        query = "SELECT points from memberships where phone_number = %(phone_number)s;"
+        parameters = {'phone_number': inserted_phone_number}
+        collected_points = self.execute_query(query=query, parameters=parameters, fetchOne=True)
+        collected_points += points_of_current_sale
+        SQL = "UPDATE memberships SET points = %s WHERE phone_number = %s;"
+        parameters = (
+            collected_points, self.phone_number, inserted_phone_number,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
@@ -410,13 +433,14 @@ class WebTranslations(Main):
 
     def register(self):
         SQL = "INSERT INTO web_translations (msgid, korean, english) VALUES (%s,%s,%s);"
-        parameters = (self.msgid, self.korean, self.english, )
+        parameters = (self.msgid, self.korean, self.english,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update(self, id):
         SQL = "UPDATE web_translations SET msgid = %s, korean = %s, english = %s WHERE id = %s;"
         parameters = (self.msgid, self.korean, self.english, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
+
 
 class RecipeComments(Main):
     def __init__(self, productid, comment):

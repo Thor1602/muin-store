@@ -126,12 +126,9 @@ def add_membership():
         elif "check_verification" in request.form:
             if session.get('verification_code'):
                 if request.form['verification_code'] == str(session['verification_code'][0]):
-                    if main.phone_number_exists(session['member_registration']['phone_number']):
-                        return make_response(jsonify({'message': 'Error: Phone Number Exists', 'code': 'ERROR'}), 201)
-                    else:
-                        Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=0).register()
-                        session.pop('member_registration')
-                        return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),412)
+                    Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=0).register()
+                    session.pop('member_registration')
+                    return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),201)
                 else:
                     return make_response(jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 412)
             else:

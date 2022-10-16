@@ -7,8 +7,7 @@
     <li><a href="#portfolio">{{ msgid['product_title'] }}</a></li>
     <li><a href="#contact">{{ msgid['contact_title'] }}</a></li>
     <li><a href="/register_membership">{{ msgid['membership_points_title'] }}</a></li>
-
-
+    <li><a href="" class="check-membership-points">{{ msgid['membership_points_title'] }}</a></li>
 {% endblock %}
 
 {% block body %}
@@ -25,6 +24,7 @@
                            class="glightbox btn-watch-video d-flex align-items-center"><i
                                 class="bi bi-play-circle"></i><span>Watch Video</span></a>
                     </div>
+
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2">
                     {#          <img src="/static/img/croissant.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">#}
@@ -148,7 +148,7 @@
                                         src="/img/products/eclair2.jpg" class="img-fluid" alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>_{{ "Eclair" }}</h4>
-                                    <p>_{{ "Delicious French eclair with fresh cream"}}</p>
+                                    <p>_{{ "Delicious French eclair with fresh cream" }}</p>
                                 </div>
                             </div>
                         </div><!-- End Portfolio Item -->
@@ -159,7 +159,7 @@
                                    class="glightbox"><img src="/img/products/macaron.jpg" class="img-fluid" alt=""></a>
                                 <div class="portfolio-info">
                                     <h4>_{{ "Macaron" }}</h4>
-                                    <p>_{{ "Macarons in various colors and tastes"}}</p>
+                                    <p>_{{ "Macarons in various colors and tastes" }}</p>
                                 </div>
                             </div>
                         </div><!-- End Portfolio Item -->
@@ -170,8 +170,8 @@
                                    class="glightbox"><img src="/img/products/choco-macaron-2.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
-                                    <h4>{{ "Choco Macaron"}}</h4>
-                                    <p>_{{ "Brown macaron with ganache"}}</p>
+                                    <h4>{{ "Choco Macaron" }}</h4>
+                                    <p>_{{ "Brown macaron with ganache" }}</p>
                                 </div>
                             </div>
                         </div><!-- End Portfolio Item -->
@@ -182,9 +182,9 @@
                                    class="glightbox"><img src="/img/products/strawberry-bavarois.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
-                                    <h4>_{{ "Strawberry bavarois"}}
+                                    <h4>_{{ "Strawberry bavarois" }}
                                     </h4>
-                                    <p>_{{ "Bavarois made with fresh strawberries and almond biscuit"}}</p>
+                                    <p>_{{ "Bavarois made with fresh strawberries and almond biscuit" }}</p>
                                 </div>
                             </div>
                         </div><!-- End Portfolio Item -->
@@ -194,9 +194,9 @@
                                    class="glightbox"><img src="/img/products/choco-cake-2.jpg" class="img-fluid"
                                                           alt=""></a>
                                 <div class="portfolio-info">
-                                    <h4>_{{ "Choco cake"}}
-                                     </h4>
-                                    <p>)_{{ "Chocolate cream and soft chocolate biscuit"}}</p>
+                                    <h4>_{{ "Choco cake" }}
+                                    </h4>
+                                    <p>)_{{ "Chocolate cream and soft chocolate biscuit" }}</p>
                                 </div>
                             </div>
                         </div><!-- End Portfolio Item -->
@@ -328,18 +328,18 @@
                                        required><span></span>
                             </div>
                             <div class="form-group mt-3">
-                            <textarea class="form-control" name="message" rows="7" id="message" placeholder="{{ msgid['message'] }}"
+                            <textarea class="form-control" name="message" rows="7" id="message"
+                                      placeholder="{{ msgid['message'] }}"
                                       required></textarea><span></span>
                             </div>
                             <div class="my-3">
-                                <div class="loading">{{ msgid['loading'] }}Loading</div>
+                                <div class="loading">{{ msgid['loading'] }}</div>
                                 <div class="error-message">{{ msgid['contact-form-error'] }}</div>
                                 <div class="sent-message">{{ msgid['success_contact_submission'] }}</div>
                             </div>
                             <div class="text-center">
-{#                                <input type="button" onClick="sendLinkCustom();" value="Custom"/>#}
-{#                                <input type="button" onClick="sendLinkDefault();" value="Default"/>#}
-                                <button type="button" id="contact_submit_button">{{ msgid['send_message_button'] }}</button>
+                                <button type="button"
+                                        id="contact_submit_button">{{ msgid['send_message_button'] }}</button>
                             </div>
                         </form>
                     </div><!-- End Contact Form -->
@@ -408,6 +408,6 @@
     </div>
 {% endblock %}
 {% block endbody %}
-
+<script src="{{ url_for('static', filename='js/contact_form.js') }}"></script>
 
 {% endblock %}

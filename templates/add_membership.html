@@ -1,4 +1,12 @@
 {% extends "base.html" %}
+{% block nav %}
+    <li><a href="#hero">{{ msgid['home_title'] }}</a></li>
+    <li><a href="#about">{{ msgid['about_title'] }}</a></li>
+    <li><a href="#clients">{{ msgid['suppliers_title'] }}</a></li>
+    <li><a href="#portfolio">{{ msgid['product_title'] }}</a></li>
+    <li><a href="#contact">{{ msgid['contact_title'] }}</a></li>
+    <li><a href="/register_membership">{{ msgid['membership_points_title'] }}</a></li>
+{% endblock %}
 {% block body %}
 
     <section id="contact" class="membership sections-bg">
@@ -33,7 +41,8 @@
             </div>
             <div class="row gx-lg-0 gy-4">
                 <div class="col-lg-6 mx-auto">
-                    <form action="/register_membership" method="post" role="form" class="registration-form" id="get_verification_form">
+                    <form action="/register_membership" method="post" role="form" class="registration-form"
+                          id="get_verification_form">
                         <div class="row">
                             <div class="form-outline mb-4">
                                 <input type="text" name="first_name" id="first_name"
@@ -73,7 +82,8 @@
                             </div>
                         </div>
                         <div class="text-center">
-                            <button id="check_verification" type="button" name="check_verification" disabled>Verify</button>
+                            <button id="check_verification" type="button" name="check_verification" disabled>Verify
+                            </button>
                         </div>
                         <div class="my-3">
                             <div class="loading-add-membership">{{ msgid['loading'] }}</div>
@@ -88,4 +98,28 @@
         </div>
     </section><!-- End Contact Section -->
 
+
+{% endblock %}
+{% block modalbody %}
+    <div class="modal fade" id="modalRegistrationComplete" tabindex="-1"
+         aria-labelledby="modalRegistrationCompleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalRegistrationCompleteLabel"> Registration Successful</h5>
+                </div>
+                <div class="modal-body">
+                    Your points are 2000.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary go_to_homepage">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block endbody %}
+    <script src="{{ url_for('static', filename='js/ajax_requests.js') }}"></script>
 {% endblock %}

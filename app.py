@@ -13,6 +13,7 @@ TODO add kakao alert messaging
 import datetime
 import random
 import string
+import time
 from datetime import timedelta
 import pytz
 
@@ -81,7 +82,6 @@ def set_language(lang):
 @app.route("/", methods=['GET', 'POST'])
 def index():
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
-    # <b>{{ gettext('Free Trial') }}</b>  use _() as a shortcut for gettext().
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
         admin_msg = Message("Coup De Foudre: Customer Contact Submit Website",
@@ -90,6 +90,7 @@ def index():
         admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
         admin_msg.html = f"<b>Hello Sumin. {request.form['name']} contacted us on our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>"
         mail.send(admin_msg)
+        naver_setup.send_message_admin(f"<b>Hello Sumin. {request.form['name']} contacted us on our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>")
         # cust_msg = Message("Coup De Foudre Customer Service",
         #                    sender="from@example.com",
         #                    recipients=["to@example.com"])
@@ -117,8 +118,7 @@ def add_membership():
                 phone_number = phone_number.replace(char, '')
             phone_number = phone_number.replace(' ', '')
             if main.phone_number_exists(phone_number):
-                flash("Phone number exists")
-                return redirect(url_for('index'))
+                return make_response(jsonify({'message': 'Phone number: ' + phone_number + ' exists.', 'code': 'ERROR'}), 201)
             else:
                 session['member_registration'] = {'first_name': request.form['first_name'],'last_name': request.form['last_name'],'phone_number': phone_number}
                 naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0], language=session["preferred_language"])
@@ -126,13 +126,13 @@ def add_membership():
         elif "check_verification" in request.form:
             if session.get('verification_code'):
                 if request.form['verification_code'] == str(session['verification_code'][0]):
-                    Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=0).register()
+                    Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=2000).register()
                     session.pop('member_registration')
                     return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),201)
                 else:
-                    return make_response(jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 412)
+                    return make_response(jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 201)
             else:
-                return make_response(jsonify({'message': 'Verification code can be expired.', 'code': 'ERROR'}), 412)
+                return make_response(jsonify({'message': 'Verification code can be expired.', 'code': 'ERROR'}), 201)
 
     return render_template("add_membership.html")
 

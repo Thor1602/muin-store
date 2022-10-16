@@ -133,7 +133,7 @@
 <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
 <div id="preloader"></div>
-
+{% block modalbody %}{% endblock %}
 
 <!-- Vendor JS Files -->
 {#<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>#}
@@ -154,7 +154,6 @@
 
 <!-- Template Main JS File -->
 <script src="/static/js/main.js"></script>
-<script src="{{ url_for('static', filename='js/ajax_requests.js') }}"></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 
 <script>

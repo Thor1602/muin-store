@@ -74,6 +74,7 @@ $(document).ready(function () {
         $('html, body').animate({
         scrollTop: $("#hero").offset().top
     }, 2000);
+        modalMembershipCheck.show();
     });
 });
 

@@ -72,7 +72,7 @@ def get_locale():
         return dict(msgid=english_translation)
 
 
-# PUBLIC
+# -----------------------PUBLIC-----------------------
 @app.route("/lang_<lang>", methods=['GET', 'POST'])
 def set_language(lang):
     session["preferred_language"] = lang
@@ -183,7 +183,7 @@ def check_membership():
         redirect(url_for("add_membership"))
     return render_template("check_membership.html")
 
-# ADMIN
+# -----------------------ADMIN-----------------------
 @app.route('/admin_overview', methods=['GET', 'POST'])
 def admin_overview():
     if not session.get('logged_in'):

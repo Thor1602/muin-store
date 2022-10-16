@@ -7,7 +7,7 @@
     <li><a href="#portfolio">{{ msgid['product_title'] }}</a></li>
     <li><a href="#contact">{{ msgid['contact_title'] }}</a></li>
     <li><a href="/register_membership">{{ msgid['membership_points_title'] }}</a></li>
-    <li><a href="" class="check-membership-points">{{ msgid['membership_points_title'] }}</a></li>
+    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] }}</a></li>
 {% endblock %}
 
 {% block body %}
@@ -407,7 +407,31 @@
         </div>
     </div>
 {% endblock %}
+
+{% block modalbody %}
+    <div class="modal fade" id="modalCheckMembershipPoints" tabindex="-1"
+         aria-labelledby="modalCheckMembershipPointsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCheckMembershipPointsLabel">Membership Points</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
 {% block endbody %}
 <script src="{{ url_for('static', filename='js/contact_form.js') }}"></script>
 
 {% endblock %}
+

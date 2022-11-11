@@ -101,6 +101,9 @@ def index():
         # if cform.validate_on_submit():
         #     print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
     return render_template('index.html', api_kakao_js=api_kakao_js)
+@app.route("/privacy_policy", methods=['GET', 'POST'])
+def privacy_policy():
+    return render_template('privacy_policy.html')
 
 @app.route("/register_membership", methods=['GET', 'POST'])
 def add_membership():

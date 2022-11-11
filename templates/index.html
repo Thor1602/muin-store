@@ -371,11 +371,9 @@
             <div class="col-lg-2 col-6 footer-links">
                 <h4>Useful Links</h4>
                 <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">About us</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Terms of service</a></li>
-                    <li><a href="#">Privacy policy</a></li>
+                    <li><a href="/privacy_policy">{{ msgid['privacy_policy'] | safe }}</a></li>
+                    <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
+                    <li><a href="#">{{ msgid['2'] | safe }}Terms of service</a></li>
                 </ul>
             </div>
 
@@ -393,8 +391,8 @@
                 <h4>Contact Us</h4>
                 <p>
                     {{ msgid['address'] | safe }}<br>
-                    <strong>Phone:</strong> 010-4887-8249<br>
-                    <strong>Email:</strong> thorbendhaenenstd@gmail.com<br>
+                    <strong>{{ msgid['phone_number'] | safe }}:</strong> 010-4887-8249<br>
+                    <strong>{{ msgid['email'] | safe }}:</strong> thorbendhaenenstd@gmail.com<br>
                 </p>
 
             </div>

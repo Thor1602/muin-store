@@ -278,6 +278,47 @@
                             <input type="text" class="form-control" id="inputImage"
                                    name="image" value=".jpg">
                         </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type</label>
+                            <select class="form-select" id="type" type="type" name="type">
+                                <option value="Bread" selected>Bread</option>
+                                <option value="Pastry">Pastry</option>
+                                <option value="Patisserie">Patisserie</option>
+                                <option value="Cookies">Cookies</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="currently_selling" class="form-label">Currently Selling?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="currently_selling"
+                                       id="currently_selling" checked>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="best_product" class="form-label">Best product?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="best_product"
+                                       id="best_product" checked>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Korean_description" class="form-label">Korean
+                                Description</label>
+                            <textarea type="text" class="form-control" id="Korean_description"
+                                      name="Korean_description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="English_description" class="form-label">English
+                                Description</label>
+                            <textarea type="text" class="form-control" id="English_description"
+                                      name="English_description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="QR" class="form-label">QR code number</label>
+                            <input type="number" class="form-control" id="QR" name="QR"
+                                   value="">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

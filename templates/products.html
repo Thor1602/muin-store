@@ -1,409 +1,238 @@
 {% extends "base.html" %}
 
 {% block nav %}
-    {% for menu_item in nav_menu_admin %}
-        <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
-    {% endfor %}
+    <li><a href="/">{{ msgid['home_title'] | safe }}</a></li>
 {% endblock %}
 
 {% block body %}
 
-    <section id="about" class="about">
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="hero">
+        <div class="container position-relative">
+            <div class="row gy-5" data-aos="fade-in">
+                <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center text-center text-lg-start">
+                    <h2><span>{{ msgid['title'] | safe }} </span></h2>
+                    <p></p>
+                    <div class="d-flex justify-content-center justify-content-lg-start">
+                        <a href="https://map.naver.com/v5/entry/place/17852314?c=14152267.5888352,4523139.1287502,18,0,0,0,dh"
+                           class="glightbox btn-watch-video d-flex align-items-center"><i
+                                class="bi bi-geo-alt"></i><span>{{ msgid['open_map'] | safe }}</span></a>
+                    </div>
+
+                </div>
+                <div class="col-lg-6 order-1 order-lg-2">
+                    {#          <img src="/static/img/croissant.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">#}
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Hero Section -->
+    <!-- ======= Portfolio Section ======= -->
+    <section id="portfolio" class="portfolio sections-bg">
         <div class="container" data-aos="fade-up">
 
             <div class="section-header">
-                <h2>Admin</h2>
-                <p>Products</p>
+                <h2>{{ msgid['product_title'] | safe }}</h2>
+                <p>{{ msgid['product_intro'] | safe }}</p>
             </div>
 
-            <div class="row gy-4">
+            <div class="portfolio-isotope" data-portfolio-filter="*" data-portfolio-layout="masonry"
+                 data-portfolio-sort="original-order" data-aos="fade-up" data-aos-delay="100">
+
                 <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                        <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-                        </symbol>
-                    </svg>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-warning d-flex align-items-center alert-dismissible fade show"
-                                     role="alert">
-                                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
-                                         aria-label="Info:">
-                                        <use xlink:href="#info-fill"></use>
-                                    </svg>
-                                    <div> {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                aria-label="Close"></button>
+                    <ul class="portfolio-flters">
+                        <li data-filter="*" class="filter-active">{{ msgid['All'] | safe }}</li>
+                        <li data-filter=".filter-app">{{ msgid['Bread'] | safe }}</li>
+                        <li data-filter=".filter-product">{{ msgid['Viennoiserie'] | safe }}</li>
+                        <li data-filter=".filter-branding">{{ msgid['Patisserie'] | safe }}</li>
+                        <li data-filter=".filter-books">{{ msgid['Cookies'] | safe }}</li>
+                        <li data-filter=".filter-other">{{ msgid['Other_Products'] | safe }}</li>
+                    </ul><!-- End Portfolio Filters -->
+                </div>
+
+                <div class="row gy-4 portfolio-container">
+                    {% for product in products %}
+                        {% if product[6] == 'Bread' and product[7] == True %}
+                            <div class="col-xl-4 col-md-6 portfolio-item filter-app ">
+                                <div class="portfolio-wrap">
+                                    <a href="/static/img/products/{{ product[5] }}"
+                                       data-gallery="portfolio-gallery-app"
+                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
+                                                              class="img-fluid"
+                                                              alt="{{ product[5] }}"></a>
+                                    <div class="portfolio-info">
+                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                            <h4>{{ product[2] | safe }}</h4>
+                                            <p>{{ product[9] | safe }}</p>
+                                        {% else %}
+                                            <h4>{{ product[1] | safe }}</h4>
+                                            <p>{{ product[10] | safe }}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                </div>
-                <h4>제품원가</h4>
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <!-- List group-->
-                        <ul class="list-group shadow">
-                            <!-- list group item-->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">크로아상 80g</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/크로아상.png" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">뺑 오 쇼콜라 75g</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/뺑 오 쇼콜라 75g.png"
-                                                     alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">맥시핑거 초콜릿칩</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/맥시핑거 초콜릿칩.png"
-                                                     alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">바게뜨</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/바게뜨.png" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">블루베리 머핀</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/블루베리 머핀.png" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">뺑 오 레장</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/뺑 오 레장.png" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">사나몬 스월</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/사나몬 스월.png" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">애플 시나몬 머핀</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/애플 시나몬 머핀.png"
-                                                     alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">에그타르트</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/에그타르트.png" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">초콜릿 트위스트</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/초콜릿 트위스트.png"
-                                                     alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">초콜릿 파운드 케익</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/static/img/admin/초콜릿 파운드 케익.png"
-                                                     alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">딸기무스 케이크</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/img/products/strawberry-bavarois.jpg"
-                                                     alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
-                            <li class="list-group-item">
-                                <!-- Custom content-->
-                                <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                    <div class="media-body order-2 order-lg-1">
-                                        <div class="row">
-                                            <div class="col-7">
-                                                <h5 class="mt-0 font-weight-bold mb-2">살구잼 롤케이크</h5>
-                                                <p class="font-italic text-muted mb-0 small"></p>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1700</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1550 (>30)</h6>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                                    <h6 class="font-weight-bold my-2">₩1400 (>100)</h6>
-                                                </div>
-                                            </div>
-                                            <div class="col-5">
-                                                <img src="/img/products/rollcake1.jpg" alt="Generic placeholder image"
-                                                     class="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- End -->
-                            </li> <!-- End -->
+                            </div><!-- End Portfolio Item -->
 
-                        </ul> <!-- End -->
-                    </div>
-                </div>
-                <ul>
-                    <li>Interesting Ingredients</li>
-                    <li>칼리바우트 헤이즐넛 프랄린 페이스</li>
-                </ul>
+                        {% elif product[6] == 'Viennoiserie' and product[7] == True %}
+                            <div class="col-xl-4 col-md-6 portfolio-item filter-product ">
+                                <div class="portfolio-wrap">
+                                    <a href="/static/img/products/{{ product[5] }}"
+                                       data-gallery="portfolio-gallery-app"
+                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
+                                                              class="img-fluid"
+                                                              alt="{{ product[5] }}"></a>
+                                    <div class="portfolio-info">
+                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                            <h4>{{ product[2] | safe }}</h4>
+                                            <p>{{ product[9] | safe }}</p>
+                                        {% else %}
+                                            <h4>{{ product[1] | safe }}</h4>
+                                            <p>{{ product[10] | safe }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div><!-- End Portfolio Item -->
+                        {% elif product[6] == 'Patisserie' and product[7] == True %}
+                            <div class="col-xl-4 col-md-6 portfolio-item filter-branding ">
+                                <div class="portfolio-wrap">
+                                    <a href="/static/img/products/{{ product[5] }}"
+                                       data-gallery="portfolio-gallery-app"
+                                       class="glightbox"><img
+                                            src="/static/img/products/{{ product[5] }}" class="img-fluid"
+                                            alt="{{ product[5] | safe }}"></a>
+                                    <div class="portfolio-info">
+                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                            <h4>{{ product[2] | safe }}</h4>
+                                            <p>{{ product[9] | safe }}</p>
+                                        {% else %}
+                                            <h4>{{ product[1] | safe }}</h4>
+                                            <p>{{ product[10] | safe }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div><!-- End Portfolio Item -->
+                        {% elif product[6] == 'Cookies' and product[7] == True %}
+                            <div class="col-xl-4 col-md-6 portfolio-item filter-books ">
+                                <div class="portfolio-wrap">
+                                    <a href="/static/img/products/{{ product[5] }}"
+                                       data-gallery="portfolio-gallery-app"
+                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
+                                                              class="img-fluid" alt="{{ product[5] }}"></a>
+                                    <div class="portfolio-info">
+                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                            <h4>{{ product[2] | safe }}</h4>
+                                            <p>{{ product[9] | safe }}</p>
+                                        {% else %}
+                                            <h4>{{ product[1] | safe }}</h4>
+                                            <p>{{ product[10] | safe }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div><!-- End Portfolio Item -->
+                        {% else %}
+                            <div class="col-xl-4 col-md-6 portfolio-item filter-other ">
+                                <div class="portfolio-wrap">
+                                    <a href="/static/img/products/{{ product[5] }}"
+                                       data-gallery="portfolio-gallery-app"
+                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
+                                                              class="img-fluid" alt="{{ product[5] }}"></a>
+                                    <div class="portfolio-info">
+                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                            <h4>{{ product[2] | safe }}</h4>
+                                            <p>{{ product[9] | safe }}</p>
+                                        {% else %}
+                                            <h4>{{ product[1] | safe }}</h4>
+                                            <p>{{ product[10] | safe }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div><!-- End Portfolio Item -->
+                        {% endif %}
+                    {% endfor %}
+                </div><!-- End Portfolio Container -->
+
             </div>
 
         </div>
-    </section><!-- End About Us Section -->
+    </section><!-- End Portfolio Section -->
 
 {% endblock %}
 
+{% block footer %}
+
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-lg-5 col-md-12 footer-info">
+                <a href="/" class="logo d-flex align-items-center">
+                    <span>Coup De Foudre</span>
+                </a>
+                <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
+                    valies
+                    darta donna mare fermentum iaculis eu non diam phasellus.</p>
+                {#          <div class="social-links d-flex mt-4">#}
+                {#            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
+                {#            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
+                {#            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
+                {#            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
+                {#          </div>#}
+            </div>
+
+            <div class="col-lg-2 col-6 footer-links">
+                <h4>Useful Links</h4>
+                <ul>
+                    <li><a href="/privacy_policy">{{ msgid['privacy_policy'] | safe }}</a></li>
+                    <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
+                    <li><a href="#">{{ msgid['2'] | safe }}Terms of service</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-6 footer-links">
+                <h4>{{ msgid['product_title'] | safe }}</h4>
+                <ul>
+                    <li><a href="#">Eclairs</a></li>
+                    <li><a href="#">Macarons</a></li>
+                    <li><a href="#">Vienoisserie</a></li>
+                    <li><a href="#">Bread</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+                <h4>Contact Us</h4>
+                <p>
+                    {{ msgid['address'] | safe }}<br>
+                    <strong>{{ msgid['phone_number'] | safe }}:</strong> 010-4887-8249<br>
+                    <strong>{{ msgid['email'] | safe }}:</strong> thorbendhaenenstd@gmail.com<br>
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block modalbody %}
+    <div class="modal fade" id="modalCheckMembershipPoints" tabindex="-1"
+         aria-labelledby="modalCheckMembershipPointsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCheckMembershipPointsLabel">Membership Points</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block endbody %}
+    <script src="{{ url_for('static', filename='js/contact_form.js') }}"></script>
+
+{% endblock %}
 

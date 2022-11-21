@@ -46,8 +46,10 @@ mail = Mail(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
-                  '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Cost Calculation',
-                  '/invoices': 'Invoices', '/homepage_admin': 'Homepage Admin', '/images': 'Images'}
+                  '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Add Cost Calculation',
+                  '/edit_cost_calculation': 'Edit Cost Calculation',
+                  '/invoices': 'Invoices', '/translations': 'Translations', '/images': 'Images'}
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -82,28 +84,31 @@ def set_language(lang):
 @app.route("/", methods=['GET', 'POST'])
 def index():
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
+    best_products = []
+    for row in main.read_table('products'):
+        if row[8] == True:
+            best_products.append(row)
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
         admin_msg = Message("Coup De Foudre: Customer Contact Submit Website",
                             sender="from@example.com",
                             recipients=["to@example.com"])
         admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-        admin_msg.html = f"<b>Hello Sumin. {request.form['name']} contacted us on our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>"
+        message = f"<b>Customer, {request.form['name']}, send a message from our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>"
+        admin_msg.html = message
         mail.send(admin_msg)
-        naver_setup.send_message_admin(f"<b>Hello Sumin. {request.form['name']} contacted us on our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>")
-        # cust_msg = Message("Coup De Foudre Customer Service",
-        #                    sender="from@example.com",
-        #                    recipients=["to@example.com"])
-        # cust_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-        # cust_msg.html = f"<b>Thank you for contacting us, {request.form['name']}. We will reply ASAP.</b>"
-        # cust_msg.send(cust_msg)
-        # cform = Contact.contactForm()
-        # if cform.validate_on_submit():
-        #     print(f"Name:{cform.name.data}, E-mail:{cform.email.data}, message: {cform.message.data}")
-    return render_template('index.html', api_kakao_js=api_kakao_js)
+        naver_setup.send_message_admin(message)
+    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products)
+
+@app.route("/products", methods=['GET', 'POST'])
+def products():
+    products = main.read_table('products')
+    return render_template('products.html', products=products)
+
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
     return render_template('privacy_policy.html')
+
 
 @app.route("/register_membership", methods=['GET', 'POST'])
 def add_membership():
@@ -121,23 +126,32 @@ def add_membership():
                 phone_number = phone_number.replace(char, '')
             phone_number = phone_number.replace(' ', '')
             if main.phone_number_exists(phone_number):
-                return make_response(jsonify({'message': 'Phone number: ' + phone_number + ' exists.', 'code': 'ERROR'}), 201)
+                return make_response(
+                    jsonify({'message': 'Phone number: ' + phone_number + ' exists.', 'code': 'ERROR'}), 201)
             else:
-                session['member_registration'] = {'first_name': request.form['first_name'],'last_name': request.form['last_name'],'phone_number': phone_number}
-                naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0], language=session["preferred_language"])
-                return make_response(jsonify({'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}), 201)
+                session['member_registration'] = {'first_name': request.form['first_name'],
+                                                  'last_name': request.form['last_name'], 'phone_number': phone_number}
+                naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0],
+                                                   language=session["preferred_language"])
+                return make_response(jsonify(
+                    {'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}),
+                    201)
         elif "check_verification" in request.form:
             if session.get('verification_code'):
                 if request.form['verification_code'] == str(session['verification_code'][0]):
-                    Database.Membership(session['member_registration']['first_name'],session['member_registration']['last_name'],session['member_registration']['phone_number'], points=2000).register()
+                    Database.Membership(session['member_registration']['first_name'],
+                                        session['member_registration']['last_name'],
+                                        session['member_registration']['phone_number'], points=2000).register()
                     session.pop('member_registration')
-                    return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}),201)
+                    return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}), 201)
                 else:
-                    return make_response(jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 201)
+                    return make_response(
+                        jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 201)
             else:
                 return make_response(jsonify({'message': 'Verification code can be expired.', 'code': 'ERROR'}), 201)
 
     return render_template("add_membership.html")
+
 
 @app.route("/membership", methods=['GET', 'POST'])
 def check_membership():
@@ -151,10 +165,14 @@ def check_membership():
                 if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
                     session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
                     flash("Verification code expired. A new code has been sent.")
-                    naver_setup.send_notification_code(to_no=request.form['phone_number'], code=session['verification_code'][0], language=session["preferred_language"] )
+                    naver_setup.send_notification_code(to_no=request.form['phone_number'],
+                                                       code=session['verification_code'][0],
+                                                       language=session["preferred_language"])
                 else:
                     flash("Verification code is not expired yet. The code has been resent.")
-                    naver_setup.send_notification_code(to_no=request.form['phone_number'], code=session['verification_code'][0], language=session["preferred_language"])
+                    naver_setup.send_notification_code(to_no=request.form['phone_number'],
+                                                       code=session['verification_code'][0],
+                                                       language=session["preferred_language"])
             else:
                 session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
 
@@ -173,7 +191,8 @@ def check_membership():
                 flash("Verification code is not created yet.")
 
         elif "request_membership_points" in request.form:
-            if request.form["verification_code"] == session['verification_code'][0] and session['verification_code'][1] + datetime.timedelta(minutes=5) >= datetime.datetime.now():
+            if request.form["verification_code"] == session['verification_code'][0] and session['verification_code'][
+                1] + datetime.timedelta(minutes=5) >= datetime.datetime.now():
                 flash("Verification succeeded")
             else:
                 if request.form["verification_code"] != session['verification_code'][0]:
@@ -185,6 +204,7 @@ def check_membership():
             redirect(url_for('add_membership'))
         redirect(url_for("add_membership"))
     return render_template("check_membership.html")
+
 
 # -----------------------ADMIN-----------------------
 @app.route('/admin_overview', methods=['GET', 'POST'])
@@ -225,9 +245,20 @@ def cost_calculation():
                 packaging = Database.Packaging(request.form['english'], request.form['korean'])
                 packaging.register()
             elif 'product_add_button' in request.form:
+                if request.form['currently_selling'] == 'on':
+                    currently_selling = True
+                else:
+                    currently_selling = False
+                if request.form['best'] == 'on':
+                    best_product = True
+                else:
+                    best_product = False
                 product = Database.Products(request.form['english'], request.form['korean'],
                                             request.form['weight_in_gram_per_product'], request.form['unit'],
-                                            request.form['image'])
+                                            request.form['image'], type=request.form['type'],
+                                            currently_selling=currently_selling, best=best_product,
+                                            Korean_description=request.form['Korean_description'],
+                                            English_description=request.form['English_description'], QR=request.form['QR'])
                 product.register()
             elif 'price_ingredient_add_button' in request.form:
                 if request.form['date'] == '':
@@ -260,6 +291,48 @@ def cost_calculation():
         packaging = main.read_table('packaging')
         return render_template('cost_calculation.html', nav_menu_admin=nav_menu_admin, packaging=packaging,
                                ingredients=ingredients, products=products)
+
+
+@app.route('/edit_cost_calculation', methods=['GET', 'POST'])
+def edit_cost_calculation():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        if request.method == "POST":
+            if 'products_edit_button' in request.form:
+                if request.form['currently_selling'] == 'on':
+                    currently_selling = True
+                else:
+                    currently_selling = False
+                if request.form['best_product'] == 'on':
+                    best_product = True
+                else:
+                    best_product = False
+                Database.Products(english=request.form['english'], korean=request.form['korean'],
+                                  weight_in_gram_per_product=request.form['weight'], unit=request.form['unit'],
+                                  image=request.form['image'], type=request.form['type'],
+                                  currently_selling=currently_selling, best=best_product,
+                                  Korean_description=request.form['Korean_description'],
+                                  English_description=request.form['English_description'],QR=request.form['QR']).update(
+                    request.form['products_edit_button'])
+
+        data_dictionary = {}
+        data_dictionary['ingredients'] = main.read_table('ingredients')
+        data_dictionary['products'] = main.read_table('products')
+        data_dictionary['packaging'] = main.read_table('packaging')
+        data_dictionary['prices_ingredients'] = main.read_table('prices_ingredients')
+        data_dictionary['prices_packaging'] = main.read_table('prices_packaging')
+        data_dictionary['packagingproduct'] = main.read_table('packagingproduct')
+        data_dictionary['ingredientproduct'] = main.read_table('ingredientproduct')
+        data_dictionary['ingredients_col'] = main.show_columns('ingredients')
+        data_dictionary['products_col'] = main.show_columns('products')
+        data_dictionary['packaging_col'] = main.show_columns('packaging')
+        data_dictionary['prices_ingredients_col'] = main.show_columns('prices_ingredients')
+        data_dictionary['prices_packaging_col'] = main.show_columns('prices_packaging')
+        data_dictionary['packagingproduct_col'] = main.show_columns('packagingproduct')
+        data_dictionary['ingredientproduct_col'] = main.show_columns('ingredientproduct')
+        return render_template('edit_cost_calculation.html', nav_menu_admin=nav_menu_admin,
+                               data_dictionary=data_dictionary)
 
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
@@ -455,15 +528,6 @@ def images():
 
         return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=[])
 
-
-@app.route('/products', methods=['GET', 'POST'])
-def products():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    else:
-        return render_template('products.html', nav_menu_admin=nav_menu_admin)
-
-
 @app.route('/recipes', methods=['GET', 'POST'])
 def recipes():
     if not session.get('logged_in'):
@@ -484,8 +548,8 @@ def recipes():
                                products=products)
 
 
-@app.route('/homepage_admin', methods=['GET', 'POST'])
-def homepage_admin():
+@app.route('/translations', methods=['GET', 'POST'])
+def translations():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:

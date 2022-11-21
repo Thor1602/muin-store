@@ -91,9 +91,15 @@ class Main:
         self.execute_query("INSERT INTO settings (name, key, value) VALUES (%s,%s,%s)",
                            (name, key, value,), commit=True)
 
+    def add_column(self, tablename, columname, type, default_value=None):
+        self.execute_query(f"ALTER TABLE {tablename} ADD COLUMN {columname} {type} DEFAULT '{default_value}';",
+                           commit=True)
+        # main.add_column(tablename='products', columname='type', type='VARCHAR', default_value='pastry')
+
     def get_setting_by_name(self, name):
         return \
-        self.execute_query(query="SELECT key, value FROM settings where name = '{}';".format(name), fetchAll=True)[0]
+            self.execute_query(query="SELECT key, value FROM settings where name = '{}';".format(name), fetchAll=True)[
+                0]
 
     def get_cloud_images(self):
         return googledrive_connector.list_all_files(parent='images')
@@ -101,7 +107,7 @@ class Main:
     def get_membership_points(self, phone_number):
         SQL = "SELECT points from memberships where phone_number = %(phone_number)s;"
         parameters = {'phone_number': phone_number}
-        query = self.execute_query(query=SQL, parameters=parameters,fetchOne=True)
+        query = self.execute_query(query=SQL, parameters=parameters, fetchOne=True)
         return query
 
     def phone_number_exists(self, phone_number):
@@ -111,8 +117,6 @@ class Main:
             return True
         else:
             return False
-
-
 
 
 class User(Main):
@@ -141,7 +145,7 @@ class Membership(Main):
 
     def register(self):
         SQL = "INSERT INTO memberships (first_name, last_name, phone_number, points) VALUES (%s,%s,%s,%s);"
-        parameters = (self.first_name,self.last_name, self.phone_number, self.points,)
+        parameters = (self.first_name, self.last_name, self.phone_number, self.points,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update_points(self, inserted_phone_number, points_of_current_sale):
@@ -339,22 +343,30 @@ class PricesPackaging(Main):
 
 
 class Products(Main):
-    def __init__(self, english, korean, weight_in_gram_per_product, unit, image):
+    def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, Korean_description, English_description, QR):
         self.english = english
         self.korean = korean
         self.weight_in_gram_per_product = weight_in_gram_per_product
         self.unit = unit
         self.image = image
+        self.type = type
+        self.currently_selling = currently_selling
+        self.best = best
+        self.Korean_description = Korean_description
+        self.English_description = English_description
+        self.QR = QR
 
     def register(self):
-        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit ,image) VALUES (%s,%s,%s,%s,%s);"
-        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image,)
+        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit ,image,type,currently_selling, best, Korean_description, English_description, QR) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
+                      self.currently_selling, self.best, self.Korean_description, self.English_description, self.QR,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
     def update(self, id):
-        SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s, image = %s WHERE id = %s;"
+        SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s, image = %s , type = %s , currently_selling = %s, best = %s, Korean_description = %s, English_description = %s , QR = %s WHERE id = %s;"
         parameters = (
-            self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, id,)
+            self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
+            self.currently_selling, self.best, self.Korean_description, self.English_description, self.QR, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 

@@ -306,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 filter: portfolioFilter,
                 sortBy: portfolioSort
             });
-
             let menuFilters = document.querySelectorAll('.portfolio-isotope .portfolio-flters li');
             menuFilters.forEach(function (el) {
                 el.addEventListener('click', function () {

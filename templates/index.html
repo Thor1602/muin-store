@@ -2,12 +2,12 @@
 
 {% block nav %}
     <li><a href="#hero">{{ msgid['home_title'] | safe }}</a></li>
-    <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
-    <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
-    <li><a href="#portfolio">{{ msgid['product_title'] | safe }}</a></li>
     <li><a href="#contact">{{ msgid['contact_title'] | safe }}</a></li>
+    <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
+    <li><a href="/products">{{ msgid['product_title'] | safe }}</a></li>
+    <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
     <li><a href="/register_membership">{{ msgid['membership_points_title'] | safe }}</a></li>
-{#    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] | safe }}</a></li>#}
+    {#    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] | safe }}</a></li>#}
 {% endblock %}
 
 {% block body %}
@@ -20,9 +20,9 @@
                     <h2><span>{{ msgid['title'] | safe }} </span></h2>
                     <p></p>
                     <div class="d-flex justify-content-center justify-content-lg-start">
-                        <a href="https://map.naver.com/v5/entry/place/17852314?c=14152267.5888352,4523139.1287502,18,0,0,0,dh"
+                        <a href="/static/img/grand-opening-finished.jpg"
                            class="glightbox btn-watch-video d-flex align-items-center"><i
-                                class="bi bi-geo-alt"></i><span>{{ msgid['open_map'] | safe }}</span></a>
+                                class="bi bi-geo-alt"></i><span>GRAND OPENING</span></a>
                     </div>
 
                 </div>
@@ -33,7 +33,121 @@
         </div>
     </section>
     <!-- End Hero Section -->
-    <!-- ======= Contact Section ======= -->
+    <main id="main">
+
+        <section id="news" class="news">
+            <div class="container" data-aos="fade-up">
+                <div class="section-header">
+                    <h2>GRAND OPENING</h2>
+                    <p>2022년 12월 10일</p>
+                </div>
+                <div class="d-flex justify-content-center justify-content-lg-start">
+                    <a href="/static/img/grand-opening-finished.jpg"
+                       class="glightbox btn-watch-video d-flex align-items-center"><span>More</span></a>
+                </div>
+
+            </div>
+        </section><!-- End About Us Section -->
+        <!-- ======= Portfolio Section ======= -->
+        <section id="portfolio" class="portfolio sections-bg">
+            <div class="container" data-aos="fade-up">
+
+                <div class="section-header">
+                    <h2>{{ msgid['best_product_title'] | safe }}</h2>
+                    <p>{{ msgid['best_product_intro'] | safe }}</p>
+                </div>
+
+                <div class="portfolio-isotope" data-portfolio-filter="*" data-portfolio-layout="masonry"
+                     data-portfolio-sort="original-order" data-aos="fade-up" data-aos-delay="100">
+
+                    <div class="row gy-4 portfolio-container">
+                        {% for product in products %}
+                            <div class="col-xl-4 col-md-6 portfolio-item filter-product ">
+                                <div class="portfolio-wrap">
+                                    <a href="/static/img/products/{{ product[5] }}"
+                                       data-gallery="portfolio-gallery-app"
+                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
+                                                              class="img-fluid"
+                                                              alt="{{ product[5] }}"></a>
+                                    <div class="portfolio-info">
+                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                            <h4>{{ product[2] | safe }}</h4>
+                                            <p>{{ product[9] | safe }}</p>
+                                        {% else %}
+                                            <h4>{{ product[1] | safe }}</h4>
+                                            <p>{{ product[10] | safe }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div><!-- End Portfolio Item -->
+                        {% endfor %}
+                    </div><!-- End Portfolio Container -->
+
+                    <div class="d-flex justify-content-center justify-content-lg-start mt-5">
+                        <a href="/products"><span>{{ msgid['view_more'] | safe }}</span></a>
+                    </div>
+                </div>
+
+            </div>
+        </section><!-- End Portfolio Section -->
+        <!-- ======= About Us Section ======= -->
+        <section id="about" class="about">
+            <div class="container" data-aos="fade-up">
+
+                <div class="section-header">
+                    <h2>{{ msgid['about_title'] | safe }}</h2>
+                    <p>{{ msgid['about_content'] | safe }}</p>
+                </div>
+
+                <div class="row gy-4">
+                    <div class="col-lg-6">
+                        <h3>{{ msgid['about_subtitle_one'] | safe }}</h3>
+                        <img src="/static/img/products/about.jpg" class="img-fluid rounded-4 mb-4" alt="">
+                        <p>{{ msgid['about_subcontent_one'] | safe }} </p>
+                        <p>{{ msgid['about_subcontent_two'] | safe }}</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="content ps-0 ps-lg-5">
+                            <p class="fst-italic">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                incididunt ut
+                                labore et dolore
+                                magna aliqua.
+                            </p>
+                            <ul>
+                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea
+                                    commodo
+                                    consequat.
+                                </li>
+                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in
+                                    voluptate velit.
+                                </li>
+                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea
+                                    commodo
+                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta
+                                    storacalaperda
+                                    mastiro dolore eu fugiat nulla pariatur.
+                                </li>
+                            </ul>
+                            <p>
+                                Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                                reprehenderit in voluptate
+                                velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+                                proident
+                            </p>
+
+                            <div class="position-relative mt-4">
+                                <img src="/static/img/products/about-2.jpg" class="img-fluid rounded-4" alt="">
+                                <a href="https://www.youtube.com/watch?v=9i1G8i_Q-Lk&ab_channel=DessertsbyDesign"
+                                   class="glightbox play-btn"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section><!-- End About Us Section -->
+        <!-- ======= Contact Section ======= -->
         <section id="contact" class="contact sections-bg">
             <div class="container" data-aos="fade-up">
 
@@ -132,189 +246,8 @@
 
             </div>
         </section><!-- End Contact Section -->
-    <main id="main">
 
-        <!-- ======= About Us Section ======= -->
-        <section id="about" class="about">
-            <div class="container" data-aos="fade-up">
 
-                <div class="section-header">
-                    <h2>{{ msgid['about_title'] | safe }}</h2>
-                    <p>{{ msgid['about_content'] | safe }}</p>
-                </div>
-
-                <div class="row gy-4">
-                    <div class="col-lg-6">
-                        <h3>{{ msgid['about_subtitle_one'] | safe }}</h3>
-                        <img src="/static/img/products/about.jpg" class="img-fluid rounded-4 mb-4" alt="">
-                        <p>{{ msgid['about_subcontent_one'] | safe }} </p>
-                        <p>{{ msgid['about_subcontent_two'] | safe }}</p>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="content ps-0 ps-lg-5">
-                            <p class="fst-italic">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                incididunt ut
-                                labore et dolore
-                                magna aliqua.
-                            </p>
-                            <ul>
-                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea
-                                    commodo
-                                    consequat.
-                                </li>
-                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in
-                                    voluptate velit.
-                                </li>
-                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea
-                                    commodo
-                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta
-                                    storacalaperda
-                                    mastiro dolore eu fugiat nulla pariatur.
-                                </li>
-                            </ul>
-                            <p>
-                                Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                reprehenderit in voluptate
-                                velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                                proident
-                            </p>
-
-                            <div class="position-relative mt-4">
-                                <img src="/static/img/products/about-2.jpg" class="img-fluid rounded-4" alt="">
-                                <a href="https://www.youtube.com/watch?v=9i1G8i_Q-Lk&ab_channel=DessertsbyDesign"
-                                   class="glightbox play-btn"></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End About Us Section -->
-        <!-- ======= Portfolio Section ======= -->
-        <section id="portfolio" class="portfolio sections-bg">
-            <div class="container" data-aos="fade-up">
-
-                <div class="section-header">
-                    <h2>{{ msgid['product_title'] | safe }}</h2>
-                    <p>{{ msgid['product_intro'] | safe }}</p>
-                </div>
-
-                <div class="portfolio-isotope" data-portfolio-filter="*" data-portfolio-layout="masonry"
-                     data-portfolio-sort="original-order" data-aos="fade-up" data-aos-delay="100">
-
-                    <div>
-                        <ul class="portfolio-flters">
-                            <li data-filter="*" class="filter-active">{{ msgid['All'] | safe }}</li>
-                            <li data-filter=".filter-app">{{ msgid['Bread'] | safe }}</li>
-                            <li data-filter=".filter-product">{{ msgid['Viennoiserie'] | safe }}</li>
-                            <li data-filter=".filter-branding">{{ msgid['Patisserie'] | safe }}</li>
-                            <li data-filter=".filter-books">{{ msgid['Cookies'] | safe }}</li>
-                        </ul><!-- End Portfolio Filters -->
-                    </div>
-
-                    <div class="row gy-4 portfolio-container">
-
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-app">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/portfolio/app-1.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/portfolio/app-1.jpg" class="img-fluid"
-                                                          alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>App 1</h4>
-                                    <p>Lorem ipsum, dolor sit amet consectetur</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-product">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/portfolio/product-1.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/portfolio/product-1.jpg" class="img-fluid"
-                                                          alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>Product 1</h4>
-                                    <p>Lorem ipsum, dolor sit amet consectetur</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/products/eclair2.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img
-                                        src="/static/img/products/eclair2.jpg" class="img-fluid" alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>{{ "Eclair" }}</h4>
-                                    <p>{{ "Delicious French eclair with fresh cream" }}</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-books">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/products/macaron.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/products/macaron.jpg" class="img-fluid" alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>{{ "Macaron" }}</h4>
-                                    <p>{{ "Macarons in various colors and tastes" }}</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-books">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/products/choco-macaron-1.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/products/choco-macaron-2.jpg" class="img-fluid"
-                                                          alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>{{ "Choco Macaron" }}</h4>
-                                    <p>{{ "Brown macaron with ganache" }}</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/products/strawberry-bavarois.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/products/strawberry-bavarois.jpg" class="img-fluid"
-                                                          alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>{{ "Strawberry bavarois" }}
-                                    </h4>
-                                    <p>{{ "Bavarois made with fresh strawberries and almond biscuit" }}</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/products/choco-cake-3.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/products/choco-cake-2.jpg" class="img-fluid"
-                                                          alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>{{ "Choco cake" }}
-                                    </h4>
-                                    <p>{{ "Chocolate cream and soft chocolate biscuit" }}</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-                        <div class="col-xl-4 col-md-6 portfolio-item filter-branding">
-                            <div class="portfolio-wrap">
-                                <a href="/static/img/products/rollcake-piece.jpg" data-gallery="portfolio-gallery-app"
-                                   class="glightbox"><img src="/static/img/products/rollcake-2.jpg" class="img-fluid"
-                                                          alt=""></a>
-                                <div class="portfolio-info">
-                                    <h4>Roll cake
-                                    </h4>
-                                    <p>Soft biscuit with jam (apricot)</p>
-                                </div>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-                    </div><!-- End Portfolio Container -->
-                </div>
-
-            </div>
-        </section><!-- End Portfolio Section -->
         <!-- ======= Clients Section ======= -->
         <section id="clients" class="clients">
             <div class="container" data-aos="zoom-out">
@@ -424,7 +357,7 @@
 {% endblock %}
 
 {% block endbody %}
-<script src="{{ url_for('static', filename='js/contact_form.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/contact_form.js') }}"></script>
 
 {% endblock %}
 

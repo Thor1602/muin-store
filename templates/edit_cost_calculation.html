@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block nav %}
+    {% for menu_item in nav_menu_admin %}
+        <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+    {% endfor %}
+{% endblock %}
+
+{% block body %}
+
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+            <div class="section-header">
+                <h2>Cost Calculation Edit</h2>
+                <p>Edit your products, prices and more</p>
+            </div>
+            <hr>
+            <div class="section-header row gy-4">
+                <h4>Products</h4>
+                <div class="overflow-scroll max-height-table" id="products-table">
+                    <input class="form-control" id="productSearch" type="text" placeholder="Search..">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['products_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['products'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#products_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                {#                                <th>#}
+                                {#                                    <button class="btn btn-danger" type="button"#}
+                                {#                                            data-bs-toggle="modal"#}
+                                {#                                            data-bs-target="#deleteModalVariableCost{{ row[0] }}">#}
+                                {#                                        <i class="bi bi-trash-fill"></i>#}
+                                {#                                    </button>#}
+                                {#                                </th>#}
+                                {% for col in row[1:] %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Ingredients</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['ingredients_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['ingredients'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#ingredients_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                {% for col in row[1:] %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Packaging</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['packaging_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['packaging'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#packaging_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                {% for col in row[1:] %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Prices Ingredients</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['prices_ingredients_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['prices_ingredients'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#prices_ingredients_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                <th>{{ row[1] }}</th>
+                                <th>₩{{ row[2] }}</th>
+                                <th>{{ row[3] }}g</th>
+                                <th>{{ row[4] }}</th>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Prices Packaging</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['prices_packaging_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['prices_packaging'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#prices_packaging_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                {% for col in row[1:] %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Packaging Product</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['packagingproduct_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['packagingproduct'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#packagingproduct_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                {% for col in row[1:] %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Ingredient Product</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['ingredientproduct_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['ingredientproduct'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#ingredientproduct_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                {% for col in row[1:] %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block endbody %}
+    {% for row in data_dictionary['products'] %}
+        <div class="modal fade" id="products_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="products_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="products_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputEnglish{{ row[0] }}" class="form-label">English</label>
+                                <input type="text" class="form-control" id="inputEnglish{{ row[0] }}" name="english"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputKorean{{ row[0] }}" class="form-label">Korean</label>
+                                <input type="text" class="form-control" id="inputKorean{{ row[0] }}" name="korean"
+                                       value="{{ row[2] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="weight{{ row[0] }}" class="form-label">Weight In Gram Per Product</label>
+                                <input type="text" class="form-control" id="weight{{ row[0] }}"
+                                       name="weight" value="{{ row[3] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="unit{{ row[0] }}" class="form-label">Unit</label>
+                                <input type="text" class="form-control" id="unit{{ row[0] }}"
+                                       name="unit" value="{{ row[4] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="image{{ row[0] }}" class="form-label">Image</label>
+                                <input type="text" class="form-control" id="image{{ row[0] }}" name="image"
+                                       value="{{ row[5] }}">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="type{{ row[0] }}" class="form-label">Type</label>
+                                <select class="form-select" id="type{{ row[0] }}" type="type" name="type">
+                                    {% if row[6] == "Bread" %}
+                                        <option value="Bread" selected>Bread</option>
+                                        <option value="Pastry">Pastry</option>
+                                        <option value="Patisserie">Patisserie</option>
+                                        <option value="Cookies">Cookies</option>
+                                        <option value="Other">Other</option>
+                                    {% elif row[6] == "Pastry" %}
+                                        <option value="Bread">Bread</option>
+                                        <option value="Pastry" selected>Pastry</option>
+                                        <option value="Patisserie">Patisserie</option>
+                                        <option value="Cookies">Cookies</option>
+                                        <option value="Other">Other</option>
+                                    {% elif row[6] == "Patisserie" %}
+                                        <option value="Bread">Bread</option>
+                                        <option value="Pastry">Pastry</option>
+                                        <option value="Patisserie" selected>Patisserie</option>
+                                        <option value="Cookies">Cookies</option>
+                                        <option value="Other">Other</option>
+                                    {% elif row[6] == "Cookies" %}
+                                        <option value="Bread">Bread</option>
+                                        <option value="Pastry">Pastry</option>
+                                        <option value="Patisserie">Patisserie</option>
+                                        <option value="Cookies" selected>Cookies</option>
+                                        <option value="Other">Other</option>
+                                    {% elif row[6] == "Other" %}
+                                        <option value="Bread">Bread</option>
+                                        <option value="Pastry">Pastry</option>
+                                        <option value="Patisserie">Patisserie</option>
+                                        <option value="Cookies">Cookies</option>
+                                        <option value="Other" selected>Other</option>
+                                    {% else %}
+                                        <option value="Bread">Bread</option>
+                                        <option value="Pastry" selected>Pastry</option>
+                                        <option value="Patisserie">Patisserie</option>
+                                        <option value="Cookies">Cookies</option>
+                                        <option value="Other">Other</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="currently_selling{{ row[0] }}" class="form-label">Currently Selling?</label>
+                                <div class="form-check form-switch">
+
+                                    {% if row[7] == True %}
+                                        <input class="form-check-input" type="checkbox" name="currently_selling"
+                                               id="currently_selling{{ row[0] }}" checked>
+                                    {% else %}
+                                        <input class="form-check-input" type="checkbox" name="currently_selling"
+                                               id="currently_selling{{ row[0] }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="best_product{{ row[0] }}" class="form-label">Best product?</label>
+                                <div class="form-check form-switch">
+
+                                    {% if row[8] == True %}
+                                        <input class="form-check-input" type="checkbox" name="best_product"
+                                               id="best_product{{ row[0] }}" checked>
+                                    {% else %}
+                                        <input class="form-check-input" type="checkbox" name="best_product"
+                                               id="best_product{{ row[0] }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="Korean_description{{ row[0] }}" class="form-label">Korean
+                                    Description</label>
+                                <textarea type="text" class="form-control" id="Korean_description{{ row[0] }}"
+                                          name="Korean_description">{{ row[9] }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="English_description{{ row[0] }}" class="form-label">English
+                                    Description</label>
+                                <textarea type="text" class="form-control" id="English_description{{ row[0] }}"
+                                          name="English_description">{{ row[10] }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="QR{{ row[0] }}" class="form-label">QR code number</label>
+                                <input type="number" class="form-control" id="QR{{ row[0] }}" name="QR"
+                                       value="{{ row[11] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="products_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        $(document).ready(function () {
+            $("#productSearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#products-table tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+
+
+

@@ -303,13 +303,14 @@ def edit_cost_calculation():
         return redirect(url_for('login'))
     else:
         if request.method == "POST":
+            print(request.form)
             if 'products_edit_button' in request.form:
-                if request.form['currently_selling'] == 'on':
-                    currently_selling = True
+                if 'currently_selling' in request.form:
+                    currently_selling = request.form['currently_selling'] == 'on'
                 else:
                     currently_selling = False
-                if request.form['best_product'] == 'on':
-                    best_product = True
+                if 'best_product' in request.form:
+                    best_product = request.form['best_product'] == 'on'
                 else:
                     best_product = False
                 Database.Products(english=request.form['english'], korean=request.form['korean'],

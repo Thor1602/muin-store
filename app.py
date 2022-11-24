@@ -13,7 +13,6 @@ TODO add kakao alert messaging
 import datetime
 import random
 import string
-import time
 from datetime import timedelta
 import pytz
 import qrcode
@@ -49,7 +48,8 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
                   '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Add Cost Calculation',
                   '/edit_cost_calculation': 'Edit Cost Calculation',
-                  '/invoices': 'Invoices', '/translations': 'Translations', '/images': 'Images'}
+                  '/invoices': 'Invoices', '/translations': 'Translations', '/images': 'Images', '/qr_info': 'QR Info',
+                  '/large_order_price': 'Large Orders'}
 
 
 def allowed_file(filename):
@@ -101,10 +101,12 @@ def index():
         naver_setup.send_message_admin(message)
     return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products)
 
+
 @app.route("/products", methods=['GET', 'POST'])
 def products():
     products = main.read_table('products')
     return render_template('products.html', products=products)
+
 
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
@@ -259,7 +261,8 @@ def cost_calculation():
                                             request.form['image'], type=request.form['type'],
                                             currently_selling=currently_selling, best=best_product,
                                             Korean_description=request.form['Korean_description'],
-                                            English_description=request.form['English_description'], QR=request.form['QR'])
+                                            English_description=request.form['English_description'],
+                                            QR=request.form['QR'])
                 product.register()
             elif 'price_ingredient_add_button' in request.form:
                 if request.form['date'] == '':
@@ -314,7 +317,8 @@ def edit_cost_calculation():
                                   image=request.form['image'], type=request.form['type'],
                                   currently_selling=currently_selling, best=best_product,
                                   Korean_description=request.form['Korean_description'],
-                                  English_description=request.form['English_description'],QR=request.form['QR']).update(
+                                  English_description=request.form['English_description'],
+                                  QR=request.form['QR']).update(
                     request.form['products_edit_button'])
 
         data_dictionary = {}
@@ -478,56 +482,8 @@ def images():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        # if request.method == 'POST':
-        #     if 'images_add_button' in request.form:
-        #         if 'file' not in request.files:
-        #             flash('No file part')
-        #             return redirect(request.url)
-        #         files = request.files.getlist("file")
-        #         for file in files:
-        #             if file.filename == '':
-        #                 flash('File has no filename')
-        #                 break
-        #             if request.form['new_filename'] != "":
-        #                 if allowed_file(request.form['new_filename']):
-        #                     file.filename = request.form['new_filename']
-        #             if file.filename in googledrive_connector.list_all_files(return_id=False, parent='images'):
-        #                 new_filename = file.filename.rsplit('.', 1)[0] + datetime.datetime.now().strftime(
-        #                     "%Y%m%d_%H%M%S") + '.' + file.filename.rsplit('.', 1)[1]
-        #                 file.filename = new_filename
-        #                 flash('File name already exists. Name is changed to: ' + file.filename)
-        #             if file and allowed_file(file.filename):
-        #                 googledrive_connector.upload_image(file)
-        #                 flash('File name: ' + file.filename + ' is uploaded.')
-        #             else:
-        #                 flash('File name: ' + file.filename + ' is not allowed.')
-        #         return redirect(url_for('images'))
-        #     elif 'images_edit_button' in request.form:
-        #         file_id = request.form['images_edit_button']
-        #         new_filename = request.form['new_filename']
-        #         old_filename = googledrive_connector.search_file_by_id(file_id)
-        #         googledrive_connector.change_name_from_id(file_id=file_id, new_filename=new_filename)
-        #         if (isinstance(new_filename, str) and isinstance(old_filename, str)):
-        #             flash('File name: ' + old_filename + ' is changed to ' + new_filename + '.')
-        #         else:
-        #             flash('File name has changed.')
-        #
-        #     elif 'images_edit_all_button' in request.form:
-        #         for key in request.form:
-        #             if 'new_filename' in key:
-        #                 name_id = key.split('___')
-        #                 googledrive_connector.change_name_from_id(file_id=name_id[1], new_filename=request.form[key])
-        #         flash('File names have changed.')
-        #     elif 'btn_delete_image' in request.form:
-        #         file_id = request.form['btn_delete_image']
-        #         deleted_filename = googledrive_connector.search_file_by_id(file_id)
-        #         googledrive_connector.delete_file(file_id=file_id)
-        #         if isinstance(deleted_filename, str):
-        #             flash('File name: ' + deleted_filename + ' is deleted.')
-        #         else:
-        #             flash('File is deleted.')
-
         return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=[])
+
 
 @app.route('/recipes', methods=['GET', 'POST'])
 def recipes():
@@ -569,19 +525,30 @@ def translations():
         return render_template('homepage_admin.html', web_translations=sorted_web_translations,
                                web_translations_col=web_translations_col, nav_menu_admin=nav_menu_admin)
 
+
 @app.route('/qr_info', methods=['GET', 'POST'])
 def qr_info():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
+        if request.method == 'POST':
+            for key in request.form:
+                if 'product_' in key:
+                    img = qrcode.make(request.form[key])
+                    img.save("/static/img/QR/" + request.form[key] + ".png")
+            return render_template('qr_info.html', nav_menu_admin=nav_menu_admin)
         return render_template('qr_info.html', nav_menu_admin=nav_menu_admin)
+
 
 @app.route('/large_orders_price', methods=['GET', 'POST'])
 def large_orders_price():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('large_orders_price.html', nav_menu_admin=nav_menu_admin)
+        products = main.read_table('products')
+        variable_costs = main.read_table('variable_costs')
+        return render_template('large_orders_price.html', nav_menu_admin=nav_menu_admin, products=products,variable_costs=variable_costs)
+
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])

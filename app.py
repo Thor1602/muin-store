@@ -16,6 +16,7 @@ import string
 import time
 from datetime import timedelta
 import pytz
+import qrcode
 
 from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response, \
     jsonify
@@ -568,6 +569,19 @@ def translations():
         return render_template('homepage_admin.html', web_translations=sorted_web_translations,
                                web_translations_col=web_translations_col, nav_menu_admin=nav_menu_admin)
 
+@app.route('/qr_info', methods=['GET', 'POST'])
+def qr_info():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('qr_info.html', nav_menu_admin=nav_menu_admin)
+
+@app.route('/large_orders_price', methods=['GET', 'POST'])
+def large_orders_price():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('large_orders_price.html', nav_menu_admin=nav_menu_admin)
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])

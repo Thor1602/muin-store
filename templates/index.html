@@ -2,14 +2,13 @@
 
 {% block nav %}
     <li><a href="#hero">{{ msgid['home_title'] | safe }}</a></li>
-    <li><a href="/products">{{ msgid['product_title'] | safe }}</a></li>
+    <li><a href="#product">{{ msgid['product_title'] | safe }}</a></li>
     <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
     <li><a href="#contact">{{ msgid['contact_title'] | safe }}</a></li>
     <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
     <li><a href="/register_membership">{{ msgid['membership_points_title'] | safe }}</a></li>
     {#    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] | safe }}</a></li>#}
 {% endblock %}
-
 {% block body %}
 
     <!-- ======= Hero Section ======= -->
@@ -49,7 +48,7 @@
             </div>
         </section><!-- End About Us Section -->
         <!-- ======= Portfolio Section ======= -->
-        <section id="portfolio" class="portfolio sections-bg">
+        <section id="product" class="portfolio sections-bg">
             <div class="container" data-aos="fade-up">
 
                 <div class="section-header">
@@ -311,12 +310,12 @@
             </div>
 
             <div class="col-lg-2 col-6 footer-links">
-                <h4>{{ msgid['product_title'] | safe }}</h4>
+                <h4>MENU</h4>
                 <ul>
-                    <li><a href="#">Eclairs</a></li>
-                    <li><a href="#">Macarons</a></li>
-                    <li><a href="#">Vienoisserie</a></li>
-                    <li><a href="#">Bread</a></li>
+                    <li><a href="#product">{{ msgid['product_title'] | safe }}</a></li>
+                    <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
+                    <li><a href="#contact">{{ msgid['contact_title'] | safe }}</a></li>
+                    <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
                 </ul>
             </div>
 

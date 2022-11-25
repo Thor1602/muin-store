@@ -2,11 +2,11 @@
 
 {% block nav %}
     <li><a href="#hero">{{ msgid['home_title'] | safe }}</a></li>
-    <li><a href="#product">{{ msgid['product_title'] | safe }}</a></li>
+    <li><a href="#best-product">{{ msgid['product_title'] | safe }}</a></li>
     <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
     <li><a href="#contact">{{ msgid['contact_title'] | safe }}</a></li>
     <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
-    <li><a href="/register_membership">{{ msgid['membership_points_title'] | safe }}</a></li>
+{#    <li><a href="/register_membership">{{ msgid['membership_points_title'] | safe }}</a></li>#}
     {#    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] | safe }}</a></li>#}
 {% endblock %}
 {% block body %}
@@ -19,9 +19,9 @@
                     <h2><span>{{ msgid['title'] | safe }} </span></h2>
                     <p></p>
                     <div class="d-flex justify-content-center justify-content-lg-start">
-                        <a href="/static/img/grand-opening-finished.jpg"
+                        <a href="/static/img/map.JPG"
                            class="glightbox btn-watch-video d-flex align-items-center"><i
-                                class="bi bi-geo-alt"></i><span>GRAND OPENING</span></a>
+                                class="bi bi-geo-alt"></i><span>{{ msgid['open_map'] | safe }}</span></a>
                     </div>
 
                 </div>
@@ -42,13 +42,13 @@
                 </div>
                 <div class="d-flex justify-content-center justify-content-lg-start">
                     <a href="/static/img/grand-opening-finished.jpg"
-                       class="glightbox btn-watch-video d-flex align-items-center"><span>More</span></a>
+                       class="glightbox btn-watch-video d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                 </div>
 
             </div>
         </section><!-- End About Us Section -->
-        <!-- ======= Portfolio Section ======= -->
-        <section id="product" class="portfolio sections-bg">
+        <!-- ======= Best Product Section ======= -->
+        <section id="best-product" class="best-product sections-bg">
             <div class="container" data-aos="fade-up">
 
                 <div class="section-header">
@@ -82,8 +82,9 @@
                         {% endfor %}
                     </div><!-- End Portfolio Container -->
 
-                    <div class="d-flex justify-content-center justify-content-lg-start mt-5">
-                        <a href="/products"><span>{{ msgid['view_more'] | safe }}</span></a>
+                    <div class="d-flex justify-content-center justify-content-lg-start">
+                        <a href="/static/img/grand-opening-finished.jpg"
+                           class="glightbox btn-watch-video d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                     </div>
                 </div>
 
@@ -101,7 +102,7 @@
                 <div class="row gy-4">
                     <div class="col-lg-6">
                         <h3>{{ msgid['about_subtitle_one'] | safe }}</h3>
-                        <img src="/static/img/products/about.jpg" class="img-fluid rounded-4 mb-4" alt="">
+                        <img src="/static/img/products/logo2.png" class="img-fluid rounded-4 mb-4" alt="">
                         <p>{{ msgid['about_subcontent_one'] | safe }} </p>
                         <p>{{ msgid['about_subcontent_two'] | safe }}</p>
                     </div>
@@ -110,19 +111,19 @@
                             <p class="fst-italic">
                                 {{ msgid['about_subcontent_three'] | safe }}
                             </p>
-{#                            <ul>#}
-{#                                <li><i class="bi bi-check-circle-fill"></i> #}
-{#                                </li>#}
-{#                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in#}
-{#                                    voluptate velit.#}
-{#                                </li>#}
-{#                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea#}
-{#                                    commodo#}
-{#                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta#}
-{#                                    storacalaperda#}
-{#                                    mastiro dolore eu fugiat nulla pariatur.#}
-{#                                </li>#}
-{#                            </ul>#}
+                            {#                            <ul>#}
+                            {#                                <li><i class="bi bi-check-circle-fill"></i> #}
+                            {#                                </li>#}
+                            {#                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in#}
+                            {#                                    voluptate velit.#}
+                            {#                                </li>#}
+                            {#                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea#}
+                            {#                                    commodo#}
+                            {#                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta#}
+                            {#                                    storacalaperda#}
+                            {#                                    mastiro dolore eu fugiat nulla pariatur.#}
+                            {#                                </li>#}
+                            {#                            </ul>#}
                             <p>
                                 {{ msgid['about_subcontent_four'] | safe }}
                             </p>
@@ -131,8 +132,9 @@
                             </p>
                             <div class="position-relative mt-4">
                                 <img src="/static/img/products/choco-cake-1.jpg" class="img-fluid rounded-4" alt="">
-                                <a href="/static/img/products/choco-cake-1.jpg"
-                                   class="glightbox play-btn"></a>
+                                {#                                <a href="/static/img/products/choco-cake-1.jpg"#}
+                                {#                                   class="glightbox play-btn"></a>#}
+
                             </div>
                         </div>
                     </div>
@@ -304,7 +306,7 @@
             <div class="col-lg-2 col-6 footer-links">
                 <h4>MENU</h4>
                 <ul>
-                    <li><a href="#product">{{ msgid['product_title'] | safe }}</a></li>
+                    <li><a href="#best-product">{{ msgid['product_title'] | safe }}</a></li>
                     <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
                     <li><a href="#contact">{{ msgid['contact_title'] | safe }}</a></li>
                     <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
@@ -331,7 +333,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalCheckMembershipPointsLabel">{{ msgid['membership_points_title'] | safe }}</h5>
+                    <h5 class="modal-title"
+                        id="modalCheckMembershipPointsLabel">{{ msgid['membership_points_title'] | safe }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
@@ -339,7 +342,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ msgid['ok'] | safe }}</button>
+                    <button type="button" class="btn btn-primary"
+                            data-bs-dismiss="modal">{{ msgid['ok'] | safe }}</button>
                 </div>
             </div>
         </div>

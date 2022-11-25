@@ -108,36 +108,30 @@
                     <div class="col-lg-6">
                         <div class="content ps-0 ps-lg-5">
                             <p class="fst-italic">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                incididunt ut
-                                labore et dolore
-                                magna aliqua.
+                                {{ msgid['about_subcontent_three'] | safe }}
                             </p>
-                            <ul>
-                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea
-                                    commodo
-                                    consequat.
-                                </li>
-                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in
-                                    voluptate velit.
-                                </li>
-                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea
-                                    commodo
-                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta
-                                    storacalaperda
-                                    mastiro dolore eu fugiat nulla pariatur.
-                                </li>
-                            </ul>
+{#                            <ul>#}
+{#                                <li><i class="bi bi-check-circle-fill"></i> #}
+{#                                </li>#}
+{#                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in#}
+{#                                    voluptate velit.#}
+{#                                </li>#}
+{#                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea#}
+{#                                    commodo#}
+{#                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta#}
+{#                                    storacalaperda#}
+{#                                    mastiro dolore eu fugiat nulla pariatur.#}
+{#                                </li>#}
+{#                            </ul>#}
                             <p>
-                                Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                reprehenderit in voluptate
-                                velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                                proident
+                                {{ msgid['about_subcontent_four'] | safe }}
                             </p>
-
+                            <p>
+                                {{ msgid['about_subcontent_five'] | safe }}
+                            </p>
                             <div class="position-relative mt-4">
-                                <img src="/static/img/products/about-2.jpg" class="img-fluid rounded-4" alt="">
-                                <a href="https://www.youtube.com/watch?v=9i1G8i_Q-Lk&ab_channel=DessertsbyDesign"
+                                <img src="/static/img/products/choco-cake-1.jpg" class="img-fluid rounded-4" alt="">
+                                <a href="/static/img/products/choco-cake-1.jpg"
                                    class="glightbox play-btn"></a>
                             </div>
                         </div>
@@ -251,7 +245,7 @@
         <section id="clients" class="clients">
             <div class="container" data-aos="zoom-out">
                 <div class="section-header">
-                    <h2>Our Suppliers</h2>
+                    <h2>{{ msgid['suppliers_title'] | safe }}</h2>
                     <p></p>
                 </div>
                 <div class="clients-slider swiper">
@@ -289,9 +283,7 @@
                 <a href="/" class="logo d-flex align-items-center">
                     <span>Coup De Foudre</span>
                 </a>
-                <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
-                    valies
-                    darta donna mare fermentum iaculis eu non diam phasellus.</p>
+                <p>{{ msgid['footer_content_left_under'] | safe }}</p>
                 {#          <div class="social-links d-flex mt-4">#}
                 {#            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
                 {#            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
@@ -301,11 +293,11 @@
             </div>
 
             <div class="col-lg-2 col-6 footer-links">
-                <h4>Useful Links</h4>
+                <h4>{{ msgid['useful_links'] | safe }}</h4>
                 <ul>
                     <li><a href="/privacy_policy">{{ msgid['privacy_policy'] | safe }}</a></li>
                     <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
-                    <li><a href="#">{{ msgid['2'] | safe }}Terms of service</a></li>
+                    <li><a>{{ msgid['terms_of_service'] | safe }}</a></li>
                 </ul>
             </div>
 
@@ -320,7 +312,7 @@
             </div>
 
             <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-                <h4>Contact Us</h4>
+                <h4>{{ msgid['contact_title'] | safe }}</h4>
                 <p>
                     {{ msgid['address'] | safe }}<br>
                     <strong>{{ msgid['phone_number'] | safe }}:</strong> 010-4887-8249<br>
@@ -339,7 +331,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalCheckMembershipPointsLabel">Membership Points</h5>
+                    <h5 class="modal-title" id="modalCheckMembershipPointsLabel">{{ msgid['membership_points_title'] | safe }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
@@ -347,7 +339,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ msgid['ok'] | safe }}</button>
                 </div>
             </div>
         </div>

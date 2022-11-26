@@ -252,7 +252,7 @@ def cost_calculation():
                     currently_selling = True
                 else:
                     currently_selling = False
-                if request.form['best'] == 'on':
+                if request.form['best_product'] == 'on':
                     best_product = True
                 else:
                     best_product = False

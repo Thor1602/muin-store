@@ -248,12 +248,12 @@ def cost_calculation():
                 packaging = Database.Packaging(request.form['english'], request.form['korean'])
                 packaging.register()
             elif 'product_add_button' in request.form:
-                if request.form['currently_selling'] == 'on':
-                    currently_selling = True
+                if 'currently_selling' in request.form:
+                    currently_selling = request.form['currently_selling'] == 'on'
                 else:
                     currently_selling = False
-                if request.form['best_product'] == 'on':
-                    best_product = True
+                if 'best_product' in request.form:
+                    best_product = request.form['best_product'] == 'on'
                 else:
                     best_product = False
                 product = Database.Products(request.form['english'], request.form['korean'],

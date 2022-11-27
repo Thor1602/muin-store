@@ -130,7 +130,7 @@ class User(Main):
         self.last_login = last_login
 
     def register_user(self):
-        SQL = "INSERT INTO contact_query (first_name, last_name, nickname, password, role_name, email, last_login) VALUES (%s,%s,%s,%s,%s,%s,%s);"
+        SQL = "INSERT INTO user (first_name, last_name, nickname, password, role_name, email, last_login) VALUES (%s,%s,%s,%s,%s,%s,%s);"
         parameters = (
             self.first_name, self.last_name, self.nickname, self.password, self.role_name, self.email, self.last_login)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
@@ -160,23 +160,22 @@ class Membership(Main):
 
 
 class Contact(Main):
-    def __init__(self, name, message, date, reason, phone, email, address, form_type):
+    def __init__(self, name, email, address, phone, subject, message):
         self.name = name
-        self.message = message
-        self.date = date
-        self.reason = reason
-        self.phone = phone
         self.email = email
         self.address = address
-        self.form_type = form_type
+        self.phone = phone
+        self.subject = subject
+        self.message = message
 
     def register_contact_query(self):
-        SQL = "INSERT INTO contact_query (name, message, date, reason, phone, email, address, form_type) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);"
-        parameters = (
-            self.name, self.message, self.date, self.reason, self.phone, self.email, self.address, self.form_type,)
+        SQL = "INSERT INTO customer_contact_submission (name, email, address, phone, subject, message, time, isrepliedto) VALUES (%s,%s,%s,%s,%s,%s,now()::timestamp, FALSE);"
+        parameters = (self.name, self.email, self.address, self.phone, self.subject, self.message)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
-
-
+    def isRead(self, id):
+        SQL = "UPDATE customer_contact_submission SET isrepliedto = TRUE WHERE id = %s;"
+        parameters = (id,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
 class Investment(Main):
     def __init__(self, english, korean, min_price, max_price):
         self.english = english

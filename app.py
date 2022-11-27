@@ -91,14 +91,16 @@ def index():
             best_products.append(row)
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
-        admin_msg = Message("Coup De Foudre: Customer Contact Submit Website",
+        admin_msg = Message("Coup De Foudre: 문의 주세요!",
                             sender="from@example.com",
                             recipients=["to@example.com"])
         admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-        message = f"<b>Customer, {request.form['name']}, send a message from our website. Can you reply to this person? Info:<br>Name: {request.form['name']}<br>Address: {request.form['address']}<br>Phone: {request.form['phone']}<br>Email: {request.form['email']}<br>Subject: {request.form['subject']}<br>Message: {request.form['message']}</b>"
+        message = f"<b>띵동! {request.form['name']}한테 메시지가 왔어요!! <br> 성명: {request.form['name']}<br>주소: {request.form['address']}<br>전화번호: {request.form['phone']}<br>이메일주소: {request.form['email']}<br>제목: {request.form['subject']}<br>주요 메시지: {request.form['message']} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
         admin_msg.html = message
         mail.send(admin_msg)
-        naver_setup.send_message_admin(message)
+        naver_setup.send_message_admin(f"문의 주세요! ({request.form['phone']}) {request.form['name']}")
+        naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
+        Database.Contact(name=request.form['name'], email=request.form['email'], address=request.form['address'], phone=request.form['phone'], subject=request.form['subject'], message=request.form['message']).register_contact_query()
     return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products)
 
 
@@ -484,6 +486,15 @@ def images():
         return redirect(url_for('login'))
     else:
         return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=[])
+
+
+@app.route('/contact_inquiry', methods=['GET', 'POST'])
+def contact_inquiry():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        contact_info = main.read_table('customer_contact_submission', order_desc="time")
+        return render_template('contact_inquiry.html', nav_menu_admin=nav_menu_admin, contact_info=contact_info)
 
 
 @app.route('/recipes', methods=['GET', 'POST'])

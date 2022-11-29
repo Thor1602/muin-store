@@ -20,7 +20,7 @@
                     <p></p>
                     <div class="d-flex justify-content-center justify-content-lg-start">
                         <a href="/static/img/map.JPG"
-                           class="glightbox btn-watch-video d-flex align-items-center"><i
+                           class="glightbox btn-open-map d-flex align-items-center"><i
                                 class="bi bi-geo-alt"></i><span>{{ msgid['open_map'] | safe }}</span></a>
                     </div>
 
@@ -42,7 +42,7 @@
                 </div>
                 <div class="d-flex justify-content-center justify-content-lg-start">
                     <a href="/static/img/grand-opening-finished.jpg"
-                       class="glightbox btn-watch-video d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
+                       class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                 </div>
 
             </div>
@@ -82,9 +82,8 @@
                         {% endfor %}
                     </div><!-- End Portfolio Container -->
 
-                    <div class="d-flex justify-content-center justify-content-lg-start">
-                        <a href="/products"
-                           class="glightbox btn-watch-video d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
+                    <div class="best-product-more d-flex justify-content-center justify-content-lg-start">
+                        <a href="/products" class="d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                     </div>
                 </div>
 

@@ -2291,7 +2291,7 @@ section {
     border-radius: 50px;
 }
 
-.news .btn-see-image i {
+.best-product .btn-see-image i {
     color: rgba(0, 0, 0, 0.5);
     font-size: 32px;
     transition: 0.3s;
@@ -2299,9 +2299,10 @@ section {
     margin-right: 8px;
 }
 
-.news .btn-see-image:hover i {
+.best-product .btn-see-image:hover i {
     color: #fff;
 }
+
 /*--------------------------------------------------------------
 # Footer
 --------------------------------------------------------------*/

@@ -43,7 +43,7 @@
                     href="mailto:thorbendhaenenstd@gmail.com">{{ msgid['email_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-solid fa-phone d-flex align-items-center ms-4"><a
                     href="tel:00821048878249">{{ msgid['phone_contact'] }}</a></i></span>
-            <span class="full-screen" ><i class="fa-brands fa-kickstarter d-flex align-items-center ms-4"><a
+            <span class="full-screen"><i class="fa-brands fa-kickstarter d-flex align-items-center ms-4"><a
                     href="">{{ msgid['kakao_contact'] }}</a></i></span>
             <a class="short-screen btn" href="mailto:thorbendhaenenstd@gmail.com" data-bs-toggle="tooltip"
                data-bs-placement="bottom" title="Send an email"><i
@@ -78,27 +78,37 @@
         </a>
         <nav id="navbar" class="navbar">
             <ul>
-                {% block nav %}
+                {% if session.get('logged_in') %}
+                    {% for menu_item in nav_menu_admin %}
+                        {% if nav_menu_admin[menu_item] is mapping %}
+                            <li class="dropdown"><a href="javascript:void(0)"><span>{{ menu_item }}</span> <i
+                                    class="bi bi-chevron-down dropdown-indicator"></i></a>
+                                <ul>
+                                    {% for sub_menu_item in nav_menu_admin[menu_item] %}
+                                        <li>
+                                            <a href="{{ sub_menu_item }}">{{ nav_menu_admin[menu_item][sub_menu_item] }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    <hr>
+                {% endif %}
+                {% if session['is_homepage'] %}
+                    {% for menu_item in menu_item_home %}
+                        <li><a href="{{ menu_item }}">{{ msgid[menu_item_home[menu_item]] | safe }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    {% for menu_item in menu_item_home %}
+                        <li><a href="/{{ menu_item }}">{{ msgid[menu_item_home[menu_item]] | safe }}</a></li>
+                    {% endfor %}
+                {% endif %}
+                {#    <li><a href="/register_membership">{{ msgid['membership_points_title'] | safe }}</a></li>#}
+                {#    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] | safe }}</a></li>#}
 
-                {% endblock %}
-
-                {#          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>#}
-                {#            <ul>#}
-                {#              <li><a href="#">Drop Down 1</a></li>#}
-                {#              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>#}
-                {#                <ul>#}
-                {#                  <li><a href="#">Deep Drop Down 1</a></li>#}
-                {#                  <li><a href="#">Deep Drop Down 2</a></li>#}
-                {#                  <li><a href="#">Deep Drop Down 3</a></li>#}
-                {#                  <li><a href="#">Deep Drop Down 4</a></li>#}
-                {#                  <li><a href="#">Deep Drop Down 5</a></li>#}
-                {#                </ul>#}
-                {#              </li>#}
-                {#              <li><a href="#">Drop Down 2</a></li>#}
-                {#              <li><a href="#">Drop Down 3</a></li>#}
-                {#              <li><a href="#">Drop Down 4</a></li>#}
-                {#            </ul>#}
-                {#          </li>#}
             </ul>
         </nav><!-- .navbar -->
 

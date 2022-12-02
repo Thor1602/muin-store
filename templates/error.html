@@ -1,11 +1,4 @@
 {% extends "base.html" %}
-{% block nav %}
-    {% if session['logged_in'] %}
-        {% for menu_item in nav_menu_admin %}
-            <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
-        {% endfor %}
-    {% endif %}
-{% endblock %}
 {% block body %}
     <section id="hero" class="hero">
         <div class="container position-relative">

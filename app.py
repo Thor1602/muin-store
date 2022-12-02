@@ -45,12 +45,16 @@ mail = Mail(app)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-nav_menu_admin = {'/admin_overview': 'Overview', '/business_plan': 'Business Plan', '/financial_plan': 'Financial Plan',
-                  '/products': 'Products', '/recipes': 'Recipes', '/cost_calculation': 'Add Cost Calculation',
-                  '/edit_cost_calculation': 'Edit Cost Calculation',
-                  '/invoices': 'Invoices', '/translations': 'Translations', '/images': 'Images', '/qr_info': 'QR Info',
-                  '/large_order_price': 'Large Orders'}
+nav_menu_admin = {'/admin_overview': 'Overview',
+                  'Customers': {'/qr_info': 'QR Info', '/large_order_price': 'Large Orders'},
+                  'Products': {'/recipes': 'Recipes', '/products': 'Products'},
+                  'Bookkeeping': {'/invoices': 'Invoices', '/business_plan': 'Business Plan',
+                                  '/financial_plan': 'Financial Plan'},
+                  'Site Admin': {'/translations': 'Translations', '/images': 'Images',
+                                 '/cost_calculation': 'Add Cost Calculation',
+                                 '/edit_cost_calculation': 'Edit Cost Calculation'}}
 
+menu_item_home = {'#hero':'home_title','#best-product':'best_product_title_nav','#about':'about_title','#contact':'contact_title', '#clients':'suppliers_title'}
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -59,6 +63,7 @@ def allowed_file(filename):
 
 @app.context_processor
 def get_locale():
+    session['is_homepage'] = False
     session_name = session.get("preferred_language", default='ko_KR')
     if '/login' not in request.url or '/logout' not in request.url:
         session['url'] = request.url
@@ -70,9 +75,9 @@ def get_locale():
         korean_translation[key] = x[2]
         english_translation[key] = x[3]
     if session_name == 'ko_KR':
-        return dict(msgid=korean_translation)
+        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin,menu_item_home=menu_item_home)
     else:
-        return dict(msgid=english_translation)
+        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin,menu_item_home=menu_item_home)
 
 
 # -----------------------PUBLIC-----------------------
@@ -84,6 +89,7 @@ def set_language(lang):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
+    session['is_homepage'] = True
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
     best_products = []
     for row in main.read_table('products'):
@@ -100,7 +106,9 @@ def index():
         mail.send(admin_msg)
         naver_setup.send_message_admin(f"문의 주세요! ({request.form['phone']}) {request.form['name']}")
         naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
-        Database.Contact(name=request.form['name'], email=request.form['email'], address=request.form['address'], phone=request.form['phone'], subject=request.form['subject'], message=request.form['message']).register_contact_query()
+        Database.Contact(name=request.form['name'], email=request.form['email'], address=request.form['address'],
+                         phone=request.form['phone'], subject=request.form['subject'],
+                         message=request.form['message']).register_contact_query()
     return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products)
 
 
@@ -225,8 +233,7 @@ def admin_overview():
                 comment = Database.Comment(request.form['comment'])
                 comment.register_comment()
                 redirect(url_for('admin_overview'))
-        return render_template('admin_overview.html', comments=main.read_table('comments'),
-                               nav_menu_admin=nav_menu_admin)
+        return render_template('admin_overview.html', comments=main.read_table('comments'))
 
 
 @app.route('/business_plan', methods=['GET', 'POST'])
@@ -234,7 +241,7 @@ def business_plan():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('business_plan.html', nav_menu_admin=nav_menu_admin)
+        return render_template('business_plan.html')
 
 
 @app.route('/cost_calculation', methods=['GET', 'POST'])
@@ -295,7 +302,7 @@ def cost_calculation():
         ingredients = main.read_table('ingredients')
         products = main.read_table('products')
         packaging = main.read_table('packaging')
-        return render_template('cost_calculation.html', nav_menu_admin=nav_menu_admin, packaging=packaging,
+        return render_template('cost_calculation.html', packaging=packaging,
                                ingredients=ingredients, products=products)
 
 
@@ -339,7 +346,7 @@ def edit_cost_calculation():
         data_dictionary['prices_packaging_col'] = main.show_columns('prices_packaging')
         data_dictionary['packagingproduct_col'] = main.show_columns('packagingproduct')
         data_dictionary['ingredientproduct_col'] = main.show_columns('ingredientproduct')
-        return render_template('edit_cost_calculation.html', nav_menu_admin=nav_menu_admin,
+        return render_template('edit_cost_calculation.html',
                                data_dictionary=data_dictionary)
 
 
@@ -409,7 +416,7 @@ def financial_plan():
         return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
                                variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
                                net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,
-                               nav_menu_admin=nav_menu_admin, variable_costs_edit_col=variable_costs_edit_col,
+                               variable_costs_edit_col=variable_costs_edit_col,
                                variable_costs_edit=variable_costs_edit, products=products)
 
 
@@ -475,7 +482,7 @@ def invoices():
         invoices_supplier = main.read_table('invoices_suppliers')
         invoices_supplier_columns = main.show_columns('invoices_suppliers')
         invoices_customer_columns = main.show_columns('invoices_customers')
-        return render_template('invoices.html', nav_menu_admin=nav_menu_admin, invoices_supplier=invoices_supplier,
+        return render_template('invoices.html', invoices_supplier=invoices_supplier,
                                invoices_customer=invoices_customer, invoices_supplier_columns=invoices_supplier_columns,
                                invoices_customer_columns=invoices_customer_columns)
 
@@ -485,7 +492,7 @@ def images():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        return render_template('images.html', nav_menu_admin=nav_menu_admin, cloud_images=[])
+        return render_template('images.html', cloud_images=[])
 
 
 @app.route('/contact_inquiry', methods=['GET', 'POST'])
@@ -494,7 +501,7 @@ def contact_inquiry():
         return redirect(url_for('login'))
     else:
         contact_info = main.read_table('customer_contact_submission', order_desc="time")
-        return render_template('contact_inquiry.html', nav_menu_admin=nav_menu_admin, contact_info=contact_info)
+        return render_template('contact_inquiry.html', contact_info=contact_info)
 
 
 @app.route('/recipes', methods=['GET', 'POST'])
@@ -513,7 +520,7 @@ def recipes():
         ingredients = main.read_table('ingredients')
         products = main.read_table('products')
         recipes = main.read_table('ingredientproduct')
-        return render_template('recipes.html', nav_menu_admin=nav_menu_admin, recipes=recipes, ingredients=ingredients,
+        return render_template('recipes.html', recipes=recipes, ingredients=ingredients,
                                products=products)
 
 
@@ -535,7 +542,7 @@ def translations():
                 web_translations = main.read_table('web_translations')
         sorted_web_translations = main.read_table('web_translations', order_asc="msgid")
         return render_template('homepage_admin.html', web_translations=sorted_web_translations,
-                               web_translations_col=web_translations_col, nav_menu_admin=nav_menu_admin)
+                               web_translations_col=web_translations_col)
 
 
 @app.route('/qr_info', methods=['GET', 'POST'])
@@ -548,8 +555,8 @@ def qr_info():
                 if 'product_' in key:
                     img = qrcode.make(request.form[key])
                     img.save("/static/img/QR/" + request.form[key] + ".png")
-            return render_template('qr_info.html', nav_menu_admin=nav_menu_admin)
-        return render_template('qr_info.html', nav_menu_admin=nav_menu_admin)
+            return render_template('qr_info.html')
+        return render_template('qr_info.html')
 
 
 @app.route('/large_orders_price', methods=['GET', 'POST'])
@@ -559,7 +566,8 @@ def large_orders_price():
     else:
         products = main.read_table('products')
         variable_costs = main.read_table('variable_costs')
-        return render_template('large_orders_price.html', nav_menu_admin=nav_menu_admin, products=products,variable_costs=variable_costs)
+        return render_template('large_orders_price.html', products=products,
+                               variable_costs=variable_costs)
 
 
 # LOGIN LOGOUT
@@ -590,28 +598,28 @@ def logout():
 @app.errorhandler(400)
 def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"
-    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 400
+    return render_template('error.html', e=e, e_friendly=e_friendly), 400
 
 
 @app.errorhandler(403)
 def forbidden(e):
     e_friendly = "a forbidden resource"
-    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 403
+    return render_template('error.html', e=e, e_friendly=e_friendly), 403
 
 
 @app.errorhandler(404)
 def not_found(e):
     e_friendly = "chap, you made a mistake typing that URL"
-    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 404
+    return render_template('error.html', e=e, e_friendly=e_friendly), 404
 
 
 @app.errorhandler(410)
 def gone(e):
     e_friendly = "The page existed but is deleted and sent to Valhalla for all eternity."
-    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 410
+    return render_template('error.html', e=e, e_friendly=e_friendly), 410
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
     e_friendly = "'server problems' To be or not being overloaded. That's the question."
-    return render_template('error.html', e=e, e_friendly=e_friendly, nav_menu_admin=nav_menu_admin), 500
+    return render_template('error.html', e=e, e_friendly=e_friendly), 500

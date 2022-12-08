@@ -46,13 +46,14 @@ mail = Mail(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 nav_menu_admin = {'/admin_overview': 'Overview',
-                  'Customers': {'/qr_info': 'QR Info', '/large_order_price': 'Large Orders'},
-                  'Products': {'/recipes': 'Recipes', '/products': 'Products'},
-                  'Bookkeeping': {'/invoices': 'Invoices', '/business_plan': 'Business Plan',
-                                  '/financial_plan': 'Financial Plan'},
-                  'Site Admin': {'/translations': 'Translations', '/images': 'Images',
-                                 '/cost_calculation': 'Add Cost Calculation',
-                                 '/edit_cost_calculation': 'Edit Cost Calculation'}}
+                  '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},
+                  '제품': {'/recipes': '레시피'
+                                     '', '/products': '다 제품'},
+                  '경리': {'/invoices': '송장', '/business_plan': '비즈니스 계획',
+                                  '/financial_plan': '재무 계획'},
+                  '사이트 관리자': {'/translations': '번역', '/images': '이미지',
+                                 '/cost_calculation': '비용 계산 추가하기',
+                                 '/edit_cost_calculation': '비용 계산 편집하기'}}
 
 menu_item_home = {'#hero':'home_title','#best-product':'best_product_title_nav','#about':'about_title','#contact':'contact_title', '#clients':'suppliers_title'}
 

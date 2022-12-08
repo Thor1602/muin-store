@@ -1,68 +1,149 @@
+{% extends "base.html" %}
+{% block body %}
+
     <section id="about" class="about">
         <div class="container" data-aos="fade-up">
-            <div class="section-header">
-                <h2></h2>
-
-            </div>
-            <hr>
             <div class="section-header row gy-4">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr class="text-capitalize">
+                        <th scope="col" colspan="31">아이디</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for x in range(25) %}
+                    <tr style="line-height: 30px;   min-height: 30px;   height: 30px;">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="col-6">
 
-                <h4>Ingredients</h4>
-                <div class="overflow-scroll max-height-table">
-                    <table class="table table-striped table-hover">
+                    <h4>Ingredients</h4>
+                    <table class="table table-bordered">
                         <thead>
                         <tr class="text-capitalize">
                             <th scope="col"></th>
-                            {% for col in data_dictionary['ingredients_col'][1:] %}
+                            {% for col in data_dictionary['ingredients_col'] %}
                                 <th scope="col">{{ col | replace("_"," ") }}</th>
                             {% endfor %}
-                            <th></th>
-
                         </tr>
                         </thead>
                         <tbody>
-                        {% for row in data_dictionary['ingredients'] %}
-                            <tr class="table-success">
+                        {% for row in data_dictionary['ingredients'][0:data_dictionary['length_ingredients']] %}
+                            <tr>
                                 <td>
-                                    <button class="btn btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#ingredients_edit_modal_{{ row [0] }}"
-                                            type="button"><i class="bi bi-pencil"></i></button>
+                                    <p><i class="bi bi-square"></i></p>
                                 </td>
-                                {% for col in row[1:] %}
+                                {% for col in row %}
                                     <td>{{ col }}</td>
                                 {% endfor %}
-                                <td></td>
-
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <h4>Packaging</h4>
-                <div class="overflow-scroll max-height-table">
-                    <table class="table table-striped table-hover">
+                <div class="col-6">
+                    <table class="table table-bordered">
                         <thead>
                         <tr class="text-capitalize">
                             <th scope="col"></th>
-                            {% for col in data_dictionary['packaging_col'][1:] %}
+                            {% for col in data_dictionary['ingredients_col'] %}
                                 <th scope="col">{{ col | replace("_"," ") }}</th>
                             {% endfor %}
-                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['ingredients'][data_dictionary['length_ingredients']:] %}
+                            <tr>
+                                <td>
+                                    <p><i class="bi bi-square"></i></p>
+                                </td>
+                                {% for col in row %}
+                                    <td>{{ col }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <h4>Packaging</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['packaging_col'] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
                         </tr>
 
                         </thead>
                         <tbody>
-                        {% for row in data_dictionary['packaging'] %}
-                            <tr class="table-success">
+                        {% for row in data_dictionary['packaging'][0:data_dictionary['length_packaging']] %}
+                            <tr>
                                 <td>
-                                    <button class="btn btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#packaging_edit_modal_{{ row [0] }}"
-                                            type="button"><i class="bi bi-pencil"></i></button>
+                                    <p><i class="bi bi-square"></i></p>
                                 </td>
-                                {% for col in row[1:] %}
+                                {% for col in row %}
                                     <td>{{ col }}</td>
                                 {% endfor %}
-                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['packaging_col'] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                        </tr>
+
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['packaging'][data_dictionary['length_packaging']:] %}
+                            <tr>
+                                <td>
+                                    <p><i class="bi bi-square"></i></p>
+                                </td>
+                                {% for col in row %}
+                                    <td>{{ col }}</td>
+                                {% endfor %}
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -71,6 +152,7 @@
             </div>
         </div>
     </section>
+{% endblock %}
 
 
 

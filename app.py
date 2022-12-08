@@ -583,17 +583,10 @@ def print_ingredient_list():
         data_dictionary['ingredients_col'] = main.show_columns('ingredients')
         data_dictionary['packaging'] = main.read_table('packaging')
         data_dictionary['packaging_col'] = main.show_columns('packaging')
+        data_dictionary['length_ingredients'] = int(len(data_dictionary['ingredients'])/2)
+        data_dictionary['length_packaging'] = int(len(data_dictionary['packaging'])/2)
         html = render_template('print_ingredient_list.html', data_dictionary=data_dictionary)
-        options = {
-            'page-height': '297mm',
-            'page-width': '210mm',
-            'enable-local-file-access': '',
-        }
-        resp = Response(pdfkit.from_string(html, options=options), mimetype="application/pdf", headers={
-                "Content-disposition": "attachment; filename=" + "order.pdf",
-                "Content-type": "application/force-download"
-            })
-        return resp
+        return html
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])

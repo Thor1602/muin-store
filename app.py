@@ -18,10 +18,12 @@ import pytz
 import qrcode
 
 from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response, \
-    jsonify
+    jsonify, Response
 from flask_mail import Mail, Message
+import pdfkit
 import googledrive_connector
 import naver_setup
+
 
 import Database
 
@@ -53,7 +55,8 @@ nav_menu_admin = {'/admin_overview': 'Overview',
                                   '/financial_plan': '재무 계획'},
                   '사이트 관리자': {'/translations': '번역', '/images': '이미지',
                                  '/cost_calculation': '비용 계산 추가하기',
-                                 '/edit_cost_calculation': '비용 계산 편집하기'}}
+                                 '/edit_cost_calculation': '비용 계산 편집하기',
+                              '/print_ingredient_list': '성분 목록 인쇄하기'}}
 
 menu_item_home = {'#hero':'home_title','#best-product':'best_product_title_nav','#about':'about_title','#contact':'contact_title', '#clients':'suppliers_title'}
 
@@ -570,6 +573,27 @@ def large_orders_price():
         return render_template('large_orders_price.html', products=products,
                                variable_costs=variable_costs)
 
+@app.route('/print_ingredient_list', methods=['GET', 'POST'])
+def print_ingredient_list():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        data_dictionary = {}
+        data_dictionary['ingredients'] = main.read_table('ingredients')
+        data_dictionary['ingredients_col'] = main.show_columns('ingredients')
+        data_dictionary['packaging'] = main.read_table('packaging')
+        data_dictionary['packaging_col'] = main.show_columns('packaging')
+        html = render_template('print_ingredient_list.html', data_dictionary=data_dictionary)
+        options = {
+            'page-height': '297mm',
+            'page-width': '210mm',
+            'enable-local-file-access': '',
+        }
+        resp = Response(pdfkit.from_string(html, options=options), mimetype="application/pdf", headers={
+                "Content-disposition": "attachment; filename=" + "order.pdf",
+                "Content-type": "application/force-download"
+            })
+        return resp
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])

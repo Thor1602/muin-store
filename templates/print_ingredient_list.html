@@ -1,0 +1,78 @@
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+            <div class="section-header">
+                <h2></h2>
+
+            </div>
+            <hr>
+            <div class="section-header row gy-4">
+
+                <h4>Ingredients</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['ingredients_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                            <th></th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['ingredients'] %}
+                            <tr class="table-success">
+                                <td>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#ingredients_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </td>
+                                {% for col in row[1:] %}
+                                    <td>{{ col }}</td>
+                                {% endfor %}
+                                <td></td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Packaging</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="text-capitalize">
+                            <th scope="col"></th>
+                            {% for col in data_dictionary['packaging_col'][1:] %}
+                                <th scope="col">{{ col | replace("_"," ") }}</th>
+                            {% endfor %}
+                            <th></th>
+                        </tr>
+
+                        </thead>
+                        <tbody>
+                        {% for row in data_dictionary['packaging'] %}
+                            <tr class="table-success">
+                                <td>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#packaging_edit_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </td>
+                                {% for col in row[1:] %}
+                                    <td>{{ col }}</td>
+                                {% endfor %}
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+

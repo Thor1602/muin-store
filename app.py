@@ -23,7 +23,7 @@ from flask_mail import Mail, Message
 import pdfkit
 import googledrive_connector
 import naver_setup
-
+import os.path
 
 import Database
 
@@ -98,7 +98,10 @@ def index():
     best_products = []
     for row in main.read_table('products'):
         if row[8] == True:
-            best_products.append(row)
+            row_list = list(row)
+            if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
+                row_list[5] = "no-image-available.jpg"
+            best_products.append(row_list)
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
         admin_msg = Message("Coup De Foudre: 문의 주세요!",

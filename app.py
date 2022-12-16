@@ -121,7 +121,12 @@ def index():
 
 @app.route("/products", methods=['GET', 'POST'])
 def products():
-    products = main.read_table('products')
+    products = []
+    for row in main.read_table('products'):
+        row_list = list(row)
+        if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
+            row_list[5] = "no-image-available.jpg"
+        products.append(row_list)
     return render_template('products.html', products=products)
 
 

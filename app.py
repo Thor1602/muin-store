@@ -52,13 +52,16 @@ nav_menu_admin = {'/admin_overview': 'Overview',
                   '제품': {'/recipes': '레시피'
                                      '', '/products': '다 제품'},
                   '경리': {'/invoices': '송장', '/business_plan': '비즈니스 계획',
-                                  '/financial_plan': '재무 계획'},
+                         '/financial_plan': '재무 계획'},
                   '사이트 관리자': {'/translations': '번역', '/images': '이미지',
-                                 '/cost_calculation': '비용 계산 추가하기',
-                                 '/edit_cost_calculation': '비용 계산 편집하기',
+                              '/cost_calculation': '비용 계산 추가하기',
+                              '/edit_cost_calculation': '비용 계산 편집하기',
+                              '/cost_per_product': 'Cost Per Product',
                               '/print_ingredient_list': '성분 목록 인쇄하기'}}
 
-menu_item_home = {'#hero':'home_title','#best-product':'best_product_title_nav','#about':'about_title','#contact':'contact_title', '#clients':'suppliers_title'}
+menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
+                  '#contact': 'contact_title', '#clients': 'suppliers_title'}
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -79,9 +82,9 @@ def get_locale():
         korean_translation[key] = x[2]
         english_translation[key] = x[3]
     if session_name == 'ko_KR':
-        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin,menu_item_home=menu_item_home)
+        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home)
     else:
-        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin,menu_item_home=menu_item_home)
+        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home)
 
 
 # -----------------------PUBLIC-----------------------
@@ -263,11 +266,26 @@ def cost_calculation():
     else:
         if request.method == 'POST':
             if 'ingredients_add_button' in request.form:
-                ingredient = Database.Ingredients(request.form['english'], request.form['korean'])
-                ingredient.register_ingredient()
+                ingredient = Database.Ingredients(request.form['english'], request.form['korean'], get_ingredientid=True)
+                ingredientid = ingredient.register_ingredient()
+                print(ingredientid)
+                if request.form['date'] == '':
+                    date = None
+                else:
+                    date = request.form['date']
+                Database.PricesIngredients(ingredientid, request.form['price'],
+                                           request.form['weight_in_gram'], date).register()
+
             elif 'packaging_add_button' in request.form:
-                packaging = Database.Packaging(request.form['english'], request.form['korean'])
-                packaging.register()
+                packaging = Database.Packaging(request.form['english'], request.form['korean'], get_packagingid=True)
+                packagingid = packaging.register()
+                if request.form['date'] == '':
+                    date = None
+                else:
+                    date = request.form['date']
+                packaging_price = Database.PricesPackaging(packagingid, request.form['price_per_unit'],
+                                                           date)
+                packaging_price.register()
             elif 'product_add_button' in request.form:
                 if 'currently_selling' in request.form:
                     currently_selling = request.form['currently_selling'] == 'on'
@@ -277,14 +295,13 @@ def cost_calculation():
                     best_product = request.form['best_product'] == 'on'
                 else:
                     best_product = False
-                product = Database.Products(request.form['english'], request.form['korean'],
+                Database.Products(request.form['english'], request.form['korean'],
                                             request.form['weight_in_gram_per_product'], request.form['unit'],
                                             request.form['image'], type=request.form['type'],
                                             currently_selling=currently_selling, best=best_product,
                                             Korean_description=request.form['Korean_description'],
                                             English_description=request.form['English_description'],
-                                            QR=request.form['QR'])
-                product.register()
+                                            QR=request.form['QR']).register()
             elif 'price_ingredient_add_button' in request.form:
                 if request.form['date'] == '':
                     date = None
@@ -314,8 +331,10 @@ def cost_calculation():
         ingredients = main.read_table('ingredients')
         products = main.read_table('products')
         packaging = main.read_table('packaging')
+        missing_prices_ingredients = main.missing_prices_ingredients()
+        missing_prices_packaging = main.missing_prices_packaging()
         return render_template('cost_calculation.html', packaging=packaging,
-                               ingredients=ingredients, products=products)
+                               ingredients=ingredients, products=products,missing_prices_packaging=missing_prices_packaging,missing_prices_ingredients=missing_prices_ingredients)
 
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
@@ -536,6 +555,48 @@ def recipes():
                                products=products)
 
 
+@app.route('/cost_per_product', methods=['GET', 'POST'])
+def cost_per_product():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        data = {}
+        data['ingredients'] = main.read_table('ingredients')
+        data['products'] = main.read_table('products')
+        data['ingredientproduct'] = main.read_table('ingredientproduct')
+        data['ingredients_get_average'] = main.get_price('ingredients', get_average=True)
+        data['ingredients_get_latest'] = main.get_price('ingredients', get_latest=True)
+        data['packaging_get_average'] = main.get_price('packaging', get_average=True)
+        data['packaging_get_latest'] = main.get_price('packaging', get_latest=True)
+        data['total_weight'] = {}
+        for row in data['ingredientproduct']:
+            if row[1] in data['total_weight']:
+                data['total_weight'][row[1]] += row[3]
+            else:
+                data['total_weight'][row[1]] = row[3]
+        data['total_average'] = {}
+        for ingredientproduct in data['ingredientproduct']:
+            if ingredientproduct[2] in data['ingredients_get_average']:
+                product_id = ingredientproduct[1]
+                if product_id in data['total_average']:
+                    data['total_average'][product_id] += ingredientproduct[3] * data['ingredients_get_average'][
+                        ingredientproduct[2]]
+                else:
+                    data['total_average'][product_id] = ingredientproduct[3] * data['ingredients_get_average'][
+                        ingredientproduct[2]]
+        data['total_latest'] = {}
+        for ingredientproduct in data['ingredientproduct']:
+            if ingredientproduct[2] in data['ingredients_get_latest']:
+                product_id = ingredientproduct[1]
+                if product_id in data['total_latest']:
+                    data['total_latest'][product_id] += ingredientproduct[3] * data['ingredients_get_latest'][
+                        ingredientproduct[2]]
+                else:
+                    data['total_latest'][product_id] = ingredientproduct[3] * data['ingredients_get_latest'][
+                        ingredientproduct[2]]
+        return render_template('cost_per_product.html', data=data)
+
+
 @app.route('/translations', methods=['GET', 'POST'])
 def translations():
     if not session.get('logged_in'):
@@ -581,6 +642,7 @@ def large_orders_price():
         return render_template('large_orders_price.html', products=products,
                                variable_costs=variable_costs)
 
+
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])
 def print_ingredient_list():
     if not session.get('logged_in'):
@@ -591,10 +653,11 @@ def print_ingredient_list():
         data_dictionary['ingredients_col'] = main.show_columns('ingredients')
         data_dictionary['packaging'] = main.read_table('packaging')
         data_dictionary['packaging_col'] = main.show_columns('packaging')
-        data_dictionary['length_ingredients'] = int(len(data_dictionary['ingredients'])/2)
-        data_dictionary['length_packaging'] = int(len(data_dictionary['packaging'])/2)
+        data_dictionary['length_ingredients'] = int(len(data_dictionary['ingredients']) / 2)
+        data_dictionary['length_packaging'] = int(len(data_dictionary['packaging']) / 2)
         html = render_template('print_ingredient_list.html', data_dictionary=data_dictionary)
         return html
+
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])

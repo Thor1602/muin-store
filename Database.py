@@ -70,6 +70,7 @@ class Main:
         query = cursor.execute(query=SQL, parameters=parameters)
         return query.fetchOne()
 
+
     def delete_row_by_id(self, table_name, id):
         SQL = f"DELETE from {table_name} where id = {id};"
         # parameters = (table_name, id)
@@ -117,6 +118,70 @@ class Main:
             return True
         else:
             return False
+    def missing_prices_ingredients(self):
+        missing_prices = []
+        price_ingrs = [x[1] for x in self.read_table('prices_ingredients')]
+        ingredients = [x[0] for x in self.read_table('ingredients')]
+        for ingrid in set(ingredients):
+            if ingrid not in set(price_ingrs):
+                missing_prices.append(ingrid)
+        return missing_prices
+    def missing_prices_packaging(self):
+        missing_prices = []
+        price_packaging = [x[1] for x in self.read_table('prices_packaging')]
+        packaging = [x[0] for x in self.read_table('packaging')]
+        for ingrid in set(packaging):
+            if ingrid not in set(price_packaging):
+                missing_prices.append(ingrid)
+        return missing_prices
+
+
+    def get_price(self, category, get_average=False,get_latest=False,get_all=False):
+        all_prices = {}
+        if category == 'ingredients':
+            price_list = self.read_table('prices_ingredients', order_desc="date")
+            for row in price_list:
+                if row[1] in all_prices:
+                    all_prices[row[1]].append(row[2] / row[3])
+                else:
+                    all_prices[row[1]] = [row[2] / row[3]]
+            if get_all:
+                return all_prices
+            elif get_average:
+                avg_prices = {}
+                for key in all_prices:
+                    avg_prices[key] = sum(all_prices[key]) / len(all_prices[key])
+                return avg_prices
+            elif get_latest:
+                latest_prices = {}
+                for row in price_list:
+                    if row[1] not in latest_prices:
+                        latest_prices[row[1]] = row[2] / row[3]
+                return latest_prices
+            else:
+                return None
+        elif category == 'packaging':
+            price_list = self.read_table('prices_packaging', order_desc="date")
+            for row in price_list:
+                if row[1] in all_prices:
+                    all_prices[row[1]].append(row[2])
+                else:
+                    all_prices[row[1]] = [row[2]]
+            if get_all:
+                return all_prices
+            elif get_average:
+                avg_prices = {}
+                for key in all_prices:
+                    avg_prices[key] = sum(all_prices[key]) / len(all_prices[key])
+                return avg_prices
+            elif get_latest:
+                latest_prices = {}
+                for row in price_list:
+                    if row[1] not in latest_prices:
+                        latest_prices[row[1]] = row[2]
+                return latest_prices
+            else:
+                return None
 
 
 class User(Main):
@@ -257,14 +322,18 @@ class Comment(Main):
 
 
 class Ingredients(Main):
-    def __init__(self, english, korean):
+    def __init__(self, english, korean, get_ingredientid=False):
         self.english = english
         self.korean = korean
+        self.get_ingredientid = get_ingredientid
 
     def register_ingredient(self):
-        SQL = "INSERT INTO ingredients (english, korean) VALUES (%s,%s);"
+        if self.get_ingredientid:
+            SQL = "INSERT INTO ingredients (english, korean) VALUES (%s,%s) RETURNING id;"
+        else:
+            SQL = "INSERT INTO ingredients (english, korean) VALUES (%s,%s);"
         parameters = (self.english, self.korean,)
-        self.execute_query(query=SQL, parameters=parameters, commit=True)
+        return self.execute_query(query=SQL, parameters=parameters, commit=True, fetchOne=True)
 
     def update_ingredient(self, id):
         SQL = "UPDATE ingredients SET english = %s, korean = %s WHERE id = %s;"
@@ -300,14 +369,18 @@ class PricesIngredients(Main):
 
 
 class Packaging(Main):
-    def __init__(self, english, korean):
+    def __init__(self, english, korean,get_packagingid=False):
         self.english = english
         self.korean = korean
+        self.get_packagingid = get_packagingid
 
     def register(self):
-        SQL = "INSERT INTO packaging (english, korean) VALUES (%s,%s);"
+        if self.get_packagingid:
+            SQL = "INSERT INTO packaging (english, korean) VALUES (%s,%s) RETURNING id;"
+        else:
+            SQL = "INSERT INTO packaging (english, korean) VALUES (%s,%s);"
         parameters = (self.english, self.korean,)
-        self.execute_query(query=SQL, parameters=parameters, commit=True)
+        return self.execute_query(query=SQL, parameters=parameters, commit=True, fetchOne=True)
 
     def update(self, id):
         SQL = "UPDATE packaging SET english = %s, korean = %s WHERE id = %s;"
@@ -342,7 +415,7 @@ class PricesPackaging(Main):
 
 
 class Products(Main):
-    def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, Korean_description, English_description, QR):
+    def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, Korean_description, English_description, QR, get_ingredientid=False):
         self.english = english
         self.korean = korean
         self.weight_in_gram_per_product = weight_in_gram_per_product
@@ -359,7 +432,7 @@ class Products(Main):
         SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit ,image,type,currently_selling, best, Korean_description, English_description, QR) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
         parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
                       self.currently_selling, self.best, self.Korean_description, self.English_description, self.QR,)
-        self.execute_query(query=SQL, parameters=parameters, commit=True)
+        return self.execute_query(query=SQL, parameters=parameters, commit=True, fetchOne=True)
 
     def update(self, id):
         SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s, image = %s , type = %s , currently_selling = %s, best = %s, Korean_description = %s, English_description = %s , QR = %s WHERE id = %s;"

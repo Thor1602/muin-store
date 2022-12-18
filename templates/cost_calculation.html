@@ -8,7 +8,10 @@
 
             <div class="section-header">
                 <h2>Admin</h2>
-                <p>Cost Calculation</p>
+                <p>Registration</p>
+                <p>Missing prices for ingredients: {{ missing_prices_ingredients }}</p>
+                <p>Missing prices for packaging: {{ missing_prices_packaging }}</p>
+
             </div>
             <hr>
             <!-- Modal view Buttons -->
@@ -185,6 +188,23 @@
                             <input type="text" class="form-control" id="input_korean" name="korean"
                                    value="">
                         </div>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="ingredientPrice" class="form-label">Price</label>
+                            <input type="text" class="form-control" id="ingredientPrice" name="price"
+                                   value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredientWeight" class="form-label">Weight</label>
+                            <input type="text" class="form-control" id="ingredientWeight"
+                                   name="weight_in_gram" value="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredientDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="ingredientDate"
+                                   name="date" value="">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -220,6 +240,18 @@
                             <label for="input_korean" class="form-label">Korean</label>
                             <input type="text" class="form-control" id="input_korean" name="korean"
                                    value="">
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="packagingUnit" class="form-label">Price Per Unit</label>
+                            <input type="text" class="form-control" id="packagingUnit" name="price_per_unit"
+                                   value="">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="packagingDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="packagingDate"
+                                   name="date" value="">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -320,6 +352,7 @@
                                 value="">ADD PRODUCT
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>

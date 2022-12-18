@@ -562,38 +562,88 @@ def cost_per_product():
     else:
         data = {}
         data['ingredients'] = main.read_table('ingredients')
+        data['packaging'] = main.read_table('packaging')
+        data['packagingproduct'] = main.read_table('packagingproduct')
         data['products'] = main.read_table('products')
         data['ingredientproduct'] = main.read_table('ingredientproduct')
         data['ingredients_get_average'] = main.get_price('ingredients', get_average=True)
         data['ingredients_get_latest'] = main.get_price('ingredients', get_latest=True)
         data['packaging_get_average'] = main.get_price('packaging', get_average=True)
         data['packaging_get_latest'] = main.get_price('packaging', get_latest=True)
+        data['total_average_packaging'] = {}
+        for packagingproduct in data['packagingproduct']:
+            if packagingproduct[2] in data['packaging_get_average']:
+                product_id = packagingproduct[1]
+                if product_id in data['total_average_packaging']:
+                    data['total_average_packaging'][product_id] += round(
+                        data['packaging_get_latest'][packagingproduct[2]], 2)
+                else:
+                    data['total_average_packaging'][product_id] = round(
+                        data['packaging_get_latest'][packagingproduct[2]], 2)
+        data['total_latest_packaging'] = {}
+        for packagingproduct in data['packagingproduct']:
+            if packagingproduct[2] in data['packaging_get_latest']:
+                product_id = packagingproduct[1]
+                if product_id in data['total_latest_packaging']:
+                    data['total_latest_packaging'][product_id] += data['packaging_get_latest'][packagingproduct[2]]
+                else:
+                    data['total_latest_packaging'][product_id] = data['packaging_get_latest'][packagingproduct[2]]
+
         data['total_weight'] = {}
         for row in data['ingredientproduct']:
             if row[1] in data['total_weight']:
                 data['total_weight'][row[1]] += row[3]
             else:
                 data['total_weight'][row[1]] = row[3]
-        data['total_average'] = {}
+        data['total_average_ingredients'] = {}
         for ingredientproduct in data['ingredientproduct']:
             if ingredientproduct[2] in data['ingredients_get_average']:
                 product_id = ingredientproduct[1]
-                if product_id in data['total_average']:
-                    data['total_average'][product_id] += round(ingredientproduct[3] * data['ingredients_get_average'][
+                if product_id in data['total_average_ingredients']:
+                    data['total_average_ingredients'][product_id] += round(ingredientproduct[3] * data['ingredients_get_average'][
                         ingredientproduct[2]],2)
                 else:
-                    data['total_average'][product_id] = round(ingredientproduct[3] * data['ingredients_get_average'][
+                    data['total_average_ingredients'][product_id] = round(ingredientproduct[3] * data['ingredients_get_average'][
                         ingredientproduct[2]],2)
-        data['total_latest'] = {}
+        data['total_latest_ingredients'] = {}
         for ingredientproduct in data['ingredientproduct']:
             if ingredientproduct[2] in data['ingredients_get_latest']:
                 product_id = ingredientproduct[1]
-                if product_id in data['total_latest']:
-                    data['total_latest'][product_id] += round(ingredientproduct[3] * data['ingredients_get_latest'][
+                if product_id in data['total_latest_ingredients']:
+                    data['total_latest_ingredients'][product_id] += round(ingredientproduct[3] * data['ingredients_get_latest'][
                         ingredientproduct[2]],2)
                 else:
-                    data['total_latest'][product_id] = round(ingredientproduct[3] * data['ingredients_get_latest'][
+                    data['total_latest_ingredients'][product_id] = round(ingredientproduct[3] * data['ingredients_get_latest'][
                         ingredientproduct[2]],2)
+        for product in data['products']:
+            if product[0] not in data['total_latest_ingredients']:
+                data['total_latest_ingredients'][product[0]] = 0
+            if product[0] not in data['total_average_ingredients']:
+                data['total_average_ingredients'][product[0]] = 0
+            if product[0] not in data['total_weight']:
+                data['total_weight'][product[0]] = 0
+            if product[0] not in data['total_latest_packaging']:
+                data['total_latest_packaging'][product[0]] = 0
+            if product[0] not in data['total_average_packaging']:
+                data['total_average_packaging'][product[0]] = 0
+            if product[0] not in data['total_latest_ingredients']:
+                data['total_latest_ingredients'][product[0]] = 0
+        data['total_average_ingredients_per_unit'] = {}
+        data['total_average'] = {}
+        data['total_latest_ingredients_per_unit'] = {}
+        data['total_latest'] = {}
+        for product in data['products']:
+            if data['total_average_ingredients'][product[0]] == 0:
+                data['total_average_ingredients_per_unit'][product[0]] = 0
+            else:
+                data['total_average_ingredients_per_unit'][product[0]] = round(data['total_average_ingredients'][product[0]] / (data['total_weight'][product[0]] / product[3]),2)
+            data['total_average'][product[0]] = round(data['total_average_ingredients_per_unit'][product[0]] + data['total_average_packaging'][product[0]],0)
+
+            if data['total_latest_ingredients'][product[0]] == 0:
+                data['total_latest_ingredients_per_unit'][product[0]] = 0
+            else:
+                data['total_latest_ingredients_per_unit'][product[0]] = round(data['total_latest_ingredients'][product[0]] / (data['total_weight'][product[0]] / product[3]),2)
+            data['total_latest'][product[0]] = round(data['total_latest_ingredients_per_unit'][product[0]] + data['total_latest_packaging'][product[0]],0)
         return render_template('cost_per_product.html', data=data)
 
 

@@ -52,6 +52,38 @@
                                         <table class="table  table-striped table-hover table-warning">
                                             <thead>
                                             <tr>
+                                                <th scope="col">Ingredient average cost per unit</th>
+                                                <th scope="col">Packaging average cost per unit</th>
+                                                <th scope="col">Total average cost</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>₩{{ data['total_average_ingredients_per_unit'][product[0]] }}</td>
+                                                <td>₩{{ data['total_average_packaging'][product[0]] }}</td>
+                                                <td>₩{{ data['total_average'][product[0]] }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table  table-striped table-hover table-warning">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">Ingredient latest cost per unit</th>
+                                                <th scope="col">Packaging latest cost per unit</th>
+                                                <th scope="col">Total latest cost</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>₩{{ data['total_latest_ingredients_per_unit'][product[0]] }}</td>
+                                                <td>₩{{ data['total_latest_packaging'][product[0]] }}</td>
+                                                <td>₩{{ data['total_latest'][product[0]] }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table  table-striped table-hover table-warning">
+                                            <thead>
+                                            <tr>
                                                 <th scope="col">Ingredient</th>
                                                 <th scope="col">Weight</th>
                                                 <th scope="col">Avg ₩/g</th>
@@ -98,15 +130,50 @@
                                                 {% endif %}
                                             {% endfor %}
                                             <tr>
-                                                <td>TOTAL</td>
+                                                <td>SUBTOTAL</td>
                                                 <td>{{ data['total_weight'][product[0]] }}g</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td>₩{{ data['total_average'][product[0]] }}</td>
-                                                <td>₩{{ data['total_latest'][product[0]] }}</td>
+                                                <td>/ {{ product[3] }}g</td>
+                                                <td>={% if product[0] in data['total_weight'] %}
+                                                    {{ (data['total_weight'][product[0]] / product[3]) | round(1, 'floor') }}{% endif %}</td>
+                                                <td>₩{{ data['total_average_ingredients'][product[0]] }}</td>
+                                                <td>₩{{ data['total_latest_ingredients'][product[0]] }}</td>
                                             </tr>
                                             </tbody>
                                         </table>
+
+                                        <table class="table  table-striped table-hover table-warning">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">Packaging</th>
+                                                <th scope="col">Avg price/unit</th>
+                                                <th scope="col">Latest price/unit</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for packagingproduct in data['packagingproduct'] %}
+                                                {% if product[0] == packagingproduct[1] %}
+                                                    {% for packaging in data['packaging'] %}
+                                                        {% if packaging[0] == packagingproduct[2] %}
+                                                            <tr>
+                                                                <td>{{ packaging[1] }} / {{ packaging[2] }}</td>
+                                                                <td>
+                                                                    ₩{{ data['packaging_get_average'][packaging[0]] }}</td>
+                                                                <td>
+                                                                    ₩{{ data['packaging_get_latest'][packaging[0]] }}</td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            <tr>
+                                                <td>SUBTOTAL</td>
+                                                <td>₩{{ data['total_average_packaging'][product[0]] }}</td>
+                                                <td>₩{{ data['total_latest_packaging'][product[0]] }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+
                                     </div>
                                 </div>
                             </div>

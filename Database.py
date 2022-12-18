@@ -142,21 +142,21 @@ class Main:
             price_list = self.read_table('prices_ingredients', order_desc="date")
             for row in price_list:
                 if row[1] in all_prices:
-                    all_prices[row[1]].append(row[2] / row[3])
+                    all_prices[row[1]].append(round(row[2] / row[3], 2))
                 else:
-                    all_prices[row[1]] = [row[2] / row[3]]
+                    all_prices[row[1]] = [round(row[2] / row[3], 2)]
             if get_all:
                 return all_prices
             elif get_average:
                 avg_prices = {}
                 for key in all_prices:
-                    avg_prices[key] = sum(all_prices[key]) / len(all_prices[key])
+                    avg_prices[key] = round(sum(all_prices[key]) / len(all_prices[key]),2)
                 return avg_prices
             elif get_latest:
                 latest_prices = {}
                 for row in price_list:
                     if row[1] not in latest_prices:
-                        latest_prices[row[1]] = row[2] / row[3]
+                        latest_prices[row[1]] = round(row[2] / row[3])
                 return latest_prices
             else:
                 return None
@@ -172,7 +172,7 @@ class Main:
             elif get_average:
                 avg_prices = {}
                 for key in all_prices:
-                    avg_prices[key] = sum(all_prices[key]) / len(all_prices[key])
+                    avg_prices[key] = round(sum(all_prices[key]) / len(all_prices[key]),2)
                 return avg_prices
             elif get_latest:
                 latest_prices = {}

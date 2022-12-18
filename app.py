@@ -579,21 +579,21 @@ def cost_per_product():
             if ingredientproduct[2] in data['ingredients_get_average']:
                 product_id = ingredientproduct[1]
                 if product_id in data['total_average']:
-                    data['total_average'][product_id] += ingredientproduct[3] * data['ingredients_get_average'][
-                        ingredientproduct[2]]
+                    data['total_average'][product_id] += round(ingredientproduct[3] * data['ingredients_get_average'][
+                        ingredientproduct[2]],2)
                 else:
-                    data['total_average'][product_id] = ingredientproduct[3] * data['ingredients_get_average'][
-                        ingredientproduct[2]]
+                    data['total_average'][product_id] = round(ingredientproduct[3] * data['ingredients_get_average'][
+                        ingredientproduct[2]],2)
         data['total_latest'] = {}
         for ingredientproduct in data['ingredientproduct']:
             if ingredientproduct[2] in data['ingredients_get_latest']:
                 product_id = ingredientproduct[1]
                 if product_id in data['total_latest']:
-                    data['total_latest'][product_id] += ingredientproduct[3] * data['ingredients_get_latest'][
-                        ingredientproduct[2]]
+                    data['total_latest'][product_id] += round(ingredientproduct[3] * data['ingredients_get_latest'][
+                        ingredientproduct[2]],2)
                 else:
-                    data['total_latest'][product_id] = ingredientproduct[3] * data['ingredients_get_latest'][
-                        ingredientproduct[2]]
+                    data['total_latest'][product_id] = round(ingredientproduct[3] * data['ingredients_get_latest'][
+                        ingredientproduct[2]],2)
         return render_template('cost_per_product.html', data=data)
 
 

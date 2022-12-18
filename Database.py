@@ -156,10 +156,10 @@ class Main:
                 latest_prices = {}
                 for row in price_list:
                     if row[1] not in latest_prices:
-                        latest_prices[row[1]] = round(row[2] / row[3])
+                        latest_prices[row[1]] = round(row[2] / row[3],2)
                 return latest_prices
             else:
-                return None
+                return {}
         elif category == 'packaging':
             price_list = self.read_table('prices_packaging', order_desc="date")
             for row in price_list:

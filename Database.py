@@ -70,7 +70,6 @@ class Main:
         query = cursor.execute(query=SQL, parameters=parameters)
         return query.fetchOne()
 
-
     def delete_row_by_id(self, table_name, id):
         SQL = f"DELETE from {table_name} where id = {id};"
         # parameters = (table_name, id)
@@ -118,6 +117,7 @@ class Main:
             return True
         else:
             return False
+
     def missing_prices_ingredients(self):
         missing_prices = []
         price_ingrs = [x[1] for x in self.read_table('prices_ingredients')]
@@ -126,6 +126,7 @@ class Main:
             if ingrid not in set(price_ingrs):
                 missing_prices.append(ingrid)
         return missing_prices
+
     def missing_prices_packaging(self):
         missing_prices = []
         price_packaging = [x[1] for x in self.read_table('prices_packaging')]
@@ -135,8 +136,7 @@ class Main:
                 missing_prices.append(ingrid)
         return missing_prices
 
-
-    def get_price(self, category, get_average=False,get_latest=False,get_all=False):
+    def get_price(self, category, get_average=False, get_latest=False, get_all=False):
         all_prices = {}
         if category == 'ingredients':
             price_list = self.read_table('prices_ingredients', order_desc="date")
@@ -150,13 +150,13 @@ class Main:
             elif get_average:
                 avg_prices = {}
                 for key in all_prices:
-                    avg_prices[key] = round(sum(all_prices[key]) / len(all_prices[key]),2)
+                    avg_prices[key] = round(sum(all_prices[key]) / len(all_prices[key]), 2)
                 return avg_prices
             elif get_latest:
                 latest_prices = {}
                 for row in price_list:
                     if row[1] not in latest_prices:
-                        latest_prices[row[1]] = round(row[2] / row[3],2)
+                        latest_prices[row[1]] = round(row[2] / row[3], 2)
                 return latest_prices
             else:
                 return {}
@@ -172,7 +172,7 @@ class Main:
             elif get_average:
                 avg_prices = {}
                 for key in all_prices:
-                    avg_prices[key] = round(sum(all_prices[key]) / len(all_prices[key]),2)
+                    avg_prices[key] = round(sum(all_prices[key]) / len(all_prices[key]), 2)
                 return avg_prices
             elif get_latest:
                 latest_prices = {}
@@ -182,6 +182,105 @@ class Main:
                 return latest_prices
             else:
                 return None
+
+    def calculate_variable_cost(self):
+        data = {}
+        data['ingredients'] = self.read_table('ingredients')
+        data['packaging'] = self.read_table('packaging')
+        data['packagingproduct'] = self.read_table('packagingproduct')
+        data['products'] = self.read_table('products')
+        data['ingredientproduct'] = self.read_table('ingredientproduct')
+
+        data['ingredients_get_average'] = self.get_price('ingredients', get_average=True)
+        data['ingredients_get_latest'] = self.get_price('ingredients', get_latest=True)
+        data['packaging_get_average'] = self.get_price('packaging', get_average=True)
+        data['packaging_get_latest'] = self.get_price('packaging', get_latest=True)
+
+        data['total_average_packaging'] = {}
+        data['total_latest_packaging'] = {}
+
+        data['total_weight'] = {}
+        data['total_average_ingredients'] = {}
+        data['total_latest_ingredients'] = {}
+
+        data['total_average_ingredients_per_unit'] = {}
+        data['total_average'] = {}
+        data['total_latest_ingredients_per_unit'] = {}
+        data['total_latest'] = {}
+
+        for packagingproduct in data['packagingproduct']:
+            if packagingproduct[2] in data['packaging_get_average']:
+                product_id = packagingproduct[1]
+                if product_id in data['total_average_packaging']:
+                    data['total_average_packaging'][product_id] += round(data['packaging_get_latest'][packagingproduct[2]], 2)
+                else:
+                    data['total_average_packaging'][product_id] = round(
+                        data['packaging_get_latest'][packagingproduct[2]], 2)
+            if packagingproduct[2] in data['packaging_get_latest']:
+                product_id = packagingproduct[1]
+                if product_id in data['total_latest_packaging']:
+                    data['total_latest_packaging'][product_id] += data['packaging_get_latest'][packagingproduct[2]]
+                else:
+                    data['total_latest_packaging'][product_id] = data['packaging_get_latest'][packagingproduct[2]]
+
+        for ingredientproduct in data['ingredientproduct']:
+            if ingredientproduct[1] in data['total_weight']:
+                data['total_weight'][ingredientproduct[1]] += ingredientproduct[3]
+            else:
+                data['total_weight'][ingredientproduct[1]] = ingredientproduct[3]
+
+            if ingredientproduct[2] in data['ingredients_get_average']:
+                product_id = ingredientproduct[1]
+                if product_id in data['total_average_ingredients']:
+                    data['total_average_ingredients'][product_id] += round(
+                        ingredientproduct[3] * data['ingredients_get_average'][
+                            ingredientproduct[2]], 2)
+                else:
+                    data['total_average_ingredients'][product_id] = round(
+                        ingredientproduct[3] * data['ingredients_get_average'][
+                            ingredientproduct[2]], 2)
+
+            if ingredientproduct[2] in data['ingredients_get_latest']:
+                product_id = ingredientproduct[1]
+                if product_id in data['total_latest_ingredients']:
+                    data['total_latest_ingredients'][product_id] += round(
+                        ingredientproduct[3] * data['ingredients_get_latest'][
+                            ingredientproduct[2]], 2)
+                else:
+                    data['total_latest_ingredients'][product_id] = round(
+                        ingredientproduct[3] * data['ingredients_get_latest'][
+                            ingredientproduct[2]], 2)
+
+        for product in data['products']:
+            if product[0] not in data['total_latest_ingredients']:
+                data['total_latest_ingredients'][product[0]] = 0
+            if product[0] not in data['total_average_ingredients']:
+                data['total_average_ingredients'][product[0]] = 0
+            if product[0] not in data['total_weight']:
+                data['total_weight'][product[0]] = 0
+            if product[0] not in data['total_latest_packaging']:
+                data['total_latest_packaging'][product[0]] = 0
+            if product[0] not in data['total_average_packaging']:
+                data['total_average_packaging'][product[0]] = 0
+            if product[0] not in data['total_latest_ingredients']:
+                data['total_latest_ingredients'][product[0]] = 0
+
+            if data['total_average_ingredients'][product[0]] == 0:
+                data['total_average_ingredients_per_unit'][product[0]] = 0
+            else:
+                data['total_average_ingredients_per_unit'][product[0]] = round(
+                    data['total_average_ingredients'][product[0]] / (data['total_weight'][product[0]] / product[3]), 2)
+            data['total_average'][product[0]] = round(
+                data['total_average_ingredients_per_unit'][product[0]] + data['total_average_packaging'][product[0]], 0)
+
+            if data['total_latest_ingredients'][product[0]] == 0:
+                data['total_latest_ingredients_per_unit'][product[0]] = 0
+            else:
+                data['total_latest_ingredients_per_unit'][product[0]] = round(
+                    data['total_latest_ingredients'][product[0]] / (data['total_weight'][product[0]] / product[3]), 2)
+            data['total_latest'][product[0]] = round(
+                data['total_latest_ingredients_per_unit'][product[0]] + data['total_latest_packaging'][product[0]], 0)
+        return data
 
 
 class User(Main):
@@ -237,10 +336,13 @@ class Contact(Main):
         SQL = "INSERT INTO customer_contact_submission (name, email, address, phone, subject, message, time, isrepliedto) VALUES (%s,%s,%s,%s,%s,%s,now()::timestamp, FALSE);"
         parameters = (self.name, self.email, self.address, self.phone, self.subject, self.message)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
+
     def isRead(self, id):
         SQL = "UPDATE customer_contact_submission SET isrepliedto = TRUE WHERE id = %s;"
         parameters = (id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+
 class Investment(Main):
     def __init__(self, english, korean, min_price, max_price):
         self.english = english
@@ -369,7 +471,7 @@ class PricesIngredients(Main):
 
 
 class Packaging(Main):
-    def __init__(self, english, korean,get_packagingid=False):
+    def __init__(self, english, korean, get_packagingid=False):
         self.english = english
         self.korean = korean
         self.get_packagingid = get_packagingid
@@ -414,8 +516,40 @@ class PricesPackaging(Main):
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 
+# class VariableCost(Main):
+#     def __init__(self, productid, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
+#                  selling_price_hv, criteria_hv, work_time_min, estimated_items):
+#         self.productid = productid
+#         self.variable_cost = variable_cost
+#         self.selling_price_lv = selling_price_lv
+#         self.criteria_lv = criteria_lv
+#         self.selling_price_mv = selling_price_mv
+#         self.criteria_mv = criteria_mv
+#         self.selling_price_hv = selling_price_hv
+#         self.criteria_hv = criteria_hv
+#         self.work_time_min = work_time_min
+#         self.estimated_items = estimated_items
+#
+#     def register_cost(self):
+#         SQL = "INSERT INTO variable_costs (productid, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv, work_time_min, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+#         parameters = (
+#             self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv, self.selling_price_mv,
+#             self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min,
+#             self.estimated_items,)
+#         self.execute_query(query=SQL, parameters=parameters, commit=True)
+#
+#     def update_cost(self, id):
+#         SQL = "UPDATE variable_costs SET productid = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, work_time_min = %s, estimated_items = %s WHERE id = %s;"
+#         parameters = (
+#             self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv,
+#             self.selling_price_mv,
+#             self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min,
+#             self.estimated_items, id,)
+#         self.execute_query(query=SQL, parameters=parameters, commit=True)
 class Products(Main):
-    def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, Korean_description, English_description, QR, get_ingredientid=False):
+    def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best,
+                 korean_description, english_description, qr, selling_price_lv, criteria_lv, selling_price_mv,
+                 criteria_mv, selling_price_hv, criteria_hv, work_time_min, estimated_items):
         self.english = english
         self.korean = korean
         self.weight_in_gram_per_product = weight_in_gram_per_product
@@ -424,21 +558,32 @@ class Products(Main):
         self.type = type
         self.currently_selling = currently_selling
         self.best = best
-        self.Korean_description = Korean_description
-        self.English_description = English_description
-        self.QR = QR
+        self.korean_description = korean_description
+        self.english_description = english_description
+        self.qr = qr
+        self.selling_price_lv = selling_price_lv
+        self.criteria_lv = criteria_lv
+        self.selling_price_mv = selling_price_mv
+        self.criteria_mv = criteria_mv
+        self.selling_price_hv = selling_price_hv
+        self.criteria_hv = criteria_hv
+        self.work_time_min = work_time_min
+        self.estimated_items = estimated_items
 
     def register(self):
-        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit ,image,type,currently_selling, best, Korean_description, English_description, QR) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, korean_description, english_description, qr, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, work_time_min, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
         parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
-                      self.currently_selling, self.best, self.Korean_description, self.English_description, self.QR,)
+                      self.currently_selling, self.best, self.korean_description, self.english_description, self.qr,
+                      self.selling_price_lv, self.criteria_lv, self.selling_price_mv, self.criteria_mv,
+                      self.selling_price_hv, self.criteria_hv, self.work_time_min, self.estimated_items)
         return self.execute_query(query=SQL, parameters=parameters, commit=True, fetchOne=True)
 
     def update(self, id):
-        SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s, image = %s , type = %s , currently_selling = %s, best = %s, Korean_description = %s, English_description = %s , QR = %s WHERE id = %s;"
-        parameters = (
-            self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
-            self.currently_selling, self.best, self.Korean_description, self.English_description, self.QR, id,)
+        SQL = "UPDATE products SET english = %s, korean = %s, weight_in_gram_per_product = %s, unit = %s, image = %s, type = %s, currently_selling = %s, best = %s, korean_description = %s, english_description = %s, qr = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, work_time_min = %s, estimated_items = %s WHERE id = %s;"
+        parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
+                      self.currently_selling, self.best, self.korean_description, self.english_description, self.qr,
+                      self.selling_price_lv, self.criteria_lv, self.selling_price_mv, self.criteria_mv,
+                      self.selling_price_hv, self.criteria_hv, self.work_time_min, self.estimated_items, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 

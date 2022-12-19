@@ -14,6 +14,8 @@ import datetime
 import random
 import string
 from datetime import timedelta
+from typing import Union, Tuple, Any
+
 import pytz
 import qrcode
 
@@ -266,7 +268,8 @@ def cost_calculation():
     else:
         if request.method == 'POST':
             if 'ingredients_add_button' in request.form:
-                ingredient = Database.Ingredients(request.form['english'], request.form['korean'], get_ingredientid=True)
+                ingredient = Database.Ingredients(request.form['english'], request.form['korean'],
+                                                  get_ingredientid=True)
                 ingredientid = ingredient.register_ingredient()
                 print(ingredientid)
                 if request.form['date'] == '':
@@ -296,12 +299,16 @@ def cost_calculation():
                 else:
                     best_product = False
                 Database.Products(request.form['english'], request.form['korean'],
-                                            request.form['weight_in_gram_per_product'], request.form['unit'],
-                                            request.form['image'], type=request.form['type'],
-                                            currently_selling=currently_selling, best=best_product,
-                                            Korean_description=request.form['Korean_description'],
-                                            English_description=request.form['English_description'],
-                                            QR=request.form['QR']).register()
+                                  request.form['weight_in_gram_per_product'], request.form['unit'],
+                                  request.form['image'], type=request.form['type'],
+                                  currently_selling=currently_selling, best=best_product,
+                                  korean_description=request.form['Korean_description'],
+                                  english_description=request.form['English_description'],
+                                  qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
+                                  criteria_lv=request.form['criteria_lv'], selling_price_mv=request.form['selling_price_mv'],
+                                  criteria_mv=request.form['criteria_mv'], selling_price_hv=request.form['selling_price_hv'],
+                                  criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
+                                  estimated_items=request.form['estimated_items']).register()
             elif 'price_ingredient_add_button' in request.form:
                 if request.form['date'] == '':
                     date = None
@@ -334,7 +341,9 @@ def cost_calculation():
         missing_prices_ingredients = main.missing_prices_ingredients()
         missing_prices_packaging = main.missing_prices_packaging()
         return render_template('cost_calculation.html', packaging=packaging,
-                               ingredients=ingredients, products=products,missing_prices_packaging=missing_prices_packaging,missing_prices_ingredients=missing_prices_ingredients)
+                               ingredients=ingredients, products=products,
+                               missing_prices_packaging=missing_prices_packaging,
+                               missing_prices_ingredients=missing_prices_ingredients)
 
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
@@ -353,15 +362,19 @@ def edit_cost_calculation():
                     best_product = request.form['best_product'] == 'on'
                 else:
                     best_product = False
-                Database.Products(english=request.form['english'], korean=request.form['korean'],
-                                  weight_in_gram_per_product=request.form['weight'], unit=request.form['unit'],
-                                  image=request.form['image'], type=request.form['type'],
+                Database.Products(request.form['english'], request.form['korean'],
+                                  request.form['weight'], request.form['unit'],
+                                  request.form['image'], type=request.form['type'],
                                   currently_selling=currently_selling, best=best_product,
-                                  Korean_description=request.form['Korean_description'],
-                                  English_description=request.form['English_description'],
-                                  QR=request.form['QR']).update(
-                    request.form['products_edit_button'])
-
+                                  korean_description=request.form['Korean_description'],
+                                  english_description=request.form['English_description'],
+                                  qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
+                                  criteria_lv=request.form['criteria_lv'],
+                                  selling_price_mv=request.form['selling_price_mv'],
+                                  criteria_mv=request.form['criteria_mv'],
+                                  selling_price_hv=request.form['selling_price_hv'],
+                                  criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
+                                  estimated_items=request.form['estimated_items']).update(request.form['products_edit_button'])
         data_dictionary = {}
         data_dictionary['ingredients'] = main.read_table('ingredients')
         data_dictionary['products'] = main.read_table('products')
@@ -403,52 +416,36 @@ def financial_plan():
                     investment.register_investment()
                 elif 'investment_edit_button' in request.form:
                     investment.update_investment(request.form['investment_edit_button'])
-            elif 'variable_cost_edit_button' in request.form or 'variable_cost_add_button' in request.form:
-                variable_cost = Database.VariableCost(request.form['productid'], request.form['variable_cost'],
-                                                      request.form['selling_price_lv'], request.form['criteria_lv'],
-                                                      request.form['selling_price_mv'], request.form['criteria_mv'],
-                                                      request.form['selling_price_hv'], request.form['criteria_hv'],
-                                                      request.form['work_time_min'],
-                                                      request.form['estimated_items'])
-                if 'variable_cost_add_button' in request.form:
-                    variable_cost.register_cost()
-                elif 'variable_cost_edit_button' in request.form:
-                    variable_cost.update_cost(request.form['variable_cost_edit_button'])
             elif 'btn_delete_fixed_cost' in request.form:
                 main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
             elif 'btn_delete_investment' in request.form:
                 main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
-            elif 'btn_delete_variable_cost' in request.form:
-                main.delete_row_by_id('variable_costs', request.form['btn_delete_variable_cost'])
             else:
                 abort(500)
-        total = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
-        investments = []
+        data={}
+        data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
+        data['investments'] = []
         for row in main.read_table('investments'):
             row = list(row)
-            total['minimum'] += int(row[3])
-            total['maximum'] += int(row[4])
-            investments.append(row)
-        fixed_costs = []
+            data['total']['minimum'] += int(row[3])
+            data['total']['maximum'] += int(row[4])
+            data['investments'].append(row)
+        data['fixed_costs']  = []
         for row in main.read_table('fixed_costs'):
             row = [row[0], row[1], row[2], row[4], row[5], row[6]]
-            total['total_cost'] += row[3]
-            fixed_costs.append(row)
-        variable_costs_edit = main.read_table('variable_costs')
-        products = main.read_table('products')
-        variable_costs_edit_col = main.show_columns('variable_costs')
-        variable_costs = main.fetch_variable_costs()[0]
-        variable_costs_columns = main.fetch_variable_costs()[1]
-        variable_costs_prefilled_input = ('', '', '>=', '', '>=', '', '>=', '', '', '', '')
-        net_profit = {}
-        for row in variable_costs:
-            net_profit[row[2]] = [row[4], int(row[4] / 1.1), int((row[4] / 1.1) - row[3]), row[12], row[3]]
-
-        return render_template('financial_plan.html', investments=investments, fixed_costs=fixed_costs, total=total,
-                               variable_costs=variable_costs, variable_costs_columns=variable_costs_columns,
-                               net_profit=net_profit, variable_costs_prefilled_input=variable_costs_prefilled_input,
-                               variable_costs_edit_col=variable_costs_edit_col,
-                               variable_costs_edit=variable_costs_edit, products=products)
+            data['total']['total_cost'] += row[3]
+            data['fixed_costs'].append(row)
+        data['products'] = main.read_table('products')
+        data['products-col'] = main.show_columns('products')
+        data['vat'] = {}
+        data['turnover-after-vat'] = {}
+        data['variable-costs'] = main.calculate_variable_cost()['total_average']
+        data['breakeven-per-product'] = {}
+        for product in data['products']:
+            data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
+            data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
+            data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+        return render_template('financial_plan.html', data=data)
 
 
 @app.route('/invoices', methods=['GET', 'POST'])
@@ -560,91 +557,7 @@ def cost_per_product():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     else:
-        data = {}
-        data['ingredients'] = main.read_table('ingredients')
-        data['packaging'] = main.read_table('packaging')
-        data['packagingproduct'] = main.read_table('packagingproduct')
-        data['products'] = main.read_table('products')
-        data['ingredientproduct'] = main.read_table('ingredientproduct')
-        data['ingredients_get_average'] = main.get_price('ingredients', get_average=True)
-        data['ingredients_get_latest'] = main.get_price('ingredients', get_latest=True)
-        data['packaging_get_average'] = main.get_price('packaging', get_average=True)
-        data['packaging_get_latest'] = main.get_price('packaging', get_latest=True)
-        data['total_average_packaging'] = {}
-        for packagingproduct in data['packagingproduct']:
-            if packagingproduct[2] in data['packaging_get_average']:
-                product_id = packagingproduct[1]
-                if product_id in data['total_average_packaging']:
-                    data['total_average_packaging'][product_id] += round(
-                        data['packaging_get_latest'][packagingproduct[2]], 2)
-                else:
-                    data['total_average_packaging'][product_id] = round(
-                        data['packaging_get_latest'][packagingproduct[2]], 2)
-        data['total_latest_packaging'] = {}
-        for packagingproduct in data['packagingproduct']:
-            if packagingproduct[2] in data['packaging_get_latest']:
-                product_id = packagingproduct[1]
-                if product_id in data['total_latest_packaging']:
-                    data['total_latest_packaging'][product_id] += data['packaging_get_latest'][packagingproduct[2]]
-                else:
-                    data['total_latest_packaging'][product_id] = data['packaging_get_latest'][packagingproduct[2]]
-
-        data['total_weight'] = {}
-        for row in data['ingredientproduct']:
-            if row[1] in data['total_weight']:
-                data['total_weight'][row[1]] += row[3]
-            else:
-                data['total_weight'][row[1]] = row[3]
-        data['total_average_ingredients'] = {}
-        for ingredientproduct in data['ingredientproduct']:
-            if ingredientproduct[2] in data['ingredients_get_average']:
-                product_id = ingredientproduct[1]
-                if product_id in data['total_average_ingredients']:
-                    data['total_average_ingredients'][product_id] += round(ingredientproduct[3] * data['ingredients_get_average'][
-                        ingredientproduct[2]],2)
-                else:
-                    data['total_average_ingredients'][product_id] = round(ingredientproduct[3] * data['ingredients_get_average'][
-                        ingredientproduct[2]],2)
-        data['total_latest_ingredients'] = {}
-        for ingredientproduct in data['ingredientproduct']:
-            if ingredientproduct[2] in data['ingredients_get_latest']:
-                product_id = ingredientproduct[1]
-                if product_id in data['total_latest_ingredients']:
-                    data['total_latest_ingredients'][product_id] += round(ingredientproduct[3] * data['ingredients_get_latest'][
-                        ingredientproduct[2]],2)
-                else:
-                    data['total_latest_ingredients'][product_id] = round(ingredientproduct[3] * data['ingredients_get_latest'][
-                        ingredientproduct[2]],2)
-        for product in data['products']:
-            if product[0] not in data['total_latest_ingredients']:
-                data['total_latest_ingredients'][product[0]] = 0
-            if product[0] not in data['total_average_ingredients']:
-                data['total_average_ingredients'][product[0]] = 0
-            if product[0] not in data['total_weight']:
-                data['total_weight'][product[0]] = 0
-            if product[0] not in data['total_latest_packaging']:
-                data['total_latest_packaging'][product[0]] = 0
-            if product[0] not in data['total_average_packaging']:
-                data['total_average_packaging'][product[0]] = 0
-            if product[0] not in data['total_latest_ingredients']:
-                data['total_latest_ingredients'][product[0]] = 0
-        data['total_average_ingredients_per_unit'] = {}
-        data['total_average'] = {}
-        data['total_latest_ingredients_per_unit'] = {}
-        data['total_latest'] = {}
-        for product in data['products']:
-            if data['total_average_ingredients'][product[0]] == 0:
-                data['total_average_ingredients_per_unit'][product[0]] = 0
-            else:
-                data['total_average_ingredients_per_unit'][product[0]] = round(data['total_average_ingredients'][product[0]] / (data['total_weight'][product[0]] / product[3]),2)
-            data['total_average'][product[0]] = round(data['total_average_ingredients_per_unit'][product[0]] + data['total_average_packaging'][product[0]],0)
-
-            if data['total_latest_ingredients'][product[0]] == 0:
-                data['total_latest_ingredients_per_unit'][product[0]] = 0
-            else:
-                data['total_latest_ingredients_per_unit'][product[0]] = round(data['total_latest_ingredients'][product[0]] / (data['total_weight'][product[0]] / product[3]),2)
-            data['total_latest'][product[0]] = round(data['total_latest_ingredients_per_unit'][product[0]] + data['total_latest_packaging'][product[0]],0)
-        return render_template('cost_per_product.html', data=data)
+        return render_template('cost_per_product.html', data=main.calculate_variable_cost())
 
 
 @app.route('/translations', methods=['GET', 'POST'])
@@ -688,9 +601,7 @@ def large_orders_price():
         return redirect(url_for('login'))
     else:
         products = main.read_table('products')
-        variable_costs = main.read_table('variable_costs')
-        return render_template('large_orders_price.html', products=products,
-                               variable_costs=variable_costs)
+        return render_template('large_orders_price.html', products=products)
 
 
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])

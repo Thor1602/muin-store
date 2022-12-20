@@ -42,7 +42,7 @@ class Main:
             print(e)
 
     def show_tables(self):
-        SQL = """SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"""
+        SQL = """SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"""
         return self.execute_query(query=SQL, fetchAll=True)
 
     def show_columns(self, table_name):
@@ -342,6 +342,23 @@ class Contact(Main):
         parameters = (id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
+class OnlineOrder(Main):
+    def __init__(self, name, email, phone, order, note):
+        self.name = name
+        self.email = email
+        self.phone = phone
+        self.order = order
+        self.note = note
+
+    def register_contact_query(self):
+        SQL = "INSERT INTO online_order (name, email, phone, subject, message, time, isCompleted) VALUES (%s,%s,%s,%s,%s,now()::timestamp, FALSE);"
+        parameters = (self.name, self.email, self.phone, self.order, self.note,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def isCompleted(self, id):
+        SQL = "UPDATE online_order SET isCompleted = TRUE WHERE id = %s;"
+        parameters = (id,)
+        self.execute_query(query=SQL, parameters=parameters, commit=True)
 
 class Investment(Main):
     def __init__(self, english, korean, min_price, max_price):

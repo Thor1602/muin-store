@@ -10,6 +10,41 @@
             <div class="section-header">
                 <h2>{{ msgid['large_orders_title'] | safe }}</h2>
             </div>
+            <div class="overflow-scroll max-height-table">
+                <table class="table table-bordered table-hover table-light">
+                    <thead><tr class="keep-all">
+                        <th scope="col"></th>
+                        <th scope="col" colspan="2">작은 주문</th>
+                        <th scope="col" colspan="2">대량 주문</th>
+                        <th scope="col" colspan="2">메가 대량 주문</th>
+                    </tr>
+                    <tr class="keep-all">
+                        <th scope="col">제폼</th>
+                        <th scope="col">가격</th>
+                        <th scope="col">기준</th>
+                        <th scope="col">가격</th>
+                        <th scope="col">기준</th>
+                        <th scope="col">가격</th>
+                        <th scope="col">기준</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in products %}
+                        {% if row[7] %}
+                        <tr>
+                            <th class="keep-all">{{ row[2] }}</th>
+                            <th>{% if row[12] == 0 %}NA{% else %}₩{{ row[12] }}{% endif %}</th>
+                            <th>&#8805;{{ row[13] }}</th>
+                            <th>{% if row[14] == 0 %}NA{% else %}₩{{ row[14] }}{% endif %}</th>
+                            <th>&#8805;{{ row[15] }}</th>
+                            <th>{% if row[16] == 0 %}NA{% else %}₩{{ row[16] }}{% endif %}</th>
+                            <th>&#8805;{{ row[17] }}</th>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
         </div>
     </section><!-- End Portfolio Section -->

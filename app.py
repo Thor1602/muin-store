@@ -56,9 +56,10 @@ nav_menu_admin = {'/admin_overview': 'Overview',
                   '경리': {'/invoices': '송장', '/business_plan': '비즈니스 계획',
                          '/financial_plan': '재무 계획'},
                   '사이트 관리자': {'/translations': '번역', '/images': '이미지',
+                              '/loss_calculator': '손실 계산기',
                               '/cost_calculation': '비용 계산 추가하기',
                               '/edit_cost_calculation': '비용 계산 편집하기',
-                              '/cost_per_product': 'Cost Per Product',
+                              '/cost_per_product': '제품당 비용',
                               '/print_ingredient_list': '성분 목록 인쇄하기'}}
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
@@ -133,7 +134,10 @@ def products():
             row_list[5] = "no-image-available.jpg"
         products.append(row_list)
     return render_template('products.html', products=products)
-
+@app.route('/large_order_price', methods=['GET', 'POST'])
+def large_order_price():
+    products = main.read_table('products')
+    return render_template('large_orders_price.html', products=products)
 
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
@@ -448,6 +452,36 @@ def financial_plan():
         return render_template('financial_plan.html', data=data)
 
 
+@app.route('/loss_calculator', methods=['GET', 'POST'])
+def loss_calculator():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        data={}
+        data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
+        data['investments'] = []
+        for row in main.read_table('investments'):
+            row = list(row)
+            data['total']['minimum'] += int(row[3])
+            data['total']['maximum'] += int(row[4])
+            data['investments'].append(row)
+        data['fixed_costs']  = []
+        for row in main.read_table('fixed_costs'):
+            row = [row[0], row[1], row[2], row[4], row[5], row[6]]
+            data['total']['total_cost'] += row[3]
+            data['fixed_costs'].append(row)
+        data['products'] = main.read_table('products')
+        data['products-col'] = main.show_columns('products')
+        data['vat'] = {}
+        data['turnover-after-vat'] = {}
+        data['variable-costs'] = main.calculate_variable_cost()['total_average']
+        data['breakeven-per-product'] = {}
+        for product in data['products']:
+            data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
+            data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
+            data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+        return render_template('loss_calculator.html', data=data)
+
 @app.route('/invoices', methods=['GET', 'POST'])
 def invoices():
     if not session.get('logged_in'):
@@ -595,13 +629,7 @@ def qr_info():
         return render_template('qr_info.html')
 
 
-@app.route('/large_orders_price', methods=['GET', 'POST'])
-def large_orders_price():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    else:
-        products = main.read_table('products')
-        return render_template('large_orders_price.html', products=products)
+
 
 
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])

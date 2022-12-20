@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+
+    <!-- ======= Portfolio Section ======= -->
+    <section id="portfolio" class="portfolio sections-bg">
+        <div class="container" data-aos="fade-up">
+            <div class="section-header">
+                <h2>Loss Calculator</h2>
+                <h4>Total loss: <span class="totalLoss"></span></h4>
+            </div>
+            <div class="overflow-scroll max-height-table">
+                <table class="table table-striped table-hover table-warning" id="loss-calculator-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Variable Cost</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col">.</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for product in data['products'] %}
+                        {% if product[7] %}
+                            <tr class="product-row">
+                                <td>{{ product[2] }}</td>
+                                <td><input type="number" aria-label="{{ product[2] }}"
+                                           class="form-control unit-product"
+                                           id="breakevenInput{{ loop.index0 }}"
+                                           value="0"
+                                           style="width: 200px">
+                                </td>
+                                <td><span class="variable-costs">{{ data['variable-costs'][product[0]] }}</span></td>
+                                <td style="border-left: black solid 3px"><span class="subtotal"></span></td>
+                                <td></td>
+                            </tr>
+
+                        {% endif %}
+                    {% endfor %}
+                    <tr class="product-row">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>Total loss: <span class="totalLoss"></span></td>
+                                <td>.</td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section><!-- End Portfolio Section -->
+
+{% endblock %}
+{% block endbody %}
+    <script>
+        $(document).ready(function () {
+            $.fn.digits = function () {
+                return this.each(function () {
+                    $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                })
+            }
+
+            function changeTable() {
+                var totalLoss = 0;
+                $('#loss-calculator-table tbody tr').each(function () {
+                    var $tblrow = $(this);
+                    var varcost = $tblrow.find('.variable-costs').text();
+                    var qty = $tblrow.find('.unit-product').val();
+                    if (!isNaN(qty) && !isNaN(varcost)) {
+                        var subTotal = parseInt(qty) * parseInt(varcost);
+                        $tblrow.find('.subtotal').text(subTotal).digits();
+                        totalLoss += subTotal;
+                    }
+                });
+                $('.totalLoss').text(parseInt(totalLoss)).digits();
+            }
+
+            $('.unit-product').change(function () {
+                changeTable();
+            });
+            changeTable();
+        });
+    </script>
+{% endblock %}

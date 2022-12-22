@@ -532,37 +532,6 @@ class PricesPackaging(Main):
             parameters = (self.packagingID, self.price_per_unit, self.date, id,)
         self.execute_query(query=SQL, parameters=parameters, commit=True)
 
-
-# class VariableCost(Main):
-#     def __init__(self, productid, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,
-#                  selling_price_hv, criteria_hv, work_time_min, estimated_items):
-#         self.productid = productid
-#         self.variable_cost = variable_cost
-#         self.selling_price_lv = selling_price_lv
-#         self.criteria_lv = criteria_lv
-#         self.selling_price_mv = selling_price_mv
-#         self.criteria_mv = criteria_mv
-#         self.selling_price_hv = selling_price_hv
-#         self.criteria_hv = criteria_hv
-#         self.work_time_min = work_time_min
-#         self.estimated_items = estimated_items
-#
-#     def register_cost(self):
-#         SQL = "INSERT INTO variable_costs (productid, variable_cost, selling_price_lv, criteria_lv,selling_price_mv, criteria_mv,selling_price_hv, criteria_hv, work_time_min, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-#         parameters = (
-#             self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv, self.selling_price_mv,
-#             self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min,
-#             self.estimated_items,)
-#         self.execute_query(query=SQL, parameters=parameters, commit=True)
-#
-#     def update_cost(self, id):
-#         SQL = "UPDATE variable_costs SET productid = %s, variable_cost = %s, selling_price_lv = %s, criteria_lv = %s, selling_price_mv = %s, criteria_mv = %s, selling_price_hv = %s, criteria_hv = %s, work_time_min = %s, estimated_items = %s WHERE id = %s;"
-#         parameters = (
-#             self.productid, self.variable_cost, self.selling_price_lv, self.criteria_lv,
-#             self.selling_price_mv,
-#             self.criteria_mv, self.selling_price_hv, self.criteria_hv, self.work_time_min,
-#             self.estimated_items, id,)
-#         self.execute_query(query=SQL, parameters=parameters, commit=True)
 class Products(Main):
     def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best,
                  korean_description, english_description, qr, selling_price_lv, criteria_lv, selling_price_mv,

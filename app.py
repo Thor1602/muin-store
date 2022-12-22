@@ -458,20 +458,7 @@ def loss_calculator():
         return redirect(url_for('login'))
     else:
         data={}
-        data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
-        data['investments'] = []
-        for row in main.read_table('investments'):
-            row = list(row)
-            data['total']['minimum'] += int(row[3])
-            data['total']['maximum'] += int(row[4])
-            data['investments'].append(row)
-        data['fixed_costs']  = []
-        for row in main.read_table('fixed_costs'):
-            row = [row[0], row[1], row[2], row[4], row[5], row[6]]
-            data['total']['total_cost'] += row[3]
-            data['fixed_costs'].append(row)
         data['products'] = main.read_table('products')
-        data['products-col'] = main.show_columns('products')
         data['vat'] = {}
         data['turnover-after-vat'] = {}
         data['variable-costs'] = main.calculate_variable_cost()['total_average']

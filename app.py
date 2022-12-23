@@ -639,7 +639,7 @@ def login():
     if request.method == 'GET':
         flash('This place is only for admins.')
         if session.get(main.get_setting_by_name('logged_in_session')[0]):
-            redirect(url_for('logout'))
+            session.pop(main.get_setting_by_name('logged_in_session')[0])
         return render_template('login.html')
     elif request.method == 'POST':
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):

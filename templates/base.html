@@ -79,7 +79,7 @@
         </a>
         <nav id="navbar" class="navbar">
             <ul>
-                {% if session.get('logged_in') %}
+                {% if admin_menu %}
                     {% for menu_item in nav_menu_admin %}
                         {% if nav_menu_admin[menu_item] is mapping %}
                             <li class="dropdown"><a href="javascript:void(0)"><span>{{ menu_item }}</span> <i
@@ -98,7 +98,7 @@
                     {% endfor %}
                     <hr>
                 {% endif %}
-                {% if session['is_homepage'] %}
+                {% if session[homepage] %}
                     {% for menu_item in menu_item_home %}
                         <li><a href="{{ menu_item }}">{{ msgid[menu_item_home[menu_item]] | safe }}</a></li>
                     {% endfor %}

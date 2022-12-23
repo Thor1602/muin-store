@@ -4,6 +4,8 @@ from os.path import exists
 from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2 import Error, sql
 import psycopg2
+import random
+import string
 
 import googledrive_connector
 
@@ -80,6 +82,9 @@ class Main:
                                                 fetchOne=True)
         return check_password_hash(retrieved_password, pwd)
 
+    def random_string_generator(self, N):
+        chars = string.digits + string.punctuation + string.ascii_letters
+        return ''.join(random.SystemRandom().choice(chars.replace("'\"", "")) for _ in range(N))
     def fetch_variable_costs(self):
         col = ('cost_id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
                'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'estimated_items',

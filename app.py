@@ -11,18 +11,11 @@ TODO add file handler cloud
 TODO add kakao alert messaging
 """
 import datetime
-import random
-import string
-from datetime import timedelta
-from typing import Union, Tuple, Any
-
-import pytz
 import qrcode
 
-from flask import Flask, Blueprint, render_template, session, redirect, url_for, flash, request, abort, make_response, \
-    jsonify, Response
+from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
+
 from flask_mail import Mail, Message
-import pdfkit
 import googledrive_connector
 import naver_setup
 import os.path
@@ -32,7 +25,7 @@ import Database
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
-app.secret_key = main.get_setting_by_name('secret_key')[1]
+app.secret_key = main.random_string_generator(100)
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 mail_cred = main.get_setting_by_name('main_gmail')
 app.config.update(dict(
@@ -73,7 +66,12 @@ def allowed_file(filename):
 
 @app.context_processor
 def get_locale():
-    session['is_homepage'] = False
+    homepage = main.get_setting_by_name('is_homepage_session')[0]
+    session[main.get_setting_by_name('is_homepage_session')[0]] = False
+    if session.get(main.get_setting_by_name('logged_in_session')[0]):
+        admin_menu = True
+    else:
+        admin_menu = False
     session_name = session.get("preferred_language", default='ko_KR')
     if '/login' not in request.url or '/logout' not in request.url:
         session['url'] = request.url
@@ -85,9 +83,9 @@ def get_locale():
         korean_translation[key] = x[2]
         english_translation[key] = x[3]
     if session_name == 'ko_KR':
-        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home)
+        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,admin_menu=admin_menu, homepage=homepage)
     else:
-        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home)
+        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,admin_menu=admin_menu, homepage=homepage)
 
 
 # -----------------------PUBLIC-----------------------
@@ -99,7 +97,7 @@ def set_language(lang):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    session['is_homepage'] = True
+    session[main.get_setting_by_name('is_homepage_session')[0]] = True
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
     best_products = []
     for row in main.read_table('products'):
@@ -143,107 +141,107 @@ def large_order_price():
 def privacy_policy():
     return render_template('privacy_policy.html')
 
-
-@app.route("/register_membership", methods=['GET', 'POST'])
-def add_membership():
-    if request.method == "POST":
-        if "get_verification" in request.form:
-            if session.get('verification_code'):
-                time_now = pytz.utc.localize(datetime.datetime.now() - timedelta(minutes=5))
-                time_verification = session['verification_code'][1]
-                if time_now > time_verification:
-                    session.pop('verification_code')
-            if not session.get('verification_code'):
-                session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
-            phone_number = request.form['phone_number']
-            for char in string.punctuation:
-                phone_number = phone_number.replace(char, '')
-            phone_number = phone_number.replace(' ', '')
-            if main.phone_number_exists(phone_number):
-                return make_response(
-                    jsonify({'message': 'Phone number: ' + phone_number + ' exists.', 'code': 'ERROR'}), 201)
-            else:
-                session['member_registration'] = {'first_name': request.form['first_name'],
-                                                  'last_name': request.form['last_name'], 'phone_number': phone_number}
-                naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0],
-                                                   language=session["preferred_language"])
-                return make_response(jsonify(
-                    {'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}),
-                    201)
-        elif "check_verification" in request.form:
-            if session.get('verification_code'):
-                if request.form['verification_code'] == str(session['verification_code'][0]):
-                    Database.Membership(session['member_registration']['first_name'],
-                                        session['member_registration']['last_name'],
-                                        session['member_registration']['phone_number'], points=2000).register()
-                    session.pop('member_registration')
-                    return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}), 201)
-                else:
-                    return make_response(
-                        jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 201)
-            else:
-                return make_response(jsonify({'message': 'Verification code can be expired.', 'code': 'ERROR'}), 201)
-
-    return render_template("add_membership.html")
-
-
-@app.route("/membership", methods=['GET', 'POST'])
-def check_membership():
-    membership_data = main.read_table('memberships')
-    if request.method == "POST":
-        if "verification_request" in request.form:
-            if request.form['phone_number'] not in [x[1] for x in membership_data]:
-                flash("Phone number is not registered yet.")
-                redirect(url_for('add_membership'))
-            elif session.get('verification_code'):
-                if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
-                    session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
-                    flash("Verification code expired. A new code has been sent.")
-                    naver_setup.send_notification_code(to_no=request.form['phone_number'],
-                                                       code=session['verification_code'][0],
-                                                       language=session["preferred_language"])
-                else:
-                    flash("Verification code is not expired yet. The code has been resent.")
-                    naver_setup.send_notification_code(to_no=request.form['phone_number'],
-                                                       code=session['verification_code'][0],
-                                                       language=session["preferred_language"])
-            else:
-                session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
-
-        elif "verification_validation" in request.form:
-            if session.get('verification_code'):
-                if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
-                    flash("Verification code is not correct.")
-                    redirect(url_for('check_membership'))
-
-                    if session['verification_code'][1] == request.form['given_verification_code']:
-                        flash("Verification code has been verified.")
-                        redirect(url_for('check_membership'))
-                else:
-                    flash("Verification code expired. Send a new code. ")
-            else:
-                flash("Verification code is not created yet.")
-
-        elif "request_membership_points" in request.form:
-            if request.form["verification_code"] == session['verification_code'][0] and session['verification_code'][
-                1] + datetime.timedelta(minutes=5) >= datetime.datetime.now():
-                flash("Verification succeeded")
-            else:
-                if request.form["verification_code"] != session['verification_code'][0]:
-                    flash("Verification failed: code doesn't match")
-                elif session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
-                    flash("Verification failed: code has expired. Try again.")
-                else:
-                    abort(500)
-            redirect(url_for('add_membership'))
-        redirect(url_for("add_membership"))
-    return render_template("check_membership.html")
+#
+# @app.route("/register_membership", methods=['GET', 'POST'])
+# def add_membership():
+#     if request.method == "POST":
+#         if "get_verification" in request.form:
+#             if session.get('verification_code'):
+#                 time_now = pytz.utc.localize(datetime.datetime.now() - timedelta(minutes=5))
+#                 time_verification = session['verification_code'][1]
+#                 if time_now > time_verification:
+#                     session.pop('verification_code')
+#             if not session.get('verification_code'):
+#                 session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
+#             phone_number = request.form['phone_number']
+#             for char in string.punctuation:
+#                 phone_number = phone_number.replace(char, '')
+#             phone_number = phone_number.replace(' ', '')
+#             if main.phone_number_exists(phone_number):
+#                 return make_response(
+#                     jsonify({'message': 'Phone number: ' + phone_number + ' exists.', 'code': 'ERROR'}), 201)
+#             else:
+#                 session['member_registration'] = {'first_name': request.form['first_name'],
+#                                                   'last_name': request.form['last_name'], 'phone_number': phone_number}
+#                 naver_setup.send_notification_code(to_no=phone_number, code=session['verification_code'][0],
+#                                                    language=session["preferred_language"])
+#                 return make_response(jsonify(
+#                     {'message': 'The verification code has been sent to ' + phone_number + ".", 'code': 'SUCCESS'}),
+#                     201)
+#         elif "check_verification" in request.form:
+#             if session.get('verification_code'):
+#                 if request.form['verification_code'] == str(session['verification_code'][0]):
+#                     Database.Membership(session['member_registration']['first_name'],
+#                                         session['member_registration']['last_name'],
+#                                         session['member_registration']['phone_number'], points=2000).register()
+#                     session.pop('member_registration')
+#                     return make_response(jsonify({'message': 'Verification completed', 'code': 'SUCCESS'}), 201)
+#                 else:
+#                     return make_response(
+#                         jsonify({'message': 'Verification error: The codes did not match', 'code': 'ERROR'}), 201)
+#             else:
+#                 return make_response(jsonify({'message': 'Verification code can be expired.', 'code': 'ERROR'}), 201)
+#
+#     return render_template("add_membership.html")
+#
+#
+# @app.route("/membership", methods=['GET', 'POST'])
+# def check_membership():
+#     membership_data = main.read_table('memberships')
+#     if request.method == "POST":
+#         if "verification_request" in request.form:
+#             if request.form['phone_number'] not in [x[1] for x in membership_data]:
+#                 flash("Phone number is not registered yet.")
+#                 redirect(url_for('add_membership'))
+#             elif session.get('verification_code'):
+#                 if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
+#                     session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
+#                     flash("Verification code expired. A new code has been sent.")
+#                     naver_setup.send_notification_code(to_no=request.form['phone_number'],
+#                                                        code=session['verification_code'][0],
+#                                                        language=session["preferred_language"])
+#                 else:
+#                     flash("Verification code is not expired yet. The code has been resent.")
+#                     naver_setup.send_notification_code(to_no=request.form['phone_number'],
+#                                                        code=session['verification_code'][0],
+#                                                        language=session["preferred_language"])
+#             else:
+#                 session['verification_code'] = (random.randint(100000, 999999), datetime.datetime.now())
+#
+#         elif "verification_validation" in request.form:
+#             if session.get('verification_code'):
+#                 if session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
+#                     flash("Verification code is not correct.")
+#                     redirect(url_for('check_membership'))
+#
+#                     if session['verification_code'][1] == request.form['given_verification_code']:
+#                         flash("Verification code has been verified.")
+#                         redirect(url_for('check_membership'))
+#                 else:
+#                     flash("Verification code expired. Send a new code. ")
+#             else:
+#                 flash("Verification code is not created yet.")
+#
+#         elif "request_membership_points" in request.form:
+#             if request.form["verification_code"] == session['verification_code'][0] and session['verification_code'][
+#                 1] + datetime.timedelta(minutes=5) >= datetime.datetime.now():
+#                 flash("Verification succeeded")
+#             else:
+#                 if request.form["verification_code"] != session['verification_code'][0]:
+#                     flash("Verification failed: code doesn't match")
+#                 elif session['verification_code'][1] + datetime.timedelta(minutes=5) <= datetime.datetime.now():
+#                     flash("Verification failed: code has expired. Try again.")
+#                 else:
+#                     abort(500)
+#             redirect(url_for('add_membership'))
+#         redirect(url_for("add_membership"))
+#     return render_template("check_membership.html")
 
 
 # -----------------------ADMIN-----------------------
 @app.route('/admin_overview', methods=['GET', 'POST'])
 def admin_overview():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -259,7 +257,7 @@ def admin_overview():
 
 @app.route('/business_plan', methods=['GET', 'POST'])
 def business_plan():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         return render_template('business_plan.html')
@@ -267,7 +265,7 @@ def business_plan():
 
 @app.route('/cost_calculation', methods=['GET', 'POST'])
 def cost_calculation():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -352,7 +350,7 @@ def cost_calculation():
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
 def edit_cost_calculation():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == "POST":
@@ -400,7 +398,7 @@ def edit_cost_calculation():
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
 def financial_plan():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == "POST":
@@ -454,7 +452,7 @@ def financial_plan():
 
 @app.route('/loss_calculator', methods=['GET', 'POST'])
 def loss_calculator():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         data={}
@@ -471,7 +469,7 @@ def loss_calculator():
 
 @app.route('/invoices', methods=['GET', 'POST'])
 def invoices():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -538,7 +536,7 @@ def invoices():
 
 @app.route('/images', methods=['GET', 'POST'])
 def images():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         return render_template('images.html', cloud_images=[])
@@ -546,7 +544,7 @@ def images():
 
 @app.route('/contact_inquiry', methods=['GET', 'POST'])
 def contact_inquiry():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         contact_info = main.read_table('customer_contact_submission', order_desc="time")
@@ -555,7 +553,7 @@ def contact_inquiry():
 
 @app.route('/recipes', methods=['GET', 'POST'])
 def recipes():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -575,7 +573,7 @@ def recipes():
 
 @app.route('/cost_per_product', methods=['GET', 'POST'])
 def cost_per_product():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         return render_template('cost_per_product.html', data=main.calculate_variable_cost())
@@ -583,7 +581,7 @@ def cost_per_product():
 
 @app.route('/translations', methods=['GET', 'POST'])
 def translations():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         web_translations_col = main.show_columns('web_translations')
@@ -604,7 +602,7 @@ def translations():
 
 @app.route('/qr_info', methods=['GET', 'POST'])
 def qr_info():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -621,7 +619,7 @@ def qr_info():
 
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])
 def print_ingredient_list():
-    if not session.get('logged_in'):
+    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
         return redirect(url_for('login'))
     else:
         data_dictionary = {}
@@ -639,14 +637,13 @@ def print_ingredient_list():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        flash('This is only for admins.')
-        session['logged_in'] = False
+        flash('This place is only for admins.')
+        if session.get(main.get_setting_by_name('logged_in_session')[0]):
+            session.pop(main.get_setting_by_name('logged_in_session')[0])
         return render_template('login.html')
     elif request.method == 'POST':
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
-            session['logged_in'] = True
-            session['current_user'] = request.form['emaillogin']
-            flash('Logged in')
+            session[main.get_setting_by_name('logged_in_session')[0]] = main.get_setting_by_name('logged_in_session')[1]
             return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
@@ -654,8 +651,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session['logged_in'] = False
-    flash('This is only for admins.')
+    session.pop(main.get_setting_by_name('logged_in_session')[0])
     return redirect(url_for('login'))
 
 

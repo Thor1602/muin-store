@@ -638,10 +638,11 @@ def print_ingredient_list():
 def login():
     if request.method == 'GET':
         flash('This place is only for admins.')
-        if session.get(main.get_setting_by_name('logged_in_session')[0]):
-            session.pop(main.get_setting_by_name('logged_in_session')[0])
+
         return render_template('login.html')
     elif request.method == 'POST':
+        if session.get(main.get_setting_by_name('logged_in_session')[0]):
+            session.pop(main.get_setting_by_name('logged_in_session')[0])
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
             session[main.get_setting_by_name('logged_in_session')[0]] = main.get_setting_by_name('logged_in_session')[1]
             return redirect(url_for('admin_overview'))

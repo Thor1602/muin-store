@@ -651,7 +651,8 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.pop(main.get_setting_by_name('logged_in_session')[0])
+    if session.get(main.get_setting_by_name('logged_in_session')[0]):
+        session.pop(main.get_setting_by_name('logged_in_session')[0])
     return redirect(url_for('login'))
 
 

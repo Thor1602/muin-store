@@ -57,7 +57,7 @@ nav_menu_admin = {'/admin_overview': 'Overview',
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
-
+encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -241,7 +241,7 @@ def privacy_policy():
 # -----------------------ADMIN-----------------------
 @app.route('/admin_overview', methods=['GET', 'POST'])
 def admin_overview():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -257,7 +257,7 @@ def admin_overview():
 
 @app.route('/business_plan', methods=['GET', 'POST'])
 def business_plan():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         return render_template('business_plan.html')
@@ -265,7 +265,7 @@ def business_plan():
 
 @app.route('/cost_calculation', methods=['GET', 'POST'])
 def cost_calculation():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -350,7 +350,7 @@ def cost_calculation():
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
 def edit_cost_calculation():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == "POST":
@@ -398,7 +398,7 @@ def edit_cost_calculation():
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
 def financial_plan():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == "POST":
@@ -452,7 +452,7 @@ def financial_plan():
 
 @app.route('/loss_calculator', methods=['GET', 'POST'])
 def loss_calculator():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         data={}
@@ -469,7 +469,7 @@ def loss_calculator():
 
 @app.route('/invoices', methods=['GET', 'POST'])
 def invoices():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -536,7 +536,7 @@ def invoices():
 
 @app.route('/images', methods=['GET', 'POST'])
 def images():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         return render_template('images.html', cloud_images=[])
@@ -544,7 +544,7 @@ def images():
 
 @app.route('/contact_inquiry', methods=['GET', 'POST'])
 def contact_inquiry():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         contact_info = main.read_table('customer_contact_submission', order_desc="time")
@@ -553,7 +553,7 @@ def contact_inquiry():
 
 @app.route('/recipes', methods=['GET', 'POST'])
 def recipes():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -573,7 +573,7 @@ def recipes():
 
 @app.route('/cost_per_product', methods=['GET', 'POST'])
 def cost_per_product():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         return render_template('cost_per_product.html', data=main.calculate_variable_cost())
@@ -581,7 +581,9 @@ def cost_per_product():
 
 @app.route('/translations', methods=['GET', 'POST'])
 def translations():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
+        return redirect(url_for('login'))
+    if session[main.get_setting_by_name('logged_in_session')[0]] != main.get_setting_by_name('logged_in_session')[1]:
         return redirect(url_for('login'))
     else:
         web_translations_col = main.show_columns('web_translations')
@@ -602,7 +604,7 @@ def translations():
 
 @app.route('/qr_info', methods=['GET', 'POST'])
 def qr_info():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
@@ -619,7 +621,7 @@ def qr_info():
 
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])
 def print_ingredient_list():
-    if not session.get(main.get_setting_by_name('logged_in_session')[0]):
+    if not session.get(encrypted_login_session):
         return redirect(url_for('login'))
     else:
         data_dictionary = {}
@@ -638,14 +640,14 @@ def print_ingredient_list():
 def login():
     if request.method == 'GET':
         flash('This place is only for admins.')
-
+        session[encrypted_login_session] = False
         return render_template('login.html')
     elif request.method == 'POST':
-        if session.get(main.get_setting_by_name('logged_in_session')[0]):
+        if session.get(encrypted_login_session):
             flash('Already logged in')
             return redirect(url_for('admin_overview'))
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
-            session[main.get_setting_by_name('logged_in_session')[0]] = main.get_setting_by_name('logged_in_session')[1]
+            session[encrypted_login_session] = True
             return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
@@ -653,8 +655,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    if session.get(main.get_setting_by_name('logged_in_session')[0]):
-        session.pop(main.get_setting_by_name('logged_in_session')[0])
+    session[encrypted_login_session] = False
     return redirect(url_for('login'))
 
 

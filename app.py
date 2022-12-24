@@ -17,6 +17,8 @@ from flask import Flask, render_template, session, redirect, url_for, flash, req
 
 from flask_mail import Mail, Message
 import flask_login
+from idna import unicode
+
 import googledrive_connector
 import naver_setup
 import os.path
@@ -43,6 +45,12 @@ mail = Mail(app)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.session_protection = 'strong'
+
+
 nav_menu_admin = {'/admin_overview': 'Overview',
                   '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},
                   '제품': {'/recipes': '레시피'
@@ -60,19 +68,37 @@ menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_na
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
 encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 
+# -----------------------LOGIN MANAGER-----------------------
+class User(flask_login.UserMixin):
+    def __init__(self, email):
+        self.id = ""
+        self.email = email
+
+users = [User(x) for x in main.get_all_users()]
+
+@login_manager.user_loader
+def user_loader(email):
+    user = User(email)
+    user.id = email
+    return user
+
+@login_manager.request_loader
+def request_loader(request):
+    email = request.form.get('emaillogin')
+    user = User(email)
+    user.id = email
+    return user
+
+# -----------------------FILE EXTENSIONS-----------------------
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+# -----------------------ACTIONS FOR EVERY REQUEST-----------------------
 @app.context_processor
 def get_locale():
     homepage = main.get_setting_by_name('is_homepage_session')[0]
     session[main.get_setting_by_name('is_homepage_session')[0]] = False
-    if session.get(main.get_setting_by_name('logged_in_session')[0]):
-        session['gO`]PDv2f/eh%#J^2.}PEV2Bg3CT!qutD@Ge[#$f{}2}i}8/r#'] = True
-    else:
-        session['gO`]PDv2f/eh%#J^2.}PEV2Bg3CT!qutD@Ge[#$f{}2}i}8/r#'] = False
     session_name = session.get("preferred_language", default='ko_KR')
     if '/login' not in request.url or '/logout' not in request.url:
         session['url'] = request.url
@@ -87,6 +113,7 @@ def get_locale():
         return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
     else:
         return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
+
 
 
 # -----------------------PUBLIC-----------------------
@@ -144,6 +171,7 @@ def privacy_policy():
 
 #
 # @app.route("/register_membership", methods=['GET', 'POST'])
+# @flask_login.login_required
 # def add_membership():
 #     if request.method == "POST":
 #         if "get_verification" in request.form:
@@ -187,6 +215,7 @@ def privacy_policy():
 #
 #
 # @app.route("/membership", methods=['GET', 'POST'])
+# @flask_login.login_required
 # def check_membership():
 #     membership_data = main.read_table('memberships')
 #     if request.method == "POST":
@@ -241,411 +270,385 @@ def privacy_policy():
 
 # -----------------------ADMIN-----------------------
 @app.route('/admin_overview', methods=['GET', 'POST'])
+@flask_login.login_required
 def admin_overview():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == 'POST':
-            if 'btn_delete_comment' in request.form:
-                main.delete_row_by_id('comments', request.form['btn_delete_comment'])
-                redirect(url_for('admin_overview'))
-            else:
-                comment = Database.Comment(request.form['comment'])
-                comment.register_comment()
-                redirect(url_for('admin_overview'))
-        return render_template('admin_overview.html', comments=main.read_table('comments'))
+
+    if request.method == 'POST':
+        if 'btn_delete_comment' in request.form:
+            main.delete_row_by_id('comments', request.form['btn_delete_comment'])
+            redirect(url_for('admin_overview'))
+        else:
+            comment = Database.Comment(request.form['comment'])
+            comment.register_comment()
+            redirect(url_for('admin_overview'))
+    return render_template('admin_overview.html', comments=main.read_table('comments'))
 
 
 @app.route('/business_plan', methods=['GET', 'POST'])
+@flask_login.login_required
 def business_plan():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        return render_template('business_plan.html')
+    return render_template('business_plan.html')
 
 
 @app.route('/cost_calculation', methods=['GET', 'POST'])
+@flask_login.login_required
 def cost_calculation():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == 'POST':
-            if 'ingredients_add_button' in request.form:
-                ingredient = Database.Ingredients(request.form['english'], request.form['korean'],
-                                                  get_ingredientid=True)
-                ingredientid = ingredient.register_ingredient()
-                print(ingredientid)
-                if request.form['date'] == '':
-                    date = None
-                else:
-                    date = request.form['date']
-                Database.PricesIngredients(ingredientid, request.form['price'],
-                                           request.form['weight_in_gram'], date).register()
 
-            elif 'packaging_add_button' in request.form:
-                packaging = Database.Packaging(request.form['english'], request.form['korean'], get_packagingid=True)
-                packagingid = packaging.register()
-                if request.form['date'] == '':
-                    date = None
-                else:
-                    date = request.form['date']
-                packaging_price = Database.PricesPackaging(packagingid, request.form['price_per_unit'],
-                                                           date)
-                packaging_price.register()
-            elif 'product_add_button' in request.form:
-                if 'currently_selling' in request.form:
-                    currently_selling = request.form['currently_selling'] == 'on'
-                else:
-                    currently_selling = False
-                if 'best_product' in request.form:
-                    best_product = request.form['best_product'] == 'on'
-                else:
-                    best_product = False
-                Database.Products(request.form['english'], request.form['korean'],
-                                  request.form['weight_in_gram_per_product'], request.form['unit'],
-                                  request.form['image'], type=request.form['type'],
-                                  currently_selling=currently_selling, best=best_product,
-                                  korean_description=request.form['Korean_description'],
-                                  english_description=request.form['English_description'],
-                                  qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
-                                  criteria_lv=request.form['criteria_lv'], selling_price_mv=request.form['selling_price_mv'],
-                                  criteria_mv=request.form['criteria_mv'], selling_price_hv=request.form['selling_price_hv'],
-                                  criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
-                                  estimated_items=request.form['estimated_items']).register()
-            elif 'price_ingredient_add_button' in request.form:
-                if request.form['date'] == '':
-                    date = None
-                else:
-                    date = request.form['date']
-                price_ingredient = Database.PricesIngredients(request.form['ingredientid'], request.form['price'],
-                                                              request.form['weight_in_gram'], date)
-                price_ingredient.register()
-            elif 'price_packaging_add_button' in request.form:
-                if request.form['date'] == '':
-                    date = None
-                else:
-                    date = request.form['date']
-                packaging_price = Database.PricesPackaging(request.form['packagingid'], request.form['price_per_unit'],
-                                                           date)
-                packaging_price.register()
-            elif 'recipe_add_button' in request.form:
-                for item in request.form:
-                    if 'packagingid_' in item:
-                        packaging_recipe = Database.PackagingProduct(request.form['productid'], request.form[item])
-                        packaging_recipe.register()
-                    elif 'ingredientid_' in item:
-                        weight_in_gram = 'weight_in_gram_' + item.replace('ingredientid_', '')
-                        ingredient_recipe = Database.IngredientProduct(request.form['productid'], request.form[item],
-                                                                       request.form[weight_in_gram])
-                        ingredient_recipe.register()
-        ingredients = main.read_table('ingredients')
-        products = main.read_table('products')
-        packaging = main.read_table('packaging')
-        missing_prices_ingredients = main.missing_prices_ingredients()
-        missing_prices_packaging = main.missing_prices_packaging()
-        return render_template('cost_calculation.html', packaging=packaging,
-                               ingredients=ingredients, products=products,
-                               missing_prices_packaging=missing_prices_packaging,
-                               missing_prices_ingredients=missing_prices_ingredients)
+    if request.method == 'POST':
+        if 'ingredients_add_button' in request.form:
+            ingredient = Database.Ingredients(request.form['english'], request.form['korean'],
+                                              get_ingredientid=True)
+            ingredientid = ingredient.register_ingredient()
+            print(ingredientid)
+            if request.form['date'] == '':
+                date = None
+            else:
+                date = request.form['date']
+            Database.PricesIngredients(ingredientid, request.form['price'],
+                                       request.form['weight_in_gram'], date).register()
+
+        elif 'packaging_add_button' in request.form:
+            packaging = Database.Packaging(request.form['english'], request.form['korean'], get_packagingid=True)
+            packagingid = packaging.register()
+            if request.form['date'] == '':
+                date = None
+            else:
+                date = request.form['date']
+            packaging_price = Database.PricesPackaging(packagingid, request.form['price_per_unit'],
+                                                       date)
+            packaging_price.register()
+        elif 'product_add_button' in request.form:
+            if 'currently_selling' in request.form:
+                currently_selling = request.form['currently_selling'] == 'on'
+            else:
+                currently_selling = False
+            if 'best_product' in request.form:
+                best_product = request.form['best_product'] == 'on'
+            else:
+                best_product = False
+            Database.Products(request.form['english'], request.form['korean'],
+                              request.form['weight_in_gram_per_product'], request.form['unit'],
+                              request.form['image'], type=request.form['type'],
+                              currently_selling=currently_selling, best=best_product,
+                              korean_description=request.form['Korean_description'],
+                              english_description=request.form['English_description'],
+                              qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
+                              criteria_lv=request.form['criteria_lv'], selling_price_mv=request.form['selling_price_mv'],
+                              criteria_mv=request.form['criteria_mv'], selling_price_hv=request.form['selling_price_hv'],
+                              criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
+                              estimated_items=request.form['estimated_items']).register()
+        elif 'price_ingredient_add_button' in request.form:
+            if request.form['date'] == '':
+                date = None
+            else:
+                date = request.form['date']
+            price_ingredient = Database.PricesIngredients(request.form['ingredientid'], request.form['price'],
+                                                          request.form['weight_in_gram'], date)
+            price_ingredient.register()
+        elif 'price_packaging_add_button' in request.form:
+            if request.form['date'] == '':
+                date = None
+            else:
+                date = request.form['date']
+            packaging_price = Database.PricesPackaging(request.form['packagingid'], request.form['price_per_unit'],
+                                                       date)
+            packaging_price.register()
+        elif 'recipe_add_button' in request.form:
+            for item in request.form:
+                if 'packagingid_' in item:
+                    packaging_recipe = Database.PackagingProduct(request.form['productid'], request.form[item])
+                    packaging_recipe.register()
+                elif 'ingredientid_' in item:
+                    weight_in_gram = 'weight_in_gram_' + item.replace('ingredientid_', '')
+                    ingredient_recipe = Database.IngredientProduct(request.form['productid'], request.form[item],
+                                                                   request.form[weight_in_gram])
+                    ingredient_recipe.register()
+    ingredients = main.read_table('ingredients')
+    products = main.read_table('products')
+    packaging = main.read_table('packaging')
+    missing_prices_ingredients = main.missing_prices_ingredients()
+    missing_prices_packaging = main.missing_prices_packaging()
+    return render_template('cost_calculation.html', packaging=packaging,
+                           ingredients=ingredients, products=products,
+                           missing_prices_packaging=missing_prices_packaging,
+                           missing_prices_ingredients=missing_prices_ingredients)
 
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
+@flask_login.login_required
 def edit_cost_calculation():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == "POST":
-            print(request.form)
-            if 'products_edit_button' in request.form:
-                if 'currently_selling' in request.form:
-                    currently_selling = request.form['currently_selling'] == 'on'
-                else:
-                    currently_selling = False
-                if 'best_product' in request.form:
-                    best_product = request.form['best_product'] == 'on'
-                else:
-                    best_product = False
-                Database.Products(request.form['english'], request.form['korean'],
-                                  request.form['weight'], request.form['unit'],
-                                  request.form['image'], type=request.form['type'],
-                                  currently_selling=currently_selling, best=best_product,
-                                  korean_description=request.form['Korean_description'],
-                                  english_description=request.form['English_description'],
-                                  qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
-                                  criteria_lv=request.form['criteria_lv'],
-                                  selling_price_mv=request.form['selling_price_mv'],
-                                  criteria_mv=request.form['criteria_mv'],
-                                  selling_price_hv=request.form['selling_price_hv'],
-                                  criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
-                                  estimated_items=request.form['estimated_items']).update(request.form['products_edit_button'])
-        data_dictionary = {}
-        data_dictionary['ingredients'] = main.read_table('ingredients')
-        data_dictionary['products'] = main.read_table('products')
-        data_dictionary['packaging'] = main.read_table('packaging')
-        data_dictionary['prices_ingredients'] = main.read_table('prices_ingredients')
-        data_dictionary['prices_packaging'] = main.read_table('prices_packaging')
-        data_dictionary['packagingproduct'] = main.read_table('packagingproduct')
-        data_dictionary['ingredientproduct'] = main.read_table('ingredientproduct')
-        data_dictionary['ingredients_col'] = main.show_columns('ingredients')
-        data_dictionary['products_col'] = main.show_columns('products')
-        data_dictionary['packaging_col'] = main.show_columns('packaging')
-        data_dictionary['prices_ingredients_col'] = main.show_columns('prices_ingredients')
-        data_dictionary['prices_packaging_col'] = main.show_columns('prices_packaging')
-        data_dictionary['packagingproduct_col'] = main.show_columns('packagingproduct')
-        data_dictionary['ingredientproduct_col'] = main.show_columns('ingredientproduct')
-        return render_template('edit_cost_calculation.html',
-                               data_dictionary=data_dictionary)
+
+    if request.method == "POST":
+        print(request.form)
+        if 'products_edit_button' in request.form:
+            if 'currently_selling' in request.form:
+                currently_selling = request.form['currently_selling'] == 'on'
+            else:
+                currently_selling = False
+            if 'best_product' in request.form:
+                best_product = request.form['best_product'] == 'on'
+            else:
+                best_product = False
+            Database.Products(request.form['english'], request.form['korean'],
+                              request.form['weight'], request.form['unit'],
+                              request.form['image'], type=request.form['type'],
+                              currently_selling=currently_selling, best=best_product,
+                              korean_description=request.form['Korean_description'],
+                              english_description=request.form['English_description'],
+                              qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
+                              criteria_lv=request.form['criteria_lv'],
+                              selling_price_mv=request.form['selling_price_mv'],
+                              criteria_mv=request.form['criteria_mv'],
+                              selling_price_hv=request.form['selling_price_hv'],
+                              criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
+                              estimated_items=request.form['estimated_items']).update(request.form['products_edit_button'])
+    data_dictionary = {}
+    data_dictionary['ingredients'] = main.read_table('ingredients')
+    data_dictionary['products'] = main.read_table('products')
+    data_dictionary['packaging'] = main.read_table('packaging')
+    data_dictionary['prices_ingredients'] = main.read_table('prices_ingredients')
+    data_dictionary['prices_packaging'] = main.read_table('prices_packaging')
+    data_dictionary['packagingproduct'] = main.read_table('packagingproduct')
+    data_dictionary['ingredientproduct'] = main.read_table('ingredientproduct')
+    data_dictionary['ingredients_col'] = main.show_columns('ingredients')
+    data_dictionary['products_col'] = main.show_columns('products')
+    data_dictionary['packaging_col'] = main.show_columns('packaging')
+    data_dictionary['prices_ingredients_col'] = main.show_columns('prices_ingredients')
+    data_dictionary['prices_packaging_col'] = main.show_columns('prices_packaging')
+    data_dictionary['packagingproduct_col'] = main.show_columns('packagingproduct')
+    data_dictionary['ingredientproduct_col'] = main.show_columns('ingredientproduct')
+    return render_template('edit_cost_calculation.html',
+                           data_dictionary=data_dictionary)
 
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
+@flask_login.login_required
 def financial_plan():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == "POST":
-            if 'fixed_cost_edit_button' in request.form or 'fixed_cost_add_button' in request.form:
-                fixed_cost = Database.FixedCost(request.form['english'], request.form['korean'],
-                                                request.form['cost_per_month'], request.form['one_time_cost'],
-                                                request.form['period'])
-                if 'fixed_cost_add_button' in request.form:
-                    fixed_cost.register_cost()
-                elif 'fixed_cost_edit_button' in request.form:
-                    fixed_cost.update_cost(request.form['fixed_cost_edit_button'])
-            elif 'investment_edit_button' in request.form or 'investment_add_button' in request.form:
+    if request.method == "POST":
+        if 'fixed_cost_edit_button' in request.form or 'fixed_cost_add_button' in request.form:
+            fixed_cost = Database.FixedCost(request.form['english'], request.form['korean'],
+                                            request.form['cost_per_month'], request.form['one_time_cost'],
+                                            request.form['period'])
+            if 'fixed_cost_add_button' in request.form:
+                fixed_cost.register_cost()
+            elif 'fixed_cost_edit_button' in request.form:
+                fixed_cost.update_cost(request.form['fixed_cost_edit_button'])
+        elif 'investment_edit_button' in request.form or 'investment_add_button' in request.form:
 
-                investment = Database.Investment(request.form['english'], request.form['korean'],
-                                                 request.form['min_price'], request.form['max_price'])
-                if 'investment_add_button' in request.form:
-                    investment.register_investment()
-                elif 'investment_edit_button' in request.form:
-                    investment.update_investment(request.form['investment_edit_button'])
-            elif 'btn_delete_fixed_cost' in request.form:
-                main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
-            elif 'btn_delete_investment' in request.form:
-                main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
-            else:
-                abort(500)
-        data={}
-        data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
-        data['investments'] = []
-        for row in main.read_table('investments'):
-            row = list(row)
-            data['total']['minimum'] += int(row[3])
-            data['total']['maximum'] += int(row[4])
-            data['investments'].append(row)
-        data['fixed_costs']  = []
-        for row in main.read_table('fixed_costs'):
-            row = [row[0], row[1], row[2], row[4], row[5], row[6]]
-            data['total']['total_cost'] += row[3]
-            data['fixed_costs'].append(row)
-        data['products'] = main.read_table('products')
-        data['products-col'] = main.show_columns('products')
-        data['vat'] = {}
-        data['turnover-after-vat'] = {}
-        data['variable-costs'] = main.calculate_variable_cost()['total_average']
-        data['breakeven-per-product'] = {}
-        for product in data['products']:
-            data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
-            data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
-            data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
-        return render_template('financial_plan.html', data=data)
+            investment = Database.Investment(request.form['english'], request.form['korean'],
+                                             request.form['min_price'], request.form['max_price'])
+            if 'investment_add_button' in request.form:
+                investment.register_investment()
+            elif 'investment_edit_button' in request.form:
+                investment.update_investment(request.form['investment_edit_button'])
+        elif 'btn_delete_fixed_cost' in request.form:
+            main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
+        elif 'btn_delete_investment' in request.form:
+            main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
+        else:
+            abort(500)
+    data={}
+    data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
+    data['investments'] = []
+    for row in main.read_table('investments'):
+        row = list(row)
+        data['total']['minimum'] += int(row[3])
+        data['total']['maximum'] += int(row[4])
+        data['investments'].append(row)
+    data['fixed_costs']  = []
+    for row in main.read_table('fixed_costs'):
+        row = [row[0], row[1], row[2], row[4], row[5], row[6]]
+        data['total']['total_cost'] += row[3]
+        data['fixed_costs'].append(row)
+    data['products'] = main.read_table('products')
+    data['products-col'] = main.show_columns('products')
+    data['vat'] = {}
+    data['turnover-after-vat'] = {}
+    data['variable-costs'] = main.calculate_variable_cost()['total_average']
+    data['breakeven-per-product'] = {}
+    for product in data['products']:
+        data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
+        data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
+        data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+    return render_template('financial_plan.html', data=data)
 
 
 @app.route('/loss_calculator', methods=['GET', 'POST'])
+@flask_login.login_required
 def loss_calculator():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        data={}
-        data['products'] = main.read_table('products')
-        data['vat'] = {}
-        data['turnover-after-vat'] = {}
-        data['variable-costs'] = main.calculate_variable_cost()['total_average']
-        data['breakeven-per-product'] = {}
-        for product in data['products']:
-            data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
-            data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
-            data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
-        return render_template('loss_calculator.html', data=data)
+    data={}
+    data['products'] = main.read_table('products')
+    data['vat'] = {}
+    data['turnover-after-vat'] = {}
+    data['variable-costs'] = main.calculate_variable_cost()['total_average']
+    data['breakeven-per-product'] = {}
+    for product in data['products']:
+        data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
+        data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
+        data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+    return render_template('loss_calculator.html', data=data)
 
 @app.route('/invoices', methods=['GET', 'POST'])
+@flask_login.login_required
 def invoices():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == 'POST':
-            if 'invoice_supplier_add_button' in request.form:
-                if 'file' not in request.files:
-                    flash('No file part')
-                    return redirect(request.url)
-                files = request.files.getlist("file")
-                for file in files:
-                    if file.filename == '':
-                        flash('File has no filename')
-                        break
-                    extension = file.filename.rsplit('.', 1)[1]
-                    if request.form['invoice_date'] == "":
-                        date = datetime.datetime.now().strftime("%Y-%m-%d")
-                    else:
-                        date = request.form['invoice_date']
-                    file.filename = request.form['supplier_name'] + "_" + date + "." + extension
-                    if file and allowed_file(file.filename):
-                        googledrive_connector.upload_invoice(file)
-                        Database.InvoicesSupplier(file=file.filename, type=request.form['type'],
-                                                  payment_amount=request.form['payment_amount'],
-                                                  payment_method=request.form['payment_method'],
-                                                  supplier_name=request.form['supplier_name'],
-                                                  invoice_date=date).register()
-                        flash('File name: ' + file.filename + ' is uploaded.')
-                    else:
-                        flash('File name: ' + file.filename + ' is not allowed.')
-                    return redirect(url_for('invoices'))
-            elif 'invoice_customer_add_button' in request.form:
-                if 'file' not in request.files:
-                    flash('No file part')
-                    return redirect(request.url)
-                files = request.files.getlist("file")
-                for file in files:
-                    if file.filename == '':
-                        flash('File has no filename')
-                        break
-                    extension = file.filename.rsplit('.', 1)[1]
-                    if request.form['invoice_date'] == "":
-                        date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                    else:
-                        date = request.form['invoice_date']
-                    file.filename = request.form['customer_name'] + "_" + date + "." + extension
-                    if file and allowed_file(file.filename):
-                        googledrive_connector.upload_invoice(file)
-                        Database.InvoicesSupplier(file=file.filename, type=request.form['type'],
-                                                  payment_amount=request.form['payment_amount'],
-                                                  payment_method=request.form['payment_method'],
-                                                  supplier_name=request.form['customer_name'],
-                                                  invoice_date=date).register()
-                        flash('File name: ' + file.filename + ' is uploaded.')
-                    else:
-                        flash('File name: ' + file.filename + ' is not allowed.')
-                    return redirect(url_for('invoices'))
-        invoices_customer = main.read_table('invoices_customers')
-        invoices_supplier = main.read_table('invoices_suppliers')
-        invoices_supplier_columns = main.show_columns('invoices_suppliers')
-        invoices_customer_columns = main.show_columns('invoices_customers')
-        return render_template('invoices.html', invoices_supplier=invoices_supplier,
-                               invoices_customer=invoices_customer, invoices_supplier_columns=invoices_supplier_columns,
-                               invoices_customer_columns=invoices_customer_columns)
+
+    if request.method == 'POST':
+        if 'invoice_supplier_add_button' in request.form:
+            if 'file' not in request.files:
+                flash('No file part')
+                return redirect(request.url)
+            files = request.files.getlist("file")
+            for file in files:
+                if file.filename == '':
+                    flash('File has no filename')
+                    break
+                extension = file.filename.rsplit('.', 1)[1]
+                if request.form['invoice_date'] == "":
+                    date = datetime.datetime.now().strftime("%Y-%m-%d")
+                else:
+                    date = request.form['invoice_date']
+                file.filename = request.form['supplier_name'] + "_" + date + "." + extension
+                if file and allowed_file(file.filename):
+                    googledrive_connector.upload_invoice(file)
+                    Database.InvoicesSupplier(file=file.filename, type=request.form['type'],
+                                              payment_amount=request.form['payment_amount'],
+                                              payment_method=request.form['payment_method'],
+                                              supplier_name=request.form['supplier_name'],
+                                              invoice_date=date).register()
+                    flash('File name: ' + file.filename + ' is uploaded.')
+                else:
+                    flash('File name: ' + file.filename + ' is not allowed.')
+                return redirect(url_for('invoices'))
+        elif 'invoice_customer_add_button' in request.form:
+            if 'file' not in request.files:
+                flash('No file part')
+                return redirect(request.url)
+            files = request.files.getlist("file")
+            for file in files:
+                if file.filename == '':
+                    flash('File has no filename')
+                    break
+                extension = file.filename.rsplit('.', 1)[1]
+                if request.form['invoice_date'] == "":
+                    date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                else:
+                    date = request.form['invoice_date']
+                file.filename = request.form['customer_name'] + "_" + date + "." + extension
+                if file and allowed_file(file.filename):
+                    googledrive_connector.upload_invoice(file)
+                    Database.InvoicesSupplier(file=file.filename, type=request.form['type'],
+                                              payment_amount=request.form['payment_amount'],
+                                              payment_method=request.form['payment_method'],
+                                              supplier_name=request.form['customer_name'],
+                                              invoice_date=date).register()
+                    flash('File name: ' + file.filename + ' is uploaded.')
+                else:
+                    flash('File name: ' + file.filename + ' is not allowed.')
+                return redirect(url_for('invoices'))
+    invoices_customer = main.read_table('invoices_customers')
+    invoices_supplier = main.read_table('invoices_suppliers')
+    invoices_supplier_columns = main.show_columns('invoices_suppliers')
+    invoices_customer_columns = main.show_columns('invoices_customers')
+    return render_template('invoices.html', invoices_supplier=invoices_supplier,
+                           invoices_customer=invoices_customer, invoices_supplier_columns=invoices_supplier_columns,
+                           invoices_customer_columns=invoices_customer_columns)
 
 
 @app.route('/images', methods=['GET', 'POST'])
+@flask_login.login_required
 def images():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        return render_template('images.html', cloud_images=[])
+    return render_template('images.html', cloud_images=[])
 
 
 @app.route('/contact_inquiry', methods=['GET', 'POST'])
+@flask_login.login_required
 def contact_inquiry():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        contact_info = main.read_table('customer_contact_submission', order_desc="time")
-        return render_template('contact_inquiry.html', contact_info=contact_info)
+    contact_info = main.read_table('customer_contact_submission', order_desc="time")
+    return render_template('contact_inquiry.html', contact_info=contact_info)
 
 
 @app.route('/recipes', methods=['GET', 'POST'])
+@flask_login.login_required
 def recipes():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == 'POST':
-            if 'btn_edit_recipe' in request.form:
-                data = request.form['btn_edit_recipe'].split(',')
-                ingredient = Database.IngredientProduct(data[1], data[2], request.form['weight'])
-                ingredient.update(data[0])
-            elif 'btn_delete_recipe' in request.form:
-                main.delete_row_by_id('ingredientproduct', request.form['btn_delete_recipe'])
+    if request.method == 'POST':
+        if 'btn_edit_recipe' in request.form:
+            data = request.form['btn_edit_recipe'].split(',')
+            ingredient = Database.IngredientProduct(data[1], data[2], request.form['weight'])
+            ingredient.update(data[0])
+        elif 'btn_delete_recipe' in request.form:
+            main.delete_row_by_id('ingredientproduct', request.form['btn_delete_recipe'])
 
-        ingredients = main.read_table('ingredients')
-        products = main.read_table('products')
-        recipes = main.read_table('ingredientproduct')
-        return render_template('recipes.html', recipes=recipes, ingredients=ingredients,
-                               products=products)
+    ingredients = main.read_table('ingredients')
+    products = main.read_table('products')
+    recipes = main.read_table('ingredientproduct')
+    return render_template('recipes.html', recipes=recipes, ingredients=ingredients,
+                           products=products)
 
 
 @app.route('/cost_per_product', methods=['GET', 'POST'])
+@flask_login.login_required
 def cost_per_product():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        return render_template('cost_per_product.html', data=main.calculate_variable_cost())
+    return render_template('cost_per_product.html', data=main.calculate_variable_cost())
 
 
 @app.route('/translations', methods=['GET', 'POST'])
+@flask_login.login_required
 def translations():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    if session[main.get_setting_by_name('logged_in_session')[0]] != main.get_setting_by_name('logged_in_session')[1]:
-        return redirect(url_for('login'))
-    else:
-        web_translations_col = main.show_columns('web_translations')
-        if request.method == 'POST':
-            translation_object = Database.WebTranslations(request.form[web_translations_col[1]],
-                                                          request.form[web_translations_col[2]],
-                                                          request.form[web_translations_col[3]])
-            if 'translation_modal_add_button' in request.form:
-                translation_object.register()
-            elif 'translation_modal_edit_button' in request.form:
-                translation_object.update(request.form['translation_modal_edit_button'])
-                global web_translations
-                web_translations = main.read_table('web_translations')
-        sorted_web_translations = main.read_table('web_translations', order_asc="msgid")
-        return render_template('homepage_admin.html', web_translations=sorted_web_translations,
-                               web_translations_col=web_translations_col)
+    web_translations_col = main.show_columns('web_translations')
+    if request.method == 'POST':
+        translation_object = Database.WebTranslations(request.form[web_translations_col[1]],
+                                                      request.form[web_translations_col[2]],
+                                                      request.form[web_translations_col[3]])
+        if 'translation_modal_add_button' in request.form:
+            translation_object.register()
+        elif 'translation_modal_edit_button' in request.form:
+            translation_object.update(request.form['translation_modal_edit_button'])
+            global web_translations
+            web_translations = main.read_table('web_translations')
+    sorted_web_translations = main.read_table('web_translations', order_asc="msgid")
+    return render_template('homepage_admin.html', web_translations=sorted_web_translations,
+                           web_translations_col=web_translations_col)
 
 
 @app.route('/qr_info', methods=['GET', 'POST'])
+@flask_login.login_required
 def qr_info():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        if request.method == 'POST':
-            for key in request.form:
-                if 'product_' in key:
-                    img = qrcode.make(request.form[key])
-                    img.save("/static/img/QR/" + request.form[key] + ".png")
-            return render_template('qr_info.html')
+    if request.method == 'POST':
+        for key in request.form:
+            if 'product_' in key:
+                img = qrcode.make(request.form[key])
+                img.save("/static/img/QR/" + request.form[key] + ".png")
         return render_template('qr_info.html')
+    return render_template('qr_info.html')
 
 
 
 
 
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])
+@flask_login.login_required
 def print_ingredient_list():
-    if not session.get(encrypted_login_session):
-        return redirect(url_for('login'))
-    else:
-        data_dictionary = {}
-        data_dictionary['ingredients'] = main.read_table('ingredients')
-        data_dictionary['ingredients_col'] = main.show_columns('ingredients')
-        data_dictionary['packaging'] = main.read_table('packaging')
-        data_dictionary['packaging_col'] = main.show_columns('packaging')
-        data_dictionary['length_ingredients'] = int(len(data_dictionary['ingredients']) / 2)
-        data_dictionary['length_packaging'] = int(len(data_dictionary['packaging']) / 2)
-        html = render_template('print_ingredient_list.html', data_dictionary=data_dictionary)
-        return html
+    data_dictionary = {}
+    data_dictionary['ingredients'] = main.read_table('ingredients')
+    data_dictionary['ingredients_col'] = main.show_columns('ingredients')
+    data_dictionary['packaging'] = main.read_table('packaging')
+    data_dictionary['packaging_col'] = main.show_columns('packaging')
+    data_dictionary['length_ingredients'] = int(len(data_dictionary['ingredients']) / 2)
+    data_dictionary['length_packaging'] = int(len(data_dictionary['packaging']) / 2)
+    html = render_template('print_ingredient_list.html', data_dictionary=data_dictionary)
+    return html
 
 
 # LOGIN LOGOUT
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        flash('This place is only for admins.')
-        session[encrypted_login_session] = False
         return render_template('login.html')
     elif request.method == 'POST':
-        if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
-            session[encrypted_login_session] = True
+        email = request.form['emaillogin']
+        user = User(unicode(email))
+        if user in users and main.verify_password(email, request.form['passwordlogin']):
+            flask_login.login_user(user=user)
             return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
@@ -653,15 +656,22 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session[encrypted_login_session] = False
+    flask_login.logout_user()
     return redirect(url_for('login'))
-
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return abort(401)
 
 # ERROR HANDLING
 @app.errorhandler(400)
 def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"
     return render_template('error.html', e=e, e_friendly=e_friendly), 400
+
+@app.errorhandler(401)
+def bad_request(e):
+    e_friendly = "The bad guys don't come in. I have my laser taser"
+    return render_template('error.html', e=e, e_friendly=e_friendly), 401
 
 
 @app.errorhandler(403)

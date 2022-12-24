@@ -82,6 +82,10 @@ class Main:
                                                 fetchOne=True)
         return check_password_hash(retrieved_password, pwd)
 
+    def get_all_users(self):
+        users= self.execute_query(query="SELECT key FROM settings where name = 'login';", fetchAll=True)
+        return [x[0] for x in users]
+
     def random_string_generator(self, N):
         chars = string.digits + string.punctuation + string.ascii_letters
         return ''.join(random.SystemRandom().choice(chars.replace("'\"", "")) for _ in range(N))

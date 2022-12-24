@@ -16,6 +16,7 @@ import qrcode
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 
 from flask_mail import Mail, Message
+import flask_login
 import googledrive_connector
 import naver_setup
 import os.path
@@ -25,7 +26,7 @@ import Database
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
-app.secret_key = main.random_string_generator(100)
+app.secret_key = 'kfnsdjfn125215fg545t236'
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 mail_cred = main.get_setting_by_name('main_gmail')
 app.config.update(dict(

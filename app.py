@@ -56,7 +56,7 @@ nav_menu_admin = {'/admin_overview': 'Overview',
                               '/print_ingredient_list': '성분 목록 인쇄하기'}}
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
-                  '#contact': 'contact_title', '#suppliers': 'suppliers_title'}
+                  '#contact': 'contact_title', '#clients': 'suppliers_title'}
 
 
 def allowed_file(filename):
@@ -68,6 +68,10 @@ def allowed_file(filename):
 def get_locale():
     homepage = main.get_setting_by_name('is_homepage_session')[0]
     session[main.get_setting_by_name('is_homepage_session')[0]] = False
+    if session.get(main.get_setting_by_name('logged_in_session')[0]):
+        session['gO`]PDv2f/eh%#J^2.}PEV2Bg3CT!qutD@Ge[#$f{}2}i}8/r#'] = True
+    else:
+        session['gO`]PDv2f/eh%#J^2.}PEV2Bg3CT!qutD@Ge[#$f{}2}i}8/r#'] = False
     session_name = session.get("preferred_language", default='ko_KR')
     if '/login' not in request.url or '/logout' not in request.url:
         session['url'] = request.url

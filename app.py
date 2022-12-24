@@ -17,7 +17,6 @@ from flask import Flask, render_template, session, redirect, url_for, flash, req
 
 from flask_mail import Mail, Message
 import flask_login
-from idna import unicode
 
 import googledrive_connector
 import naver_setup
@@ -646,7 +645,7 @@ def login():
         return render_template('login.html')
     elif request.method == 'POST':
         email = request.form['emaillogin']
-        user = User(unicode(email))
+        user = User(email)
         if user in users and main.verify_password(email, request.form['passwordlogin']):
             flask_login.login_user(user=user)
             return redirect(url_for('admin_overview'))

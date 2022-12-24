@@ -643,9 +643,6 @@ def login():
         session[encrypted_login_session] = False
         return render_template('login.html')
     elif request.method == 'POST':
-        if session.get(encrypted_login_session):
-            flash('Already logged in')
-            return redirect(url_for('admin_overview'))
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
             session[encrypted_login_session] = True
             return redirect(url_for('admin_overview'))

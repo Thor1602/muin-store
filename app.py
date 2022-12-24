@@ -56,7 +56,7 @@ nav_menu_admin = {'/admin_overview': 'Overview',
                               '/print_ingredient_list': '성분 목록 인쇄하기'}}
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
-                  '#contact': 'contact_title', '#clients': 'suppliers_title'}
+                  '#contact': 'contact_title', '#suppliers': 'suppliers_title'}
 
 
 def allowed_file(filename):
@@ -68,10 +68,6 @@ def allowed_file(filename):
 def get_locale():
     homepage = main.get_setting_by_name('is_homepage_session')[0]
     session[main.get_setting_by_name('is_homepage_session')[0]] = False
-    if session.get(main.get_setting_by_name('logged_in_session')[0]):
-        admin_menu = True
-    else:
-        admin_menu = False
     session_name = session.get("preferred_language", default='ko_KR')
     if '/login' not in request.url or '/logout' not in request.url:
         session['url'] = request.url
@@ -83,9 +79,9 @@ def get_locale():
         korean_translation[key] = x[2]
         english_translation[key] = x[3]
     if session_name == 'ko_KR':
-        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,admin_menu=admin_menu, homepage=homepage)
+        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
     else:
-        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,admin_menu=admin_menu, homepage=homepage)
+        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
 
 
 # -----------------------PUBLIC-----------------------
@@ -642,7 +638,8 @@ def login():
         return render_template('login.html')
     elif request.method == 'POST':
         if session.get(main.get_setting_by_name('logged_in_session')[0]):
-            session.pop(main.get_setting_by_name('logged_in_session')[0])
+            flash('Already logged in')
+            return redirect(url_for('admin_overview'))
         if main.verify_password(request.form['emaillogin'], request.form['passwordlogin']):
             session[main.get_setting_by_name('logged_in_session')[0]] = main.get_setting_by_name('logged_in_session')[1]
             return redirect(url_for('admin_overview'))

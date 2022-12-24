@@ -32,9 +32,10 @@
                     <h2>{{ msgid['news_title'] | safe }}</h2>
                     <h4>{{ msgid['news_subtitle'] | safe }}</h4>
                     <p>{{ msgid['news_details'] | safe }}</p>
+                    {% if msgid['news_image'] != "" %}<img src="/static/img/promo/{{ msgid['news_image'] | safe }}" alt="" />{% endif %}
                 </div>
                 <div class="d-flex justify-content-center justify-content-lg-start">
-                    <a href="/static/img/grand-opening-finished.jpg"
+                    <a href="/static/img/promo/{{ msgid['news_detailed_image'] | safe }}grand-opening-finished.jpg"
                        class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                 </div>
 
@@ -244,21 +245,21 @@
                 </div>
                 <div class="clients-slider swiper">
                     <div class="swiper-wrapper align-items-center">
-                        <div class="swiper-slide"><img src="/static/img/clients/client-1.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-1.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-2.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-2.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-3.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-3.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-4.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-4.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-5.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-5.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-6.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-6.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-7.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-7.png" class="img-fluid" alt="">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-8.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/suppliers/client-8.png" class="img-fluid" alt="">
                         </div>
                     </div>
                 </div>

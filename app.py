@@ -9,8 +9,11 @@ email: thorbendhaenenstd@gmail.com
 
 TODO add file handler cloud
 TODO add kakao alert messaging
+TODO REGULARLY gmail app password, secret_key, postgres, admin
 """
 import datetime
+import logging
+
 import qrcode
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
@@ -19,23 +22,21 @@ import flask_login
 import googledrive_connector
 import naver_setup
 import os.path
+import os
 import Database
 from InputForms import *
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
 
-app.config['DEFAULT_LOCALE'] = 'ko_KR'
-
-
-mail = Mail(app)
 Database.open_connection()
 mail_cred = main.get_setting_by_name('main_gmail')
 encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 app.secret_key = main.get_setting_by_name('secret_key')[1]
 Database.close_connection()
 
+app.config['DEFAULT_LOCALE'] = 'ko_KR'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',
@@ -45,8 +46,7 @@ app.config.update(dict(
     MAIL_USERNAME=mail_cred[0],
     MAIL_PASSWORD=mail_cred[1],
 ))
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
+mail = Mail(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -68,6 +68,19 @@ nav_menu_admin = {'/admin_overview': 'Overview',
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+# -----------------------LOGGING-----------------------
+
+gunicorn_logger = logging.getLogger('gunicorn.error')
+app.logger.handlers = gunicorn_logger.handlers
+app.logger.setLevel(gunicorn_logger.level)
+# app.logger.debug('This is a DEBUG log record.')
+# app.logger.info('This is an INFO log record.')
+# app.logger.warning('This is a WARNING log record.')
+# app.logger.error('This is an ERROR log record.')
+# app.logger.critical('This is a CRITICAL log record.')
+
 # -----------------------BEFORE AFTER REQUEST-----------------------
 
 @app.before_request
@@ -79,8 +92,6 @@ def pre_settings():
 def after_settings(response):
     Database.close_connection()
     return response
-
-
 
 # -----------------------LOGIN MANAGER-----------------------
 class User(flask_login.UserMixin):
@@ -108,7 +119,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# -----------------------ACTIONS FOR EVERY REQUEST-----------------------
+# -----------------------TEMPLATE GLOBAL VARIABLES-----------------------
 
 @app.context_processor
 def get_locale():
@@ -160,14 +171,12 @@ def index():
         try:
             mail.send(admin_msg)
         except ConnectionRefusedError:
-            print('ConnectionRefusedError')
-            print(ConnectionRefusedError)
+            app.logger.error('ConnectionRefusedError: Mail couldn\'t be send')
         try:
             naver_setup.send_message_admin(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
             naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
         except ConnectionRefusedError:
-            print('ConnectionRefusedError')
-            print(ConnectionRefusedError)
+            app.logger.error('ConnectionRefusedError: Naver SMS couldn\'t be send')
         Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
                          phone=contact_form.phone.data, subject=contact_form.subject.data,
                          message=contact_form.message.data).register_contact_query()
@@ -322,7 +331,6 @@ def cost_calculation():
             ingredient = Database.Ingredients(request.form['english'], request.form['korean'],
                                               get_ingredientid=True)
             ingredientid = ingredient.register_ingredient()
-            print(ingredientid)
             if request.form['date'] == '':
                 date = None
             else:
@@ -402,7 +410,6 @@ def cost_calculation():
 def edit_cost_calculation():
 
     if request.method == "POST":
-        print(request.form)
         if 'products_edit_button' in request.form:
             if 'currently_selling' in request.form:
                 currently_selling = request.form['currently_selling'] == 'on'
@@ -670,7 +677,9 @@ def login():
     if cform.validate_on_submit():
         email = cform.email.data
         user = User(email)
+        app.logger.warning('Validated attempt to login.')
         if user in users and main.verify_password(email, cform.password.data):
+            app.logger.info(email + ' logged in as admin.')
             flask_login.login_user(user=user)
             return redirect(url_for('admin_overview'))
         else:

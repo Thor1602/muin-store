@@ -14,15 +14,13 @@ import datetime
 import qrcode
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
-
 from flask_mail import Mail, Message
 import flask_login
-
 import googledrive_connector
 import naver_setup
 import os.path
-
 import Database
+from InputForms import *
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
@@ -127,34 +125,36 @@ def index():
     session[main.get_setting_by_name('is_homepage_session')[0]] = True
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
     best_products = []
+    contact_form = ContactForm()
     for row in main.read_table('products'):
         if row[8] == True:
-            row_list = list(row)
+            row_list = [x for x in row]
             if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
                 row_list[5] = "no-image-available.jpg"
             best_products.append(row_list)
     if request.method == "POST":
         # msg.recipients = ["rlatnals3020@naver.com"]
+
         admin_msg = Message("Coup De Foudre: 문의 주세요!",
                             sender="from@example.com",
                             recipients=["to@example.com"])
         admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-        message = f"<b>띵동! {request.form['name']}한테 메시지가 왔어요!! <br> 성명: {request.form['name']}<br>주소: {request.form['address']}<br>전화번호: {request.form['phone']}<br>이메일주소: {request.form['email']}<br>제목: {request.form['subject']}<br>주요 메시지: {request.form['message']} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
+        message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
         admin_msg.html = message
         mail.send(admin_msg)
-        naver_setup.send_message_admin(f"문의 주세요! ({request.form['phone']}) {request.form['name']}")
+        naver_setup.send_message_admin(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
         naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
-        Database.Contact(name=request.form['name'], email=request.form['email'], address=request.form['address'],
-                         phone=request.form['phone'], subject=request.form['subject'],
-                         message=request.form['message']).register_contact_query()
-    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products)
+        Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
+                         phone=contact_form.phone.data, subject=contact_form.subject.data,
+                         message=contact_form.message.data).register_contact_query()
+    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products,contact_form=contact_form)
 
 
 @app.route("/products", methods=['GET', 'POST'])
 def products():
     products = []
     for row in main.read_table('products'):
-        row_list = list(row)
+        row_list = [x for x in row]
         if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
             row_list[5] = "no-image-available.jpg"
         products.append(row_list)
@@ -638,30 +638,31 @@ def print_ingredient_list():
     return html
 
 
-# LOGIN LOGOUT
+
+# ----------------------LOG IN/OUT-----------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'GET':
-        return render_template('login.html')
-    elif request.method == 'POST':
-        email = request.form['emaillogin']
+    cform = LoginForm()
+    if cform.validate_on_submit():
+        email = cform.email.data
         user = User(email)
-        if user in users and main.verify_password(email, request.form['passwordlogin']):
+        if user in users and main.verify_password(email, cform.password.data):
             flask_login.login_user(user=user)
             return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
-
+    return render_template('login.html', form=cform)
 
 @app.route("/logout")
 def logout():
     flask_login.logout_user()
     return redirect(url_for('login'))
+
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     return abort(401)
 
-# ERROR HANDLING
+# ----------------------ERROR HANDLING-----------------------------
 @app.errorhandler(400)
 def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"

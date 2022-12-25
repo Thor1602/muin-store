@@ -60,6 +60,9 @@
             {% else %}
                 <i class="fa-solid fa-earth-americas d-flex align-items-center"><a href="/lang_en">ENGLISH </a></i>
             {% endif %}
+            {% if current_user.is_authenticated %}
+                <i class="fa-solid fa-right-from-bracket d-flex align-items-center"><a href="/logout">로그아웃</a></i>
+            {% endif %}
         </div>
         {#      <div class="social-links d-none d-md-flex align-items-center">#}
         {#        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}

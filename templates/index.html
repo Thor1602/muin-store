@@ -32,7 +32,8 @@
                     <h2>{{ msgid['news_title'] | safe }}</h2>
                     <h4>{{ msgid['news_subtitle'] | safe }}</h4>
                     <p>{{ msgid['news_details'] | safe }}</p>
-                    {% if msgid['news_image'] != "" %}<img src="/static/img/promo/{{ msgid['news_image'] | safe }}" alt="" />{% endif %}
+                    {% if msgid['news_image'] != "" %}
+                        <img src="/static/img/promo/{{ msgid['news_image'] | safe }}" alt=""/>{% endif %}
                 </div>
                 <div class="d-flex justify-content-center justify-content-lg-start">
                     <a href="/static/img/promo/{{ msgid['news_detailed_image'] | safe }}"
@@ -77,7 +78,8 @@
                     </div><!-- End Portfolio Container -->
 
                     <div class="best-product-more d-flex justify-content-center justify-content-lg-start">
-                        <a href="/products" class="d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
+                        <a href="/products"
+                           class="d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                     </div>
                 </div>
 
@@ -189,34 +191,25 @@
                               id="contact_form">
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <input type="text" name="name" class="form-control" id="name"
-                                           placeholder="{{ msgid['name'] | safe }}*"
-                                           required><span></span>
+                                    {{ contact_form.name(class="form-control", id="name", placeholder=msgid['name'] + "*") }}
                                 </div>
                                 <div class="col-md-6 form-group mt-3 mt-md-0">
-                                    <input type="email" class="form-control" name="email" id="email"
-                                           placeholder="{{ msgid['email'] | safe }}*"><span></span>
+                                    {{ contact_form.email(class="form-control", id="email", placeholder=msgid['email'] + "*") }}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <input type="text" name="address" class="form-control" id="address"
-                                           placeholder="{{ msgid['address_title'] | safe }}"><span></span>
+                                    {{ contact_form.address(class="form-control", id="address", placeholder=msgid['address_title']) }}
                                 </div>
                                 <div class="col-md-6 form-group mt-3 mt-md-0">
-                                    <input type="tel" class="form-control" name="phone" id="phone"
-                                           placeholder="{{ msgid['phone_number'] | safe }}*" required><span></span>
+                                    {{ contact_form.phone(class="form-control", id="phone", placeholder=msgid['phone_number'] + "*") }}
                                 </div>
                             </div>
                             <div class="form-group mt-3">
-                                <input type="text" class="form-control" name="subject" id="subject"
-                                       placeholder="{{ msgid['subject'] | safe }}*"
-                                       required><span></span>
+                                {{ contact_form.subject(class="form-control", id="subject", placeholder=msgid['subject'] + "*") }}
                             </div>
                             <div class="form-group mt-3">
-                            <textarea class="form-control" name="message" rows="7" id="message"
-                                      placeholder="{{ msgid['message'] | safe }}*"
-                                      required></textarea><span></span>
+                                {{ contact_form.message(class="form-control", id="message",  rows="7", placeholder=msgid['message'] + "*") }}
                             </div>
                             <div class="my-3">
                                 <div class="loading">{{ msgid['loading'] | safe }}</div>
@@ -228,6 +221,7 @@
                                         id="contact_submit_button">{{ msgid['send_message_button'] | safe }}</button>
                             </div>
                         </form>
+
                     </div><!-- End Contact Form -->
 
                 </div>
@@ -345,7 +339,90 @@
 {% endblock %}
 
 {% block endbody %}
-    <script src="{{ url_for('static', filename='js/contact_form.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $("#contact_form").validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    phone: {
+                        required: true
+                    },
+                    subject: {
+                        required: true
+                    },
+                    message: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: '{{ msgid['validation_name_message'] | safe }}'
+                    },
+                    phone: {
+                        required: '{{ msgid['validation_phone_message'] | safe }}'
+                    },
+                    email: {
+                        required: '{{ msgid['validation_email_message'] | safe }}'
+                    },
+                    subject: {
+                        required: '{{ msgid['validation_subject_message'] | safe }}'
+                    },
+                    message: {
+                        required: '{{ msgid['validation_message_message'] | safe }}'
+                    }
+                },
+                errorPlacement: function ($error, $element) {
+                    $element.appendTo($element.after($error));
+                }
+            })
+
+            $('#contact_submit_button').click(function (e) {
+                if (!$("#contact_form").valid()) {
+                    return false;
+                } else {
+                    $(document).ajaxStart(function () {
+                        $('.loading').fadeIn(100);
+                    });
+                    $(document).ajaxStop(function () {
+                        $('.loading').delay(300).fadeOut(100);
+                    });
+                    $.ajax({
+                        url: '/',
+                        type: 'POST',
+                        data: $('#contact_form').serialize(),
+                        datatype: 'json'
+                    })
+                        .done(function (data) {
+                            $("#name").val('');
+                            $("#email").val('');
+                            $("#address").val('');
+                            $("#phone").val('');
+                            $("#subject").val('');
+                            $("#message").val('');
+                            $('.sent-message').fadeIn(2000).delay(2000).fadeOut(500);
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            $('.error-message').fadeIn(2000).delay(2000).fadeOut(500);
+                        });
+                    $.ajaxSetup({
+                        beforeSend: function (xhr, settings) {
+                            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                                xhr.setRequestHeader("X-CSRFToken", "{{ contact_form.csrf_token._value() }}")
+                            }
+                        }
+                    })
+
+                }
+            });
+        });
+
+    </script>
 
 {% endblock %}
 

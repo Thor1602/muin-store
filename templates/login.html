@@ -34,25 +34,23 @@
 
                         <h3 class="mb-5">Sign in</h3>
                         <form method="POST" action="/login">
+                            {{ form.csrf_token }}
                             <div class="form-outline mb-4">
-                                <input type="email" name="emaillogin" id="typeEmailX-2"
-                                       class="form-control form-control-lg"/>
-                                <label class="form-label" for="typeEmailX-2">Email</label>
+                                {{ form.email(class="form-control form-control-lg", id="typeEmailX-2") }}
+                                {{ form.email.label(class="form-label", for="typeEmailX-2") }}
                             </div>
 
                             <div class="form-outline mb-4">
-                                <input type="password" name="passwordlogin" id="typePasswordX-2"
-                                       class="form-control form-control-lg"/>
-                                <label class="form-label" for="typePasswordX-2">Password</label>
+                                {{ form.password(id="typePasswordX-2", class="form-control form-control-lg") }}
+                                {{ form.password.label( class="form-label", for="typePasswordX-2") }}
                             </div>
 
-                            <!-- Checkbox -->
                             <div class="form-check d-flex justify-content-start mb-4">
-                                <input class="form-check-input" type="checkbox" value="" id="form1Example3"/>
-                                <label class="form-check-label" for="form1Example3"> Remember password </label>
+                                {{ form.remember_me(class="form-check-input", id="form1Example3") }}
+                                {{ form.remember_me.label( class="form-check-label", for="form1Example3") }}
                             </div>
                             <div class="text-center">
-                                <button class="login" type="submit">Login</button>
+                                {{ form.submit(class="login") }}
                             </div>
                         </form>
                     </div>

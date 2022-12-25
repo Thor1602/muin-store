@@ -25,9 +25,17 @@ from InputForms import *
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 main = Database.Main()
-app.secret_key = 'kfnsdjfn125215fg545t236'
+
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
+
+
+mail = Mail(app)
+Database.open_connection()
 mail_cred = main.get_setting_by_name('main_gmail')
+encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
+app.secret_key = main.get_setting_by_name('secret_key')[1]
+Database.close_connection()
+
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',
@@ -37,9 +45,6 @@ app.config.update(dict(
     MAIL_USERNAME=mail_cred[0],
     MAIL_PASSWORD=mail_cred[1],
 ))
-
-mail = Mail(app)
-
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 login_manager = flask_login.LoginManager()
@@ -63,16 +68,28 @@ nav_menu_admin = {'/admin_overview': 'Overview',
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
-encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
+# -----------------------BEFORE AFTER REQUEST-----------------------
+
+@app.before_request
+def pre_settings():
+    session['url'] = request.url
+    Database.open_connection()
+
+@app.teardown_request
+def after_settings(response):
+    Database.close_connection()
+    return response
+
+
 
 # -----------------------LOGIN MANAGER-----------------------
 class User(flask_login.UserMixin):
     def __init__(self, email):
         self.id = ""
         self.email = email
-
+connection = Database.open_connection()
 users = [User(x) for x in main.get_all_users()]
-
+Database.close_connection()
 @login_manager.user_loader
 def user_loader(email):
     user = User(email)
@@ -92,13 +109,12 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # -----------------------ACTIONS FOR EVERY REQUEST-----------------------
+
 @app.context_processor
 def get_locale():
     homepage = main.get_setting_by_name('is_homepage_session')[0]
     session[main.get_setting_by_name('is_homepage_session')[0]] = False
     session_name = session.get("preferred_language", default='ko_KR')
-    if '/login' not in request.url or '/logout' not in request.url:
-        session['url'] = request.url
     web_translations = main.read_table('web_translations')
     korean_translation = {}
     english_translation = {}
@@ -141,9 +157,17 @@ def index():
         admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
         message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
         admin_msg.html = message
-        mail.send(admin_msg)
-        naver_setup.send_message_admin(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
-        naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
+        try:
+            mail.send(admin_msg)
+        except ConnectionRefusedError:
+            print('ConnectionRefusedError')
+            print(ConnectionRefusedError)
+        try:
+            naver_setup.send_message_admin(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
+            naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
+        except ConnectionRefusedError:
+            print('ConnectionRefusedError')
+            print(ConnectionRefusedError)
         Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
                          phone=contact_form.phone.data, subject=contact_form.subject.data,
                          message=contact_form.message.data).register_contact_query()
@@ -660,7 +684,7 @@ def logout():
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return abort(401)
+    return redirect(url_for('login'))
 
 # ----------------------ERROR HANDLING-----------------------------
 @app.errorhandler(400)

@@ -61,7 +61,8 @@
                 <i class="fa-solid fa-earth-americas d-flex align-items-center"><a href="/lang_en">ENGLISH </a></i>
             {% endif %}
             {% if current_user.is_authenticated %}
-                <i class="fa-solid fa-right-from-bracket d-flex align-items-center"><a href="/logout">로그아웃</a></i>
+                <a class="btn" href="/logout" data-bs-toggle="tooltip" data-bs-placement="bottom"
+               title="로그아웃"><i class="fa-solid fa-right-from-bracket fa-2xl d-flex align-items-center"></i></a>
             {% endif %}
         </div>
         {#      <div class="social-links d-none d-md-flex align-items-center">#}
@@ -83,6 +84,7 @@
         <nav id="navbar" class="navbar">
             <ul>
                 {% if current_user.is_authenticated %}
+                     <li><a class="btn" href="/logout"><i class="fa-solid fa-right-from-bracket fa-2xl"></i>로그아웃</a></li>
                     {% for menu_item in nav_menu_admin %}
                         {% if nav_menu_admin[menu_item] is mapping %}
                             <li class="dropdown"><a href="javascript:void(0)"><span>{{ menu_item }}</span> <i
@@ -99,6 +101,7 @@
                             <li><a href="{{ menu_item }}">{{ nav_menu_admin[menu_item] }}</a></li>
                         {% endif %}
                     {% endfor %}
+
                     <hr>
                 {% endif %}
                 {% if session[homepage] %}

@@ -28,6 +28,7 @@ import os
 import Database
 from InputForms import *
 from functools import wraps
+from flask_rq2 import RQ
 
 app = Flask(__name__)
 main = Database.Main()
@@ -50,6 +51,7 @@ app.config.update(dict(
     MAIL_PASSWORD=mail_cred[1],
 ))
 mail = Mail(app)
+rq = RQ(app)
 # toolbar = DebugToolbarExtension(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
@@ -143,7 +145,14 @@ def get_locale():
     else:
         return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
 
+# -----------------------RQ-----------------------
 
+@rq.job
+def send_sms_in_background(message_str):
+    naver_setup.send_message_admin(message=message_str)
+@rq.job
+def send_email_in_background(message_object):
+    mail.send(message=message_object)
 
 # -----------------------PUBLIC-----------------------
 @app.route("/lang_<lang>", methods=['GET', 'POST'])
@@ -175,14 +184,14 @@ def index():
         message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
         admin_msg.html = message
         try:
-            mail.send(admin_msg)
-        except ConnectionRefusedError:
-            app.logger.error('ConnectionRefusedError: Mail couldn\'t be send')
+            send_email_in_background(admin_msg)
+        except Exception as e:
+            app.logger.error(str(e) + ': Mail couldn\'t be send')
         try:
-            naver_setup.send_message_admin(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
-            naver_setup.send_message_admin("더보기: https://cdf.herokuapp.com/contact_inquiry")
-        except ConnectionRefusedError:
-            app.logger.error('ConnectionRefusedError: Naver SMS couldn\'t be send')
+            send_sms_in_background(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
+            send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
+        except Exception as e:
+            app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
         Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
                          phone=contact_form.phone.data, subject=contact_form.subject.data,
                          message=contact_form.message.data).register_contact_query()

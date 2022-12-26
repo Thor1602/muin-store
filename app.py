@@ -18,6 +18,8 @@ import qrcode
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 from flask_mail import Mail, Message
+# from flask_debugtoolbar import DebugToolbarExtension
+
 import flask_login
 import googledrive_connector
 import naver_setup
@@ -25,6 +27,7 @@ import os.path
 import os
 import Database
 from InputForms import *
+from functools import wraps
 
 app = Flask(__name__)
 main = Database.Main()
@@ -47,6 +50,7 @@ app.config.update(dict(
     MAIL_PASSWORD=mail_cred[1],
 ))
 mail = Mail(app)
+# toolbar = DebugToolbarExtension(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -83,15 +87,14 @@ app.logger.setLevel(gunicorn_logger.level)
 
 # -----------------------BEFORE AFTER REQUEST-----------------------
 
-@app.before_request
-def pre_settings():
-    session['url'] = request.url
-    Database.open_connection()
-
-@app.teardown_request
-def after_settings(response):
-    Database.close_connection()
-    return response
+def postgres_connection(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        Database.open_connection()
+        value = func(*args, **kwargs)
+        Database.close_connection()
+        return value
+    return wrapper
 
 # -----------------------LOGIN MANAGER-----------------------
 class User(flask_login.UserMixin):
@@ -122,11 +125,13 @@ def allowed_file(filename):
 # -----------------------TEMPLATE GLOBAL VARIABLES-----------------------
 
 @app.context_processor
+@postgres_connection
 def get_locale():
     homepage = main.get_setting_by_name('is_homepage_session')[0]
     session[main.get_setting_by_name('is_homepage_session')[0]] = False
     session_name = session.get("preferred_language", default='ko_KR')
     web_translations = main.read_table('web_translations')
+    session['url'] = request.url
     korean_translation = {}
     english_translation = {}
     for x in web_translations:
@@ -148,6 +153,7 @@ def set_language(lang):
 
 
 @app.route("/", methods=['GET', 'POST'])
+@postgres_connection
 def index():
     session[main.get_setting_by_name('is_homepage_session')[0]] = True
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
@@ -184,6 +190,7 @@ def index():
 
 
 @app.route("/products", methods=['GET', 'POST'])
+@postgres_connection
 def products():
     products = []
     for row in main.read_table('products'):
@@ -193,6 +200,7 @@ def products():
         products.append(row_list)
     return render_template('products.html', products=products)
 @app.route('/large_order_price', methods=['GET', 'POST'])
+@postgres_connection
 def large_order_price():
     products = main.read_table('products')
     return render_template('large_orders_price.html', products=products)
@@ -303,6 +311,7 @@ def privacy_policy():
 # -----------------------ADMIN-----------------------
 @app.route('/admin_overview', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def admin_overview():
 
     if request.method == 'POST':
@@ -318,12 +327,14 @@ def admin_overview():
 
 @app.route('/business_plan', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def business_plan():
     return render_template('business_plan.html')
 
 
 @app.route('/cost_calculation', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def cost_calculation():
 
     if request.method == 'POST':
@@ -407,6 +418,7 @@ def cost_calculation():
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def edit_cost_calculation():
 
     if request.method == "POST":
@@ -453,6 +465,7 @@ def edit_cost_calculation():
 
 @app.route('/financial_plan', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def financial_plan():
     if request.method == "POST":
         if 'fixed_cost_edit_button' in request.form or 'fixed_cost_add_button' in request.form:
@@ -505,6 +518,7 @@ def financial_plan():
 
 @app.route('/loss_calculator', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def loss_calculator():
     data={}
     data['products'] = main.read_table('products')
@@ -520,6 +534,7 @@ def loss_calculator():
 
 @app.route('/invoices', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def invoices():
 
     if request.method == 'POST':
@@ -592,6 +607,7 @@ def images():
 
 @app.route('/contact_inquiry', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def contact_inquiry():
     contact_info = main.read_table('customer_contact_submission', order_desc="time")
     return render_template('contact_inquiry.html', contact_info=contact_info)
@@ -599,6 +615,7 @@ def contact_inquiry():
 
 @app.route('/recipes', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def recipes():
     if request.method == 'POST':
         if 'btn_edit_recipe' in request.form:
@@ -617,12 +634,14 @@ def recipes():
 
 @app.route('/cost_per_product', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def cost_per_product():
     return render_template('cost_per_product.html', data=main.calculate_variable_cost())
 
 
 @app.route('/translations', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def translations():
     web_translations_col = main.show_columns('web_translations')
     if request.method == 'POST':
@@ -642,6 +661,7 @@ def translations():
 
 @app.route('/qr_info', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def qr_info():
     if request.method == 'POST':
         for key in request.form:
@@ -657,6 +677,7 @@ def qr_info():
 
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])
 @flask_login.login_required
+@postgres_connection
 def print_ingredient_list():
     data_dictionary = {}
     data_dictionary['ingredients'] = main.read_table('ingredients')
@@ -672,6 +693,7 @@ def print_ingredient_list():
 
 # ----------------------LOG IN/OUT-----------------------------
 @app.route('/login', methods=['GET', 'POST'])
+@postgres_connection
 def login():
     cform = LoginForm()
     if cform.validate_on_submit():
@@ -679,7 +701,7 @@ def login():
         user = User(email)
         app.logger.warning('Validated attempt to login.')
         if user in users and main.verify_password(email, cform.password.data):
-            app.logger.info(email + ' logged in as admin.')
+            app.logger.info(email + ' is logged in as admin.')
             flask_login.login_user(user=user)
             return redirect(url_for('admin_overview'))
         else:

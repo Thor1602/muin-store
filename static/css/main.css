@@ -2541,3 +2541,6 @@ input[type=number] {
 
 #more {display: none;}
 
+.carousel-item .carousel-caption{
+    color: var(--color-default);
+}

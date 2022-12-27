@@ -147,10 +147,10 @@ def get_locale():
 
 # -----------------------RQ-----------------------
 
-@rq.job
+# @rq.job
 def send_sms_in_background(message_str):
     naver_setup.send_message_admin(message=message_str)
-@rq.job
+# @rq.job
 def send_email_in_background(message_object):
     mail.send(message=message_object)
 

@@ -38,9 +38,9 @@
                                 aria-label="Slide 3"></button>
                     </div>
                     <div class="carousel-inner">
+
                         <div class="carousel-item active" data-bs-interval="10000">
-                            <img src="/static/img/white-bg.jpg" class="d-block img-fluid w-100" alt="...">
-                            <div class="carousel-caption d-none d-md-block">
+                            <div>
                                 <div class="section-header">
                                     <h2>{{ msgid['news_title'] | safe }}</h2>
                                     <h4>{{ msgid['news_subtitle'] | safe }}</h4>
@@ -48,43 +48,47 @@
                                     {% if msgid['news_image'] != "" %}
                                         <img src="/static/img/promo/{{ msgid['news_image'] | safe }}"
                                              alt=""/>{% endif %}
+                                    <div class="d-flex justify-content-center">
+                                        <a href="/static/img/promo/grand-opening-finished.jpg"
+                                           class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
+                                    </div>
                                 </div>
-                                <div class="d-flex justify-content-center justify-content-lg-start">
-                                    <a href="/static/img/promo/grand-opening-finished.jpg"
-                                       class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
-                                </div>
+
+
                             </div>
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="/static/img/white-bg.jpg" class="d-block img-fluid w-100" alt="...">
-                            <div class="carousel-caption d-none d-md-block">
+                            <div>
                                 <div class="section-header">
                                     <h2>SALE</h2>
                                     <h4>COMING SOON</h4>
-                                    <p></p>
+                                    <p>-</p>
                                     {% if msgid['news_image'] != "" %}
                                         <img src=""
                                              alt=""/>{% endif %}
+                                    <div class="d-flex justify-content-center">
+                                        <a href="/static/img/promo/sale-grand-opening-01-2023.png"
+                                           class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
+                                    </div>
                                 </div>
-                                <div class="d-flex justify-content-center justify-content-lg-start">
-                                    <a  href="/static/img/promo/sale-grand-opening-01-2023.png" class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
-                                </div>
+
                             </div>
                         </div>
-                        <div class="carousel-item">
-                            <img src="/static/img/white-bg.jpg" class="d-block img-fluid w-100" alt="...">
-                            <div class="carousel-caption d-none d-md-block">
-                               <div class="section-header">
+                        <div class="carousel-item" data-bs-interval="2000">
+                            <div>
+                                <div class="section-header">
                                     <h2>SALE</h2>
                                     <h4>COMING SOON</h4>
-                                    <p></p>
+                                    <p>-</p>
                                     {% if msgid['news_image'] != "" %}
                                         <img src=""
                                              alt=""/>{% endif %}
+                                    <div class="d-flex justify-content-center">
+                                        <a href="/static/img/promo/sale-grand-opening-01-2023.png"
+                                           class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
+                                    </div>
                                 </div>
-                                <div class="d-flex justify-content-center justify-content-lg-start">
-                                    <a class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
-                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -137,7 +141,7 @@
                         {% endfor %}
                     </div><!-- End Portfolio Container -->
 
-                    <div class="best-product-more d-flex justify-content-center justify-content-lg-start">
+                    <div class="best-product-more d-flex justify-content-center mt-5">
                         <a href="/products"
                            class="d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                     </div>

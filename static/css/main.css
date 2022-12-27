@@ -61,6 +61,7 @@ h6 {
         display: inline;
     }
 }
+
 /*--------------------------------------------------------------
 # Sections & Section Header
 --------------------------------------------------------------*/
@@ -303,6 +304,7 @@ section {
 .topbar .social-links a:hover {
     color: #fff;
 }
+
 .topbar .margin-right-8 {
     margin-right: 8px;
 }
@@ -2264,9 +2266,22 @@ section {
     border-radius: 50px;
 }
 
-
 .news .btn-see-image:hover i {
     color: #fff;
+}
+
+.carousel-caption .section-header {
+    color: var(--color-default);
+}
+
+@media (max-width: 768px) {
+    .news .btn-see-image {
+        margin-left: 10px;
+        margin-bottom: 10px;
+        padding: 10px 25px;
+
+    }
+
 }
 
 
@@ -2388,6 +2403,7 @@ section {
 .best-product .portfolio-wrap:hover img {
     transform: scale(1.1);
 }
+
 /*--------------------------------------------------------------
 # Footer
 --------------------------------------------------------------*/
@@ -2523,24 +2539,25 @@ hr {
     height: 55px;
 }
 
-.textarea-translations{
+.textarea-translations {
     height: 100%;
 }
 
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Firefox */
 input[type=number] {
-  -moz-appearance: textfield;
+    -moz-appearance: textfield;
 }
 
-#more {display: none;}
-
-.carousel-item .carousel-caption{
-    color: var(--color-default);
+#more {
+    display: none;
 }
+
+
+

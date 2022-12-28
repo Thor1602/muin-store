@@ -38,11 +38,12 @@ Database.open_connection()
 mail_cred = main.get_setting_by_name('main_gmail')
 encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 app.secret_key = main.get_setting_by_name('secret_key')[1]
+redis_external_url = main.get_setting_by_name('redis_external_url')[1]
 Database.close_connection()
 
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['RQ_REDIS_URL'] = main.get_setting_by_name('redis_external_url')[1]
+app.config['RQ_REDIS_URL'] = redis_external_url
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',

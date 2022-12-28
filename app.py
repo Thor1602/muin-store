@@ -10,6 +10,7 @@ email: thorbendhaenenstd@gmail.com
 TODO add file handler cloud
 TODO add kakao alert messaging
 TODO REGULARLY gmail app password, secret_key, postgres, admin
+more info later
 """
 import datetime
 import logging

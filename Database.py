@@ -15,8 +15,8 @@ def open_connection():
     try:
         global connection
         global cur
-        if exists('database_credentials.txt'):
-            credentials = str(open("database_credentials.txt", 'r').read())
+        if exists('gitignore/database_credentials.txt'):
+            credentials = str(open("gitignore/database_credentials.txt", 'r').read())
             connection = psycopg2.connect(credentials, sslmode='require')
         else:
             DATABASE_URL = os.environ['DATABASE_URL']

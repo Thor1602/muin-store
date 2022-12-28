@@ -41,7 +41,7 @@ Database.close_connection()
 
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['RQ_REDIS_URL'] = 'rediss://red-cel7llpa6gdkdn1q31h0:YuEH2WrcahMsM55q8mkWwENkkRj6K7r7@singapore-redis.render.com:6379'
+app.config['RQ_REDIS_URL'] = main.get_setting_by_name('redis_external_url')[1]
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',

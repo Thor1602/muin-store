@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <title>Contact</title>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Contact Us</h1>
+            <form method="POST" action="{{ url_for('home') }}">
+                {{ form.csrf_token }}
+
+                <p>
+                    {{ form.email.label }}
+                    <br>
+                    {{ form.email }}
+                </p>
+
+
+
+                <p>
+                    {{ form.password.label }}
+                    <br>
+                    {{ form.password }}
+                </p>
+
+
+
+                <p>
+                    {{ form.remember_me.label(style="color: red; background-color: blue;") }}
+                    <br>
+                    {{ form.remember_me }}
+                </p>
+
+                {{ form.submit }}
+            </form>
+        </div>
+    </body>
+</html>

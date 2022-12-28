@@ -41,6 +41,7 @@ Database.close_connection()
 
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['RQ_REDIS_URL'] = 'rediss://red-cel7llpa6gdkdn1q31h0:YuEH2WrcahMsM55q8mkWwENkkRj6K7r7@singapore-redis.render.com:6379'
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',
@@ -147,10 +148,10 @@ def get_locale():
 
 # -----------------------RQ-----------------------
 
-# @rq.job
+@rq.job
 def send_sms_in_background(message_str):
     naver_setup.send_message_admin(message=message_str)
-# @rq.job
+@rq.job
 def send_email_in_background(message_object):
     mail.send(message=message_object)
 
@@ -184,12 +185,12 @@ def index():
         message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
         admin_msg.html = message
         try:
-            send_email_in_background(admin_msg)
+            send_email_in_background.queue(admin_msg)
         except Exception as e:
             app.logger.error(str(e) + ': Mail couldn\'t be send')
         try:
-            send_sms_in_background(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
-            send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
+            send_sms_in_background.queue(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
+            send_sms_in_background.queue("더보기: https://cdf.herokuapp.com/contact_inquiry")
         except Exception as e:
             app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
         Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,

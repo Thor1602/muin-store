@@ -103,20 +103,6 @@
     <script>
         $(document).ready(function () {
 
-            function changeTable() {
-                {% for allergen in allergens %}
-                    if ($('#' + {{ allergen[0] }}).is(":checked")) {
-                        $('td:nth-child({{ allergen[0] + 1 }}),th:nth-child({{ allergen[0] + 1 }})').show();
-                    } else {
-                        $('td:nth-child({{ allergen[0] + 1 }}),th:nth-child({{ allergen[0] + 1 }})').hide();
-                    }
-                {% endfor %}
-            }
-
-            $('.allergen-check').change(function () {
-                changeTable();
-            });
-            changeTable();
         });
     </script>
 {% endblock %}

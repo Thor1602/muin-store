@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}{{ msgid['allergenes_title'] }} - {{ msgid['title'] }}{% endblock %}
+
+{% block body %}
+    <!-- Start main content Section -->
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-header">
+                <h2>{{ msgid['allergenes_title'] }}</h2>
+            </div>
+            <hr>
+            <div class="row">
+                <table class="table table-striped table-hover text-center">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% if session["preferred_language"] == 'ko_KR' %}
+                            {% for allergen in allergens %}
+                                <th>{{ allergen[2] }}</th>
+                            {% endfor %}
+                        {% else %}
+                            {% for allergen in allergens %}
+                                <th>{{ allergen[1] }}</th>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if session["preferred_language"] == 'ko_KR' %}
+                        <form method="POST" action="/edit_allergens">
+                            <button class="btn btn-warning" name="submit_allergen_modifications" type="submit">SUBMIT
+                            </button>
+                            {% for product in products %}
+                                <tr>
+                                    <th class="keep-all"> {{ product[2] }}</th>
+                                    {% for n in range(1,28) %}
+                                        {% if product_list[product[0]][n] == True %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input allergen-check"
+                                                           aria-label=""
+                                                           id="{{ product[0] }}$$${{ n }}"
+                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}" checked>
+                                                </div>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input allergen-check"
+                                                           aria-label=""
+                                                           id="{{ product[0] }}$$${{ n }}"
+                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}">
+                                                </div>
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </form>
+                    {% else %}
+                        <form method="POST" action="/edit_allergens">
+                            <button class="btn btn-warning" name="submit_allergen_modifications" type="submit">SUBMIT
+                            </button>
+                            {% for product in products %}
+                                <tr>
+                                    <th>{{ product[1] }}</th>
+                                    {% for n in range(1,28) %}
+                                        {% if product_list[product[0]][n] == True %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input allergen-check"
+                                                           aria-label=""
+                                                           id="{{ product[0] }}$$${{ n }}"
+                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}" checked>
+                                                </div>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input allergen-check"
+                                                           aria-label=""
+                                                           id="{{ product[0] }}$$${{ n }}"
+                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}">
+                                                </div>
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </form>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+    <!-- End main content Section -->
+{% endblock %}
+{% block endbody %}
+    <script>
+        $(document).ready(function () {
+
+            function changeTable() {
+                {% for allergen in allergens %}
+                    if ($('#' + {{ allergen[0] }}).is(":checked")) {
+                        $('td:nth-child({{ allergen[0] + 1 }}),th:nth-child({{ allergen[0] + 1 }})').show();
+                    } else {
+                        $('td:nth-child({{ allergen[0] + 1 }}),th:nth-child({{ allergen[0] + 1 }})').hide();
+                    }
+                {% endfor %}
+            }
+
+            $('.allergen-check').change(function () {
+                changeTable();
+            });
+            changeTable();
+        });
+    </script>
+{% endblock %}
+
+

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ msgid['allergenes_title'] }} - {{ msgid['title'] }}{% endblock %}
+
+{% block body %}
+    <!-- Start main content Section -->
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-header">
+                <h2>{{ msgid['allergenes_title'] }}</h2>
+            </div>
+            <hr>
+            <div class="row">
+                {% if session["preferred_language"] == 'ko_KR' %}
+                    {% for allergen in allergens %}
+                        {% if allergen[0] in common_allergens %}
+                            <div class="col-6 col-sm-6 col-md-4 col-lg-2 form-check form-switch"><input type="checkbox" class="form-check-input allergen-check"
+                                                      id="{{ allergen[0] }}" checked>
+                                <label for="{{ allergen[0] }}">{{ allergen[2] }}</label></div>
+                        {% else %}
+                            <div class="col-6 col-sm-6 col-md-4 col-lg-2 form-check form-switch"><input type="checkbox" class="form-check-input allergen-check"
+                                                      id="{{ allergen[0] }}">
+                                <label for="{{ allergen[0] }}">{{ allergen[2] }}</label></div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% for allergen in allergens %}
+                        {% if allergen[0] in common_allergens %}
+                            <div class="col-6 col-sm-6 col-md-4 col-lg-2 form-check form-switch"><input type="checkbox" class="form-check-input allergen-check"
+                                                      id="{{ allergen[0] }}" checked>
+                                <label for="{{ allergen[0] }}">{{ allergen[1] }}</label></div>
+                        {% else %}
+                            <div class="col-6 col-sm-6 col-md-4 col-lg-2 form-check form-switch"><input type="checkbox" class="form-check-input allergen-check"
+                                                      id="{{ allergen[0] }}">
+                                <label for="{{ allergen[0] }}">{{ allergen[1] }}</label></div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <table class="table table-striped table-hover text-center">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% if session["preferred_language"] == 'ko_KR' %}
+                            {% for allergen in allergens %}
+                                <th>{{ allergen[2] }}</th>
+                            {% endfor %}
+                        {% else %}
+                            {% for allergen in allergens %}
+                                <th>{{ allergen[1] }}</th>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if session["preferred_language"] == 'ko_KR' %}
+                        {% for product in products %}
+                            {% if product[7] == True %}
+                            <tr>
+                                <th class="keep-all"> {{ product[2] }}</th>
+                                {% for n in range(1,28) %}
+                                    {% if product_list[product[0]][n] == True %}
+                                        <td><i class="fa-solid fa-check"></i></td>
+                                    {% else %}
+                                        <td><i class="fa-solid fa-x"></i></td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for product in products %}
+                            {% if product[7] == True %}
+                            <tr>
+                                <th>{{ product[1] }}</th>
+                                {% for n in range(1,28) %}
+                                    {% if product_list[product[0]][n] == True %}
+                                        <td><i class="fa-solid fa-check"></i></td>
+                                    {% else %}
+                                        <td><i class="fa-solid fa-x"></i></td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+    <!-- End main content Section -->
+{% endblock %}
+{% block endbody %}
+    <script>
+        $(document).ready(function () {
+
+            function changeTable() {
+                {% for allergen in allergens %}
+                    if ($('#' + {{ allergen[0] }}).is(":checked")) {
+                        $('td:nth-child({{ allergen[0] + 1 }}),th:nth-child({{ allergen[0] + 1 }})').show();
+                    } else {
+                        $('td:nth-child({{ allergen[0] + 1 }}),th:nth-child({{ allergen[0] + 1 }})').hide();
+                    }
+                {% endfor %}
+            }
+
+            $('.allergen-check').change(function () {
+                changeTable();
+            });
+            changeTable();
+        });
+    </script>
+{% endblock %}
+
+

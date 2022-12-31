@@ -53,13 +53,12 @@
                         {% if product[6] == 'Bread' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-app ">
                                 <div class="portfolio-wrap">
-                                    <a href="/static/img/products/{{ product[5] }}"
-                                       data-gallery="portfolio-gallery-app"
-                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
-                                                              class="img-fluid"
-                                                              alt="{{ product[5] }}"></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
+                                            src="/static/img/products/{{ product[5] }}"
+                                            class="img-fluid"
+                                            alt="{{ product[5] }}"></a>
                                     <div class="portfolio-info">
-                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                        {% if session_name == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>
                                         {% else %}
@@ -73,13 +72,12 @@
                         {% elif product[6] == 'Pastry' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-product ">
                                 <div class="portfolio-wrap">
-                                    <a href="/static/img/products/{{ product[5] }}"
-                                       data-gallery="portfolio-gallery-app"
-                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
-                                                              class="img-fluid"
-                                                              alt="{{ product[5] }}"></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
+                                            src="/static/img/products/{{ product[5] }}"
+                                            class="img-fluid"
+                                            alt="{{ product[5] }}"></a>
                                     <div class="portfolio-info">
-                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                        {% if session_name == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>
                                         {% else %}
@@ -92,13 +90,11 @@
                         {% elif product[6] == 'Patisserie' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-branding ">
                                 <div class="portfolio-wrap">
-                                    <a href="/static/img/products/{{ product[5] }}"
-                                       data-gallery="portfolio-gallery-app"
-                                       class="glightbox"><img
+                                    <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
                                             src="/static/img/products/{{ product[5] }}" class="img-fluid"
                                             alt="{{ product[5] | safe }}"></a>
                                     <div class="portfolio-info">
-                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                        {% if session_name == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>
                                         {% else %}
@@ -111,12 +107,11 @@
                         {% elif product[6] == 'Cookies' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-books ">
                                 <div class="portfolio-wrap">
-                                    <a href="/static/img/products/{{ product[5] }}"
-                                       data-gallery="portfolio-gallery-app"
-                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
-                                                              class="img-fluid" alt="{{ product[5] }}"></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
+                                            src="/static/img/products/{{ product[5] }}"
+                                            class="img-fluid" alt="{{ product[5] }}"></a>
                                     <div class="portfolio-info">
-                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                        {% if session_name == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>
                                         {% else %}
@@ -129,12 +124,11 @@
                         {% elif product[6] == 'Other' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-other ">
                                 <div class="portfolio-wrap">
-                                    <a href="/static/img/products/{{ product[5] }}"
-                                       data-gallery="portfolio-gallery-app"
-                                       class="glightbox"><img src="/static/img/products/{{ product[5] }}"
-                                                              class="img-fluid" alt="{{ product[5] }}"></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
+                                            src="/static/img/products/{{ product[5] }}"
+                                            class="img-fluid" alt="{{ product[5] }}"></a>
                                     <div class="portfolio-info">
-                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                        {% if session_name == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>
                                         {% else %}
@@ -155,54 +149,44 @@
 
 {% endblock %}
 
-{% block footer %}
 
-    <div class="container">
-        <div class="row gy-4">
-            <div class="col-lg-5 col-md-12 footer-info">
-                <a href="/" class="logo d-flex align-items-center">
-                    <span>Coup De Foudre</span>
-                </a>
-                <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
-                    valies
-                    darta donna mare fermentum iaculis eu non diam phasellus.</p>
-                {#          <div class="social-links d-flex mt-4">#}
-                {#            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
-                {#            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
-                {#            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
-                {#            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
-                {#          </div>#}
+{% block modalbody %}
+    {% for product in products %}
+        <div class="modal fade" id="product_click_{{ product[0] }}" tabindex="-1"
+             aria-labelledby="exampleModalLabel{{ product[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    {% if session_name == 'ko_KR' %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel{{ product[0] }}">{{ msgid['allergenes_title'] }}: {{ product[2] }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for allergen in allergenproduct[product[0]] %}
+                                <p>{% if allergenproduct[product[0]][allergen] %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-x"></i>{% endif %} {{ korean_allergens[allergen] }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel{{ product[0] }}">{{ msgid['allergenes_title'] }}: {{ product[1] }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for allergen in allergenproduct[product[0]] %}
+                                <p>{% if allergenproduct[product[0]][allergen] %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-x"></i>{% endif %} {{ english_allergens[allergen] }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                </div>
             </div>
-
-            <div class="col-lg-2 col-6 footer-links">
-                <h4>Useful Links</h4>
-                <ul>
-                    <li><a href="/privacy_policy">{{ msgid['privacy_policy'] | safe }}</a></li>
-                    <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
-                    <li><a href="#">{{ msgid['2'] | safe }}Terms of service</a></li>
-                </ul>
-            </div>
-
-            <div class="col-lg-2 col-6 footer-links">
-                <h4>{{ msgid['product_title'] | safe }}</h4>
-                <ul>
-                    <li><a href="#">Eclairs</a></li>
-                    <li><a href="#">Macarons</a></li>
-                    <li><a href="#">Vienoisserie</a></li>
-                    <li><a href="#">Bread</a></li>
-                </ul>
-            </div>
-
-            <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-                <h4>Contact Us</h4>
-                <p>
-                    {{ msgid['address'] | safe }}<br>
-                    <strong>{{ msgid['phone_number'] | safe }}:</strong> 010-4887-8249<br>
-                    <strong>{{ msgid['email'] | safe }}:</strong> thorbendhaenenstd@gmail.com<br>
-                </p>
-
-            </div>
-
         </div>
-    </div>
+    {% endfor %}
+{% endblock %}
+{% block endbody %}
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
 {% endblock %}

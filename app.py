@@ -30,6 +30,7 @@ import Database
 from InputForms import *
 from functools import wraps
 from flask_rq2 import RQ
+
 # from secure import SecureHeaders
 
 # secure_headers = SecureHeaders()
@@ -170,10 +171,10 @@ def get_locale():
         english_translation[key] = x[3]
     if session_name == 'ko_KR':
         return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
-                    homepage=homepage)
+                    homepage=homepage, session_name=session_name)
     else:
         return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
-                    homepage=homepage)
+                    homepage=homepage, session_name=session_name)
 
 
 # -----------------------RQ-----------------------
@@ -236,12 +237,32 @@ def index():
 @postgres_connection
 def products():
     products = []
-    for row in main.read_table('products'):
+    data_products = main.read_table('products')
+    data_allergenproduct = main.read_table('allergenproduct')
+    data_allergens = main.read_table('allergens')
+    allergenproduct={}
+    for x in data_allergenproduct:
+        if x[1] in allergenproduct:
+            allergenproduct[x[1]].append({x[2]: x[3]})
+        else:
+            allergenproduct[x[1]] = [{x[2]: x[3]}]
+    for p in allergenproduct:
+        prod_list = {}
+        for a in allergenproduct[p]:
+            prod_list.update(a)
+        allergenproduct[p] = prod_list
+    korean_allergens = {}
+    english_allergens = {}
+    for row in data_allergens:
+        korean_allergens[row[0]] = row[2]
+        english_allergens[row[0]] = row[1]
+    for row in data_products:
         row_list = [x for x in row]
         if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
             row_list[5] = "no-image-available.jpg"
         products.append(row_list)
-    return render_template('products.html', products=products)
+    return render_template('products.html', products=products, korean_allergens=korean_allergens,english_allergens=english_allergens,
+                           allergenproduct=allergenproduct)
 
 
 @app.route('/large_order_price', methods=['GET', 'POST'])
@@ -270,11 +291,15 @@ def allergens():
             prod_list.update(a)
         product_list[p] = prod_list
     common_allergens = [2, 3, 5, 8, 9, 12, 14]
-    return render_template('allergens.html',product_list=product_list, products=products, allergens=allergens,common_allergens=common_allergens)
+    return render_template('allergens.html', product_list=product_list, products=products, allergens=allergens,
+                           common_allergens=common_allergens)
+
 
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
     return render_template('privacy_policy.html')
+
+
 #
 # @app.route("/register_membership", methods=['GET', 'POST'])
 # @flask_login.login_required
@@ -675,6 +700,9 @@ def images():
 @flask_login.login_required
 @postgres_connection
 def contact_inquiry():
+    if request.method == 'POST':
+        naver_setup.send_sms_to_receiver(message=request.form['message'], phone_receiver=request.form['phone_number'])
+        flash('메시지를 보냈어요!!')
     contact_info = main.read_table('customer_contact_submission', order_desc="time")
     return render_template('contact_inquiry.html', contact_info=contact_info)
 
@@ -769,7 +797,8 @@ def edit_allergens():
             count = 0
             for key in allergens_check:
                 op = key.split('$$$')
-                Database.UpdateAllergenProduct(productID=op[0], AllergenID=op[1], contains_allergen=allergens_check[key]).update()
+                Database.UpdateAllergenProduct(productID=op[0], AllergenID=op[1],
+                                               contains_allergen=allergens_check[key]).update()
     allergenproducts = main.read_table('allergenproduct')
     products = main.read_table('products')
     allergens = main.read_table('allergens')
@@ -784,8 +813,7 @@ def edit_allergens():
         for a in product_list[p]:
             prod_list.update(a)
         product_list[p] = prod_list
-    return render_template('allergens_edit.html',product_list=product_list, products=products, allergens=allergens)
-
+    return render_template('allergens_edit.html', product_list=product_list, products=products, allergens=allergens)
 
 
 # ----------------------LOG IN/OUT-----------------------------
@@ -800,7 +828,7 @@ def login():
         if user in users and main.verify_password(email, cform.password.data):
             app.logger.info(email + ' is logged in as admin.')
             flask_login.login_user(user=user, remember=True)
-            return redirect(url_for('admin_overview'))
+            return redirect(url_for('contact_inquiry'))
         else:
             return redirect(url_for('login'))
     return render_template('login.html', form=cform)

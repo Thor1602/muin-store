@@ -128,7 +128,7 @@
                                                               class="img-fluid"
                                                               alt="{{ product[5] }}"></a>
                                     <div class="portfolio-info">
-                                        {% if session["preferred_language"] == 'ko_KR' %}
+                                        {% if session_name == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>
                                         {% else %}
@@ -361,6 +361,7 @@
                     <li><a href="#about">{{ msgid['about_title'] | safe }}</a></li>
                     <li><a href="#contact">{{ msgid['contact_title'] | safe }}</a></li>
                     <li><a href="#clients">{{ msgid['suppliers_title'] | safe }}</a></li>
+                    <li><a href="/allergens">{{ msgid['allergenes_title'] | safe }}</a></li>
                 </ul>
             </div>
 

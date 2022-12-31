@@ -30,6 +30,9 @@ import Database
 from InputForms import *
 from functools import wraps
 from flask_rq2 import RQ
+# from secure import SecureHeaders
+
+# secure_headers = SecureHeaders()
 
 app = Flask(__name__)
 main = Database.Main()
@@ -52,15 +55,20 @@ app.config.update(dict(
     MAIL_USE_SSL=False,
     MAIL_USERNAME=mail_cred[0],
     MAIL_PASSWORD=mail_cred[1],
-))
+),
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=600
+)
 mail = Mail(app)
 rq = RQ(app)
+# secure_headers = SecureHeaders()
 # toolbar = DebugToolbarExtension(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.session_protection = 'strong'
-
 
 nav_menu_admin = {'/admin_overview': 'Overview',
                   '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},
@@ -84,6 +92,8 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers = gunicorn_logger.handlers
 app.logger.setLevel(gunicorn_logger.level)
+
+
 # app.logger.debug('This is a DEBUG log record.')
 # app.logger.info('This is an INFO log record.')
 # app.logger.warning('This is a WARNING log record.')
@@ -99,21 +109,34 @@ def postgres_connection(func):
         value = func(*args, **kwargs)
         Database.close_connection()
         return value
+
     return wrapper
+
+
+# @app.after_request
+# def set_secure_headers(response):
+#     secure_headers.flask(response)
+#     return response
+
 
 # -----------------------LOGIN MANAGER-----------------------
 class User(flask_login.UserMixin):
     def __init__(self, email):
         self.id = ""
         self.email = email
+
+
 connection = Database.open_connection()
 users = [User(x) for x in main.get_all_users()]
 Database.close_connection()
+
+
 @login_manager.user_loader
 def user_loader(email):
     user = User(email)
     user.id = email
     return user
+
 
 @login_manager.request_loader
 def request_loader(request):
@@ -122,10 +145,12 @@ def request_loader(request):
     user.id = email
     return user
 
+
 # -----------------------FILE EXTENSIONS-----------------------
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # -----------------------TEMPLATE GLOBAL VARIABLES-----------------------
 
@@ -144,18 +169,24 @@ def get_locale():
         korean_translation[key] = x[2]
         english_translation[key] = x[3]
     if session_name == 'ko_KR':
-        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
+        return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
+                    homepage=homepage)
     else:
-        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home, homepage=homepage)
+        return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
+                    homepage=homepage)
+
 
 # -----------------------RQ-----------------------
 
 @rq.job
 def send_sms_in_background(message_str):
     naver_setup.send_message_admin(message=message_str)
+
+
 @rq.job
 def send_email_in_background(message_object):
     mail.send(message=message_object)
+
 
 # -----------------------PUBLIC-----------------------
 @app.route("/lang_<lang>", methods=['GET', 'POST'])
@@ -198,7 +229,7 @@ def index():
         Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
                          phone=contact_form.phone.data, subject=contact_form.subject.data,
                          message=contact_form.message.data).register_contact_query()
-    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products,contact_form=contact_form)
+    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products, contact_form=contact_form)
 
 
 @app.route("/products", methods=['GET', 'POST'])
@@ -211,16 +242,39 @@ def products():
             row_list[5] = "no-image-available.jpg"
         products.append(row_list)
     return render_template('products.html', products=products)
+
+
 @app.route('/large_order_price', methods=['GET', 'POST'])
 @postgres_connection
 def large_order_price():
     products = main.read_table('products')
     return render_template('large_orders_price.html', products=products)
 
+
+@app.route("/allergens", methods=['GET', 'POST'])
+@postgres_connection
+def allergens():
+    allergenproduct = main.read_table('allergenproduct')
+    products = main.read_table('products')
+    allergens = main.read_table('allergens')
+    product_list = {}
+    for x in allergenproduct:
+        if x[1] in product_list:
+            product_list[x[1]].append({x[2]: x[3]})
+        else:
+            product_list[x[1]] = [{x[2]: x[3]}]
+
+    for p in product_list:
+        prod_list = {}
+        for a in product_list[p]:
+            prod_list.update(a)
+        product_list[p] = prod_list
+    common_allergens = [2, 3, 5, 8, 9, 12, 14]
+    return render_template('allergens.html',product_list=product_list, products=products, allergens=allergens,common_allergens=common_allergens)
+
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
     return render_template('privacy_policy.html')
-
 #
 # @app.route("/register_membership", methods=['GET', 'POST'])
 # @flask_login.login_required
@@ -325,7 +379,6 @@ def privacy_policy():
 @flask_login.login_required
 @postgres_connection
 def admin_overview():
-
     if request.method == 'POST':
         if 'btn_delete_comment' in request.form:
             main.delete_row_by_id('comments', request.form['btn_delete_comment'])
@@ -348,7 +401,6 @@ def business_plan():
 @flask_login.login_required
 @postgres_connection
 def cost_calculation():
-
     if request.method == 'POST':
         if 'ingredients_add_button' in request.form:
             ingredient = Database.Ingredients(request.form['english'], request.form['korean'],
@@ -387,8 +439,10 @@ def cost_calculation():
                               korean_description=request.form['Korean_description'],
                               english_description=request.form['English_description'],
                               qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
-                              criteria_lv=request.form['criteria_lv'], selling_price_mv=request.form['selling_price_mv'],
-                              criteria_mv=request.form['criteria_mv'], selling_price_hv=request.form['selling_price_hv'],
+                              criteria_lv=request.form['criteria_lv'],
+                              selling_price_mv=request.form['selling_price_mv'],
+                              criteria_mv=request.form['criteria_mv'],
+                              selling_price_hv=request.form['selling_price_hv'],
                               criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
                               estimated_items=request.form['estimated_items']).register()
         elif 'price_ingredient_add_button' in request.form:
@@ -432,7 +486,6 @@ def cost_calculation():
 @flask_login.login_required
 @postgres_connection
 def edit_cost_calculation():
-
     if request.method == "POST":
         if 'products_edit_button' in request.form:
             if 'currently_selling' in request.form:
@@ -455,7 +508,8 @@ def edit_cost_calculation():
                               criteria_mv=request.form['criteria_mv'],
                               selling_price_hv=request.form['selling_price_hv'],
                               criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
-                              estimated_items=request.form['estimated_items']).update(request.form['products_edit_button'])
+                              estimated_items=request.form['estimated_items']).update(
+                request.form['products_edit_button'])
     data_dictionary = {}
     data_dictionary['ingredients'] = main.read_table('ingredients')
     data_dictionary['products'] = main.read_table('products')
@@ -502,7 +556,7 @@ def financial_plan():
             main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
         else:
             abort(500)
-    data={}
+    data = {}
     data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
     data['investments'] = []
     for row in main.read_table('investments'):
@@ -510,7 +564,7 @@ def financial_plan():
         data['total']['minimum'] += int(row[3])
         data['total']['maximum'] += int(row[4])
         data['investments'].append(row)
-    data['fixed_costs']  = []
+    data['fixed_costs'] = []
     for row in main.read_table('fixed_costs'):
         row = [row[0], row[1], row[2], row[4], row[5], row[6]]
         data['total']['total_cost'] += row[3]
@@ -522,7 +576,7 @@ def financial_plan():
     data['variable-costs'] = main.calculate_variable_cost()['total_average']
     data['breakeven-per-product'] = {}
     for product in data['products']:
-        data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
+        data['vat'][product[0]] = int(product[12] - (product[12] / 1.1))
         data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
         data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
     return render_template('financial_plan.html', data=data)
@@ -532,23 +586,23 @@ def financial_plan():
 @flask_login.login_required
 @postgres_connection
 def loss_calculator():
-    data={}
+    data = {}
     data['products'] = main.read_table('products')
     data['vat'] = {}
     data['turnover-after-vat'] = {}
     data['variable-costs'] = main.calculate_variable_cost()['total_average']
     data['breakeven-per-product'] = {}
     for product in data['products']:
-        data['vat'][product[0]] = int(product[12]-(product[12] / 1.1))
+        data['vat'][product[0]] = int(product[12] - (product[12] / 1.1))
         data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
         data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
     return render_template('loss_calculator.html', data=data)
+
 
 @app.route('/invoices', methods=['GET', 'POST'])
 @flask_login.login_required
 @postgres_connection
 def invoices():
-
     if request.method == 'POST':
         if 'invoice_supplier_add_button' in request.form:
             if 'file' not in request.files:
@@ -684,9 +738,6 @@ def qr_info():
     return render_template('qr_info.html')
 
 
-
-
-
 @app.route('/print_ingredient_list', methods=['GET', 'POST'])
 @flask_login.login_required
 @postgres_connection
@@ -702,6 +753,42 @@ def print_ingredient_list():
     return html
 
 
+@app.route("/edit_allergens", methods=['GET', 'POST'])
+@flask_login.login_required
+@postgres_connection
+def edit_allergens():
+    if request.method == "POST":
+        if 'submit_allergen_modifications' in request.form:
+            allergenproducts = main.read_table('allergenproduct')
+            allergens_check = {}
+            for allergenproduct in allergenproducts:
+                allergens_check[str(allergenproduct[1]) + '$$$' + str(allergenproduct[2])] = False
+            for field in request.form:
+                if '$$$' in field:
+                    allergens_check[field] = True
+            count = 0
+            for key in allergens_check:
+                op = key.split('$$$')
+                Database.UpdateAllergenProduct(productID=op[0], AllergenID=op[1], contains_allergen=allergens_check[key]).update()
+                count += 1
+                print(round(count/len(allergens_check)))
+    allergenproducts = main.read_table('allergenproduct')
+    products = main.read_table('products')
+    allergens = main.read_table('allergens')
+    product_list = {}
+    for x in allergenproducts:
+        if x[1] in product_list:
+            product_list[x[1]].append({x[2]: x[3]})
+        else:
+            product_list[x[1]] = [{x[2]: x[3]}]
+    for p in product_list:
+        prod_list = {}
+        for a in product_list[p]:
+            prod_list.update(a)
+        product_list[p] = prod_list
+    return render_template('allergens_edit.html',product_list=product_list, products=products, allergens=allergens)
+
+
 
 # ----------------------LOG IN/OUT-----------------------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -714,26 +801,30 @@ def login():
         app.logger.warning('Validated attempt to login.')
         if user in users and main.verify_password(email, cform.password.data):
             app.logger.info(email + ' is logged in as admin.')
-            flask_login.login_user(user=user)
+            flask_login.login_user(user=user, remember=True)
             return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
     return render_template('login.html', form=cform)
+
 
 @app.route("/logout")
 def logout():
     flask_login.logout_user()
     return redirect(url_for('login'))
 
+
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     return redirect(url_for('login'))
+
 
 # ----------------------ERROR HANDLING-----------------------------
 @app.errorhandler(400)
 def bad_request(e):
     e_friendly = "The server and client don't seem to have any manners"
     return render_template('error.html', e=e, e_friendly=e_friendly), 400
+
 
 @app.errorhandler(401)
 def bad_request(e):

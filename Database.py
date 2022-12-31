@@ -11,12 +11,17 @@ import googledrive_connector
 
 connection = None
 cur = None
+
+
 def open_connection():
     try:
         global connection
         global cur
-        if exists('gitignore/database_credentials.txt'):
-            credentials = str(open("gitignore/database_credentials.txt", 'r').read())
+        if exists(
+                'D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt'):
+            credentials = str(open(
+                "D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt",
+                'r').read())
             connection = psycopg2.connect(credentials, sslmode='require')
         else:
             DATABASE_URL = os.environ['DATABASE_URL']
@@ -24,6 +29,7 @@ def open_connection():
         cur = connection.cursor()
     except Error as e:
         print(e)
+
 
 def execute_query(query, parameters=(), commit=False, fetchAll=False, fetchOne=False):
     try:
@@ -41,13 +47,16 @@ def execute_query(query, parameters=(), commit=False, fetchAll=False, fetchOne=F
         return result
     except Error as e:
         print(e)
+
+
 def close_connection():
     try:
         connection.close()
         cur.close()
     except Error as e:
         print(e)
-        
+
+
 class Main:
     """
         This main class of the database helper is:
@@ -76,6 +85,7 @@ class Main:
 
     def create_table(self, table_name, columns):
         columns = ", ".join(columns)
+        columns = "id SERIAL PRIMARY KEY, " + columns
         SQL = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns});"
         return execute_query(query=SQL, commit=True)
 
@@ -92,16 +102,17 @@ class Main:
 
     def verify_password(self, email, pwd):
         retrieved_password = execute_query(query="SELECT value FROM settings where key = %s;", parameters=(email,),
-                                                fetchOne=True)
+                                           fetchOne=True)
         return check_password_hash(retrieved_password, pwd)
 
     def get_all_users(self):
-        users= execute_query(query="SELECT key FROM settings where name = 'login';", fetchAll=True)
+        users = execute_query(query="SELECT key FROM settings where name = 'login';", fetchAll=True)
         return [x[0] for x in users]
 
     def random_string_generator(self, N):
         chars = string.digits + string.punctuation + string.ascii_letters
         return ''.join(random.SystemRandom().choice(chars.replace("'\"", "")) for _ in range(N))
+
     def fetch_variable_costs(self):
         col = ('cost_id', 'english', 'korean', 'variable_cost', 'selling_price_lv', 'criteria_lv', 'selling_price_mv',
                'criteria_mv', 'selling_price_hv', 'criteria_hv', 'unit', 'work_time_min', 'estimated_items',
@@ -111,11 +122,11 @@ class Main:
 
     def add_setting(self, name, key, value):
         execute_query("INSERT INTO settings (name, key, value) VALUES (%s,%s,%s)",
-                           (name, key, value,), commit=True)
+                      (name, key, value,), commit=True)
 
     def add_column(self, tablename, columname, type, default_value=None):
         execute_query(f"ALTER TABLE {tablename} ADD COLUMN {columname} {type} DEFAULT '{default_value}';",
-                           commit=True)
+                      commit=True)
         # main.add_column(tablename='products', columname='type', type='VARCHAR', default_value='pastry')
 
     def get_setting_by_name(self, name):
@@ -234,7 +245,8 @@ class Main:
             if packagingproduct[2] in data['packaging_get_average']:
                 product_id = packagingproduct[1]
                 if product_id in data['total_average_packaging']:
-                    data['total_average_packaging'][product_id] += round(data['packaging_get_latest'][packagingproduct[2]], 2)
+                    data['total_average_packaging'][product_id] += round(
+                        data['packaging_get_latest'][packagingproduct[2]], 2)
                 else:
                     data['total_average_packaging'][product_id] = round(
                         data['packaging_get_latest'][packagingproduct[2]], 2)
@@ -364,6 +376,7 @@ class Contact(Main):
         parameters = (id,)
         execute_query(query=SQL, parameters=parameters, commit=True)
 
+
 class OnlineOrder(Main):
     def __init__(self, name, email, phone, order, note):
         self.name = name
@@ -381,6 +394,7 @@ class OnlineOrder(Main):
         SQL = "UPDATE online_order SET isCompleted = TRUE WHERE id = %s;"
         parameters = (id,)
         execute_query(query=SQL, parameters=parameters, commit=True)
+
 
 class Investment(Main):
     def __init__(self, english, korean, min_price, max_price):
@@ -554,6 +568,7 @@ class PricesPackaging(Main):
             parameters = (self.packagingID, self.price_per_unit, self.date, id,)
         execute_query(query=SQL, parameters=parameters, commit=True)
 
+
 class Products(Main):
     def __init__(self, english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best,
                  korean_description, english_description, qr, selling_price_lv, criteria_lv, selling_price_mv,
@@ -703,4 +718,30 @@ class RecipeComments(Main):
         SQL = "UPDATE recipe_comments SET productid = %s, comment = %s WHERE id = %s;"
         parameters = (
             self.productid, self.comment, id,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class RegisterAllergensProduct(Main):
+    def __init__(self, product_dict):
+        self.product_dict = product_dict
+        self.allergen_list = []
+        for productid in self.product_dict:
+            for allergen_product in [(productid, key, productid[key]) for key in productid]:
+                self.allergen_list = self.allergen_list + str(allergen_product) + ', '
+                # self.allergen_list = self.allergen_list + str(allergen_product) + ', '
+        for x in self.allergen_list:
+            print(x)
+
+    def register_allergens_per_product(self):
+        SQL = f"INSERT INTO allergenproduct (productID, AllergenID, contains_allergen) VALUES {self.allergen_list};"
+        execute_query(query=SQL, commit=True)
+
+class UpdateAllergenProduct(Main):
+    def __init__(self, productID, AllergenID, contains_allergen):
+        self.productID = productID
+        self.AllergenID = AllergenID
+        self.contains_allergen = contains_allergen
+    def update(self):
+        SQL = "UPDATE allergenproduct SET contains_allergen= %s WHERE productID = %s AND AllergenID = %s;"
+        parameters = (self.contains_allergen, self.productID, self.AllergenID,)
         execute_query(query=SQL, parameters=parameters, commit=True)

@@ -2559,5 +2559,27 @@ input[type=number] {
     display: none;
 }
 
+/*--------------------------------------------------------------
+# Edit allergen Section
+--------------------------------------------------------------*/
 
+.header-allergen {
+    position: sticky;
+    top: 0;
+}
 
+#edit-allergen-table {
+    height: 800px;
+    width: 100%;
+}
+
+#edit-allergen-table thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+}
+#edit-allergen-table th:first-child {
+    position: sticky;
+    left: 0;
+    background-color: white;
+}

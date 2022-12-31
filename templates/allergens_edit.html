@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}{{ msgid['allergenes_title'] }} - {{ msgid['title'] }}{% endblock %}
-
 {% block body %}
     <!-- Start main content Section -->
     <section id="about" class="about">
@@ -11,89 +10,102 @@
                 <h2>{{ msgid['allergenes_title'] }}</h2>
             </div>
             <hr>
-            <div class="row">
-                <table class="table table-striped table-hover text-center">
-                    <thead>
-                    <tr>
-                        <th></th>
-                        {% if session["preferred_language"] == 'ko_KR' %}
-                            {% for allergen in allergens %}
-                                <th>{{ allergen[2] }}</th>
-                            {% endfor %}
-                        {% else %}
-                            {% for allergen in allergens %}
-                                <th>{{ allergen[1] }}</th>
-                            {% endfor %}
-                        {% endif %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if session["preferred_language"] == 'ko_KR' %}
-                        <form method="POST" action="/edit_allergens">
-                            <button class="btn btn-warning" name="submit_allergen_modifications" type="submit">SUBMIT
-                            </button>
-                            {% for product in products %}
-                                <tr>
-                                    <th class="keep-all"> {{ product[2] }}</th>
-                                    {% for n in range(1,28) %}
-                                        {% if product_list[product[0]][n] == True %}
-                                            <td>
-                                                <div class="form-check form-switch">
-                                                    <input type="checkbox" class="form-check-input allergen-check"
-                                                           aria-label=""
-                                                           id="{{ product[0] }}$$${{ n }}"
-                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}" checked>
-                                                </div>
-                                            </td>
-                                        {% else %}
-                                            <td>
-                                                <div class="form-check form-switch">
-                                                    <input type="checkbox" class="form-check-input allergen-check"
-                                                           aria-label=""
-                                                           id="{{ product[0] }}$$${{ n }}"
-                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}">
-                                                </div>
-                                            </td>
-                                        {% endif %}
+            <form method="POST" action="/edit_allergens" id="edit_allergens">
+                <div class="row">
+                    <button class="btn btn-warning" name="submit_allergen_modifications" type="submit"
+                            id="submit_edit_allergens">
+                        SUBMIT
+                    </button>
+                </div>
+                <div class="row">
+
+                    <div class="table-responsive" id="edit-allergen-table">
+                        <table class="table table-hover text-center">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                {% if session["preferred_language"] == 'ko_KR' %}
+                                    {% for allergen in allergens %}
+                                        <th>{{ allergen[2] }}</th>
                                     {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        </form>
-                    {% else %}
-                        <form method="POST" action="/edit_allergens">
-                            <button class="btn btn-warning" name="submit_allergen_modifications" type="submit">SUBMIT
-                            </button>
-                            {% for product in products %}
-                                <tr>
-                                    <th>{{ product[1] }}</th>
-                                    {% for n in range(1,28) %}
-                                        {% if product_list[product[0]][n] == True %}
-                                            <td>
-                                                <div class="form-check form-switch">
-                                                    <input type="checkbox" class="form-check-input allergen-check"
-                                                           aria-label=""
-                                                           id="{{ product[0] }}$$${{ n }}"
-                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}" checked>
-                                                </div>
-                                            </td>
-                                        {% else %}
-                                            <td>
-                                                <div class="form-check form-switch">
-                                                    <input type="checkbox" class="form-check-input allergen-check"
-                                                           aria-label=""
-                                                           id="{{ product[0] }}$$${{ n }}"
-                                                           name="{{ product[0] }}$$${{ n }}" value="{{ product[0] }}$$${{ n }}">
-                                                </div>
-                                            </td>
-                                        {% endif %}
+                                {% else %}
+                                    {% for allergen in allergens %}
+                                        <th>{{ allergen[1] }}</th>
                                     {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        </form>
-                    {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                                {% endif %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if session["preferred_language"] == 'ko_KR' %}
+
+                                {% for product in products %}
+                                    <tr>
+                                        <th class="keep-all "> {{ product[2] }}</th>
+                                        {% for n in range(1,28) %}
+                                            {% if product_list[product[0]][n] == True %}
+                                                <td>
+                                                    <div class="form-check form-switch">
+                                                        <input type="checkbox" class="form-check-input allergen-check"
+                                                               aria-label=""
+                                                               id="{{ product[0] }}$$${{ n }}"
+                                                               name="{{ product[0] }}$$${{ n }}"
+                                                               value="{{ product[0] }}$$${{ n }}" checked>
+                                                    </div>
+                                                </td>
+                                            {% else %}
+                                                <td>
+                                                    <div class="form-check form-switch">
+                                                        <input type="checkbox" class="form-check-input allergen-check"
+                                                               aria-label=""
+                                                               id="{{ product[0] }}$$${{ n }}"
+                                                               name="{{ product[0] }}$$${{ n }}"
+                                                               value="{{ product[0] }}$$${{ n }}">
+                                                    </div>
+                                                </td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+
+                            {% else %}
+                                <form method="POST" action="/edit_allergens">
+                                    {% for product in products %}
+                                        <tr>
+                                            <th>{{ product[1] }}</th>
+                                            {% for n in range(1,28) %}
+                                                {% if product_list[product[0]][n] == True %}
+                                                    <td>
+                                                        <div class="form-check form-switch">
+                                                            <input type="checkbox"
+                                                                   class="form-check-input allergen-check"
+                                                                   aria-label=""
+                                                                   id="{{ product[0] }}$$${{ n }}"
+                                                                   name="{{ product[0] }}$$${{ n }}"
+                                                                   value="{{ product[0] }}$$${{ n }}" checked>
+                                                        </div>
+                                                    </td>
+                                                {% else %}
+                                                    <td>
+                                                        <div class="form-check form-switch">
+                                                            <input type="checkbox"
+                                                                   class="form-check-input allergen-check"
+                                                                   aria-label=""
+                                                                   id="{{ product[0] }}$$${{ n }}"
+                                                                   name="{{ product[0] }}$$${{ n }}"
+                                                                   value="{{ product[0] }}$$${{ n }}">
+                                                        </div>
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </form>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
         </div>
 
     </section>

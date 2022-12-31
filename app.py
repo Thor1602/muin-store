@@ -770,8 +770,6 @@ def edit_allergens():
             for key in allergens_check:
                 op = key.split('$$$')
                 Database.UpdateAllergenProduct(productID=op[0], AllergenID=op[1], contains_allergen=allergens_check[key]).update()
-                count += 1
-                print(round(count/len(allergens_check)))
     allergenproducts = main.read_table('allergenproduct')
     products = main.read_table('products')
     allergens = main.read_table('allergens')

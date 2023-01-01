@@ -19,6 +19,8 @@ import qrcode
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 from flask_mail import Mail, Message
+from flask_compress import Compress
+
 # from flask_debugtoolbar import DebugToolbarExtension
 
 import flask_login
@@ -64,6 +66,7 @@ app.config.update(dict(
 )
 mail = Mail(app)
 rq = RQ(app)
+Compress(app)
 # secure_headers = SecureHeaders()
 # toolbar = DebugToolbarExtension(app)
 login_manager = flask_login.LoginManager()

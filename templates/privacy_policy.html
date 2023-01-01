@@ -262,9 +262,3 @@
     </div>
 
 {% endblock %}
-
-{% block endbody %}
-    <script src="{{ url_for('static', filename='js/ajax_requests.js') }}"></script>
-{% endblock %}
-
-heroku pg_dump -U xfdhvtpatzrcrr --format=plain --no-owner -h ec2-52-210-97-223.eu-west-1.compute.amazonaws.com --no-acl derknbjcj3ntf5 | sed -E ‘s/(DROP|CREATE|COMMENT ON) EXTENSION/--\1 EXTENSION/g’ > latest.sql

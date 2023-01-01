@@ -49,6 +49,7 @@ Database.close_connection()
 
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config["COMPRESS_REGISTER"] = False
 app.config['RQ_REDIS_URL'] = redis_external_url
 app.config.update(dict(
     DEBUG=True,

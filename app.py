@@ -117,11 +117,10 @@ def postgres_connection(func):
 
     return wrapper
 
-
-# @app.after_request
-# def set_secure_headers(response):
-#     secure_headers.flask(response)
-#     return response
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = 300
+    return response
 
 
 # -----------------------LOGIN MANAGER-----------------------

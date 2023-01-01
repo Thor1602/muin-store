@@ -19,7 +19,8 @@ import qrcode
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 from flask_mail import Mail, Message
-from flask_compress import Compress
+
+# from flask_compress import Compress
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -49,7 +50,6 @@ Database.close_connection()
 
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config["COMPRESS_REGISTER"] = False
 app.config['RQ_REDIS_URL'] = redis_external_url
 app.config.update(dict(
     DEBUG=True,
@@ -67,7 +67,7 @@ app.config.update(dict(
 )
 mail = Mail(app)
 rq = RQ(app)
-Compress(app)
+# Compress(app)
 # secure_headers = SecureHeaders()
 # toolbar = DebugToolbarExtension(app)
 login_manager = flask_login.LoginManager()
@@ -867,3 +867,4 @@ def gone(e):
 def internal_server_error(e):
     e_friendly = "'server problems' To be or not being overloaded. That's the question."
     return render_template('error.html', e=e, e_friendly=e_friendly), 500
+

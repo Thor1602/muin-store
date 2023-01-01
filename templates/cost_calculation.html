@@ -382,6 +382,15 @@
                             <input type="number" class="form-control" id="estimated_items" name="estimated_items"
                                    value="">
                         </div>
+                        {% for allergen in allergens %}
+                        <div class="mb-3">
+                            <label for="best_product" class="form-label">{{ allergen[1] }}</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="allergen$$${{ allergen[0] }}"
+                                       id="allergen">
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

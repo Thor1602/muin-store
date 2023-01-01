@@ -275,25 +275,11 @@ def large_order_price():
 @app.route("/allergens", methods=['GET', 'POST'])
 @postgres_connection
 def allergens():
-    allergenproduct = main.read_table('allergenproduct')
     products = main.read_table('products')
     allergens = main.read_table('allergens')
-    product_list = {}
-    for x in allergenproduct:
-        if x[1] in product_list:
-            product_list[x[1]].append({x[2]: x[3]})
-        else:
-            product_list[x[1]] = [{x[2]: x[3]}]
-
-    for p in product_list:
-        prod_list = {}
-        for a in product_list[p]:
-            prod_list.update(a)
-        product_list[p] = prod_list
-    common_allergens = [2, 3, 5, 8, 9, 12, 14]
-    return render_template('allergens.html', product_list=product_list, products=products, allergens=allergens,
+    common_allergens = [2, 3, 5, 8, 9]
+    return render_template('allergens.html', product_list=main.allergen_dict_all_products(), products=products, allergens=allergens,
                            common_allergens=common_allergens)
-
 
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
@@ -426,6 +412,7 @@ def business_plan():
 @flask_login.login_required
 @postgres_connection
 def cost_calculation():
+    allergens = main.read_table('allergens')
     if request.method == 'POST':
         if 'ingredients_add_button' in request.form:
             ingredient = Database.Ingredients(request.form['english'], request.form['korean'],
@@ -457,7 +444,7 @@ def cost_calculation():
                 best_product = request.form['best_product'] == 'on'
             else:
                 best_product = False
-            Database.Products(request.form['english'], request.form['korean'],
+            product_id = Database.Products(request.form['english'], request.form['korean'],
                               request.form['weight_in_gram_per_product'], request.form['unit'],
                               request.form['image'], type=request.form['type'],
                               currently_selling=currently_selling, best=best_product,
@@ -470,6 +457,16 @@ def cost_calculation():
                               selling_price_hv=request.form['selling_price_hv'],
                               criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
                               estimated_items=request.form['estimated_items']).register()
+            allergens_form_list = [x for x in request.form if 'allergen' in x]
+            allergen_dict = {}
+            for allergen in allergens:
+                allergen_dict[allergen[0]] = False
+            for allergen in allergens_form_list:
+                allergen_id = allergen.split("$$$")[1]
+                allergen_dict[allergen_id] = True
+            for key in allergen_dict:
+                Database.AllergenProduct(productID=product_id,AllergenID=key,contains_allergen=allergen_dict[key]).register()
+
         elif 'price_ingredient_add_button' in request.form:
             if request.form['date'] == '':
                 date = None
@@ -504,7 +501,7 @@ def cost_calculation():
     return render_template('cost_calculation.html', packaging=packaging,
                            ingredients=ingredients, products=products,
                            missing_prices_packaging=missing_prices_packaging,
-                           missing_prices_ingredients=missing_prices_ingredients)
+                           missing_prices_ingredients=missing_prices_ingredients,allergens=allergens)
 
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
@@ -794,26 +791,13 @@ def edit_allergens():
             for field in request.form:
                 if '$$$' in field:
                     allergens_check[field] = True
-            count = 0
             for key in allergens_check:
                 op = key.split('$$$')
-                Database.UpdateAllergenProduct(productID=op[0], AllergenID=op[1],
+                Database.AllergenProduct(productID=op[0], AllergenID=op[1],
                                                contains_allergen=allergens_check[key]).update()
-    allergenproducts = main.read_table('allergenproduct')
     products = main.read_table('products')
     allergens = main.read_table('allergens')
-    product_list = {}
-    for x in allergenproducts:
-        if x[1] in product_list:
-            product_list[x[1]].append({x[2]: x[3]})
-        else:
-            product_list[x[1]] = [{x[2]: x[3]}]
-    for p in product_list:
-        prod_list = {}
-        for a in product_list[p]:
-            prod_list.update(a)
-        product_list[p] = prod_list
-    return render_template('allergens_edit.html', product_list=product_list, products=products, allergens=allergens)
+    return render_template('allergens_edit.html', product_list=main.allergen_dict_all_products(), products=products, allergens=allergens)
 
 
 # ----------------------LOG IN/OUT-----------------------------

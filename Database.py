@@ -74,12 +74,14 @@ class Main:
         parameters = (table_name,)
         return [x[0] for x in execute_query(query=SQL, parameters=parameters, fetchAll=True)]
 
-    def read_table(self, table_name, order_asc="", order_desc=""):
+    def read_table(self, table_name, order_asc="", order_desc="", return_field=""):
         argument = ""
         if order_asc != "":
             argument = f"order by {order_asc} asc"
         if order_desc != "":
             argument = f"order by {order_desc} desc"
+        if return_field != "":
+            argument = f"returning {return_field}"
         SQL = f"SELECT * from {table_name} {argument};"
         return execute_query(query=SQL, fetchAll=True)
 
@@ -315,7 +317,21 @@ class Main:
             data['total_latest'][product[0]] = round(
                 data['total_latest_ingredients_per_unit'][product[0]] + data['total_latest_packaging'][product[0]], 0)
         return data
+    def allergen_dict_all_products(self):
+        product_list = {}
+        allergenproduct = self.read_table('allergenproduct')
+        for x in allergenproduct:
+            if x[1] in product_list:
+                product_list[x[1]].append({x[2]: x[3]})
+            else:
+                product_list[x[1]] = [{x[2]: x[3]}]
 
+        for p in product_list:
+            prod_list = {}
+            for a in product_list[p]:
+                prod_list.update(a)
+            product_list[p] = prod_list
+        return product_list
 
 class User(Main):
     def __init__(self, nickname, password, role, first_name, last_name, email, last_login):
@@ -594,7 +610,7 @@ class Products(Main):
         self.estimated_items = estimated_items
 
     def register(self):
-        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, korean_description, english_description, qr, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, work_time_min, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        SQL = "INSERT INTO products (english, korean, weight_in_gram_per_product, unit, image, type, currently_selling, best, korean_description, english_description, qr, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv, selling_price_hv, criteria_hv, work_time_min, estimated_items) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) returning id;"
         parameters = (self.english, self.korean, self.weight_in_gram_per_product, self.unit, self.image, self.type,
                       self.currently_selling, self.best, self.korean_description, self.english_description, self.qr,
                       self.selling_price_lv, self.criteria_lv, self.selling_price_mv, self.criteria_mv,
@@ -736,11 +752,18 @@ class RegisterAllergensProduct(Main):
         SQL = f"INSERT INTO allergenproduct (productID, AllergenID, contains_allergen) VALUES {self.allergen_list};"
         execute_query(query=SQL, commit=True)
 
-class UpdateAllergenProduct(Main):
+
+
+
+class AllergenProduct(Main):
     def __init__(self, productID, AllergenID, contains_allergen):
         self.productID = productID
         self.AllergenID = AllergenID
         self.contains_allergen = contains_allergen
+    def register(self):
+        SQL = f"INSERT INTO allergenproduct (productID, AllergenID, contains_allergen) VALUES (%s,%s,%s);"
+        parameters = (self.productID, self.AllergenID,self.contains_allergen,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
     def update(self):
         SQL = "UPDATE allergenproduct SET contains_allergen= %s WHERE productID = %s AND AllergenID = %s;"
         parameters = (self.contains_allergen, self.productID, self.AllergenID,)

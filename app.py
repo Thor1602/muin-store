@@ -585,7 +585,7 @@ def financial_plan():
     data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
     data['investments'] = []
     for row in main.read_table('investments'):
-        row = list(row)
+        row = [col for col in row]
         data['total']['minimum'] += int(row[3])
         data['total']['maximum'] += int(row[4])
         data['investments'].append(row)

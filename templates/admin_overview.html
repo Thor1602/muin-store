@@ -5,19 +5,15 @@
 
     <section id="about" class="about">
         <div class="container" data-aos="fade-up">
-
             <div class="section-header">
                 <h2>Admin</h2>
                 <p>overview {{ DATABASE_URL }}</p>
             </div>
-
             <div class="row gy-4">
                 <h3>COMMENTS</h3>
                 <div class="overflow-scroll max-height-table">
                     <table class="table">
-                        <tbody>
-                        {% for comment in comments %}
-
+                        <tbody>{% for comment in data['comments'] %}
                             <tr>
                                 <th>{{ comment[1] }}</th>
                                 <th>
@@ -28,10 +24,7 @@
                                             <i class="bi bi-trash-fill"></i></button>
                                     </form>
                                 </th>
-
-                            </tr>
-                        {% endfor %}
-
+                            </tr>{% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -45,11 +38,48 @@
                         </div>
                     </div>
                 </form>
-            </div>
 
+                <h3>NEWS</h3>
+                <form method="post" action="/admin_overview">
+                    <button class="btn btn-warning" type="submit" name="btn_news">SUBMIT</button>
+                    {% for news_banner in data['news'] %}
+                        <h4>News banner: {{ news_banner[0] }}</h4>
+                        <div class="row">
+                            {% for col in news_banner[1:9] %}
+                                <div class="col-12 col-md-6">
+                                    <input type="text" class="form-control"
+                                           id="news_{{ news_banner[0] }}_{{ loop.index }}"
+                                           name="{{ news_banner[0] }}$$${{ data['news_col'][loop.index] }}"
+                                           value="{{ col }}">
+                                    <label for="news_{{ news_banner[0] }}_{{ loop.index }}">{{ data['news_col'][loop.index] | replace('_', ' ') }}</label>
+                                </div>
+                            {% endfor %}
+
+                            <div class="col-12 col-md-6 form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="news_{{ news_banner[0] }}_9"
+                                       name="{{ news_banner[0] }}$$${{ data['news_col'][9] }}"
+                                       value="{{ news_banner[9] }}" {% if news_banner[9] %}checked{% endif %}>
+                                <label for="news_{{ news_banner[0] }}_9">{{ data['news_col'][9] | replace('_', ' ') }}</label>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <input type="number" class="form-control" id="news_{{ news_banner[0] }}_10"
+                                       name="{{ news_banner[0] }}$$${{ data['news_col'][10] }}"
+                                       value="{{ news_banner[10] }}">
+                                <label for="news_{{ news_banner[0] }}_10">{{ data['news_col'][10] | replace('_', ' ') }}</label>
+                            </div>
+                            <div class="col-12 col-md-6 form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="news_{{ news_banner[0] }}_11"
+                                       name="{{ news_banner[0] }}$$${{ data['news_col'][11] }}"
+                                       value="{{ news_banner[11] }}" {% if news_banner[11] %}checked{% endif %}>
+                                <label for="news_{{ news_banner[0] }}_11">{{ data['news_col'][11] | replace('_', ' ') }}</label>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                    <button class="btn btn-warning" type="submit" name="btn_news">SUBMIT</button>
+                </form>
+            </div>
         </div>
     </section><!-- End About Us Section -->
 
 {% endblock %}
-
-

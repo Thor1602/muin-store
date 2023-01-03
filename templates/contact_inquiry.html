@@ -37,7 +37,7 @@
                 <h4>문자 메시지를 보내기</h4>
                 <form action="/contact_inquiry" method="POST">
                     <input class="form-control" type="number" name="phone_number" aria-label="전화번호" placeholder="전화번호">
-                    <textarea class="form-control" name="message" aria-label="문자" placeholder="문자"></textarea>
+                    <textarea class="form-control" name="message" aria-label="문자" placeholder="문자" maxlength="50"></textarea>
                     <button class="btn btn-warning" type="submit">보내기</button>
                 </form>
 

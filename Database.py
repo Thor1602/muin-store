@@ -317,6 +317,7 @@ class Main:
             data['total_latest'][product[0]] = round(
                 data['total_latest_ingredients_per_unit'][product[0]] + data['total_latest_packaging'][product[0]], 0)
         return data
+
     def allergen_dict_all_products(self):
         product_list = {}
         allergenproduct = self.read_table('allergenproduct')
@@ -332,6 +333,7 @@ class Main:
                 prod_list.update(a)
             product_list[p] = prod_list
         return product_list
+
 
 class User(Main):
     def __init__(self, nickname, password, role, first_name, last_name, email, last_login):
@@ -531,10 +533,10 @@ class PricesIngredients(Main):
 
     def update(self, id):
         if self.date == None:
-            SQL = "UPDATE prices_ingredients SET ingredientID = %s, price = %s, weight_in_gram = %s WHERE id = %s;"
+            SQL = "UPDATE prices_ingredients SET ingredientID = %s, price = %s, weight_in_gram = %s, date = NOW() WHERE id = %s;"
             parameters = (self.ingredientID, self.price, self.weight_in_gram,)
         else:
-            SQL = "UPDATE prices_ingredients SET ingredientID = %s, price = %s, weight_in_gram = %s WHERE id = %s;"
+            SQL = "UPDATE prices_ingredients SET ingredientID = %s, price = %s, weight_in_gram = %s, date = %s WHERE id = %s;"
             parameters = (self.ingredientID, self.price, self.weight_in_gram, self.date, id,)
         execute_query(query=SQL, parameters=parameters, commit=True)
 
@@ -753,18 +755,51 @@ class RegisterAllergensProduct(Main):
         execute_query(query=SQL, commit=True)
 
 
-
-
 class AllergenProduct(Main):
     def __init__(self, productID, AllergenID, contains_allergen):
         self.productID = productID
         self.AllergenID = AllergenID
         self.contains_allergen = contains_allergen
+
     def register(self):
         SQL = f"INSERT INTO allergenproduct (productID, AllergenID, contains_allergen) VALUES (%s,%s,%s);"
-        parameters = (self.productID, self.AllergenID,self.contains_allergen,)
+        parameters = (self.productID, self.AllergenID, self.contains_allergen,)
         execute_query(query=SQL, parameters=parameters, commit=True)
+
     def update(self):
         SQL = "UPDATE allergenproduct SET contains_allergen= %s WHERE productID = %s AND AllergenID = %s;"
         parameters = (self.contains_allergen, self.productID, self.AllergenID,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class News(Main):
+    def __init__(self, english_news_title, korean_news_title, english_news_subtitle, korean_news_subtitle,
+                 english_news_details, korean_news_details, lightbox_image, display_image, active, bs_interval,
+                 is_published):
+        self.english_news_title = english_news_title
+        self.korean_news_title = korean_news_title
+        self.english_news_subtitle = english_news_subtitle
+        self.korean_news_subtitle = korean_news_subtitle
+        self.english_news_details = english_news_details
+        self.korean_news_details = korean_news_details
+        self.lightbox_image = lightbox_image
+        self.display_image = display_image
+        self.active = active
+        self.bs_interval = bs_interval
+        self.is_published = is_published
+
+    def register(self):
+        SQL = f"INSERT INTO news (english_news_title, korean_news_title, english_news_subtitle, korean_news_subtitle, english_news_details, korean_news_details, lightbox_image, display_image, active, bs_interval, is_published) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        parameters = (
+            self.english_news_title, self.korean_news_title, self.english_news_subtitle, self.korean_news_subtitle,
+            self.english_news_details, self.korean_news_details, self.lightbox_image, self.display_image, self.active,
+            self.bs_interval, self.is_published,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update(self, news_id):
+        SQL = "UPDATE news SET english_news_title= %s, korean_news_title= %s, english_news_subtitle= %s, korean_news_subtitle= %s, english_news_details= %s, korean_news_details= %s, lightbox_image= %s, display_image= %s, active= %s, bs_interval= %s, is_published = %s  WHERE id = %s;"
+        parameters = (
+            self.english_news_title, self.korean_news_title, self.english_news_subtitle, self.korean_news_subtitle,
+            self.english_news_details, self.korean_news_details, self.lightbox_image, self.display_image, self.active,
+            self.bs_interval, self.is_published, news_id,)
         execute_query(query=SQL, parameters=parameters, commit=True)

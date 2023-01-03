@@ -4,7 +4,6 @@
 
 
 {% block body %}
-
     <section id="about" class="about">
         <div class="container" data-aos="fade-up">
             <div class="section-header">
@@ -33,13 +32,7 @@
                                             data-bs-target="#products_edit_modal_{{ row [0] }}"
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
-                                {#                                <th>#}
-                                {#                                    <button class="btn btn-danger" type="button"#}
-                                {#                                            data-bs-toggle="modal"#}
-                                {#                                            data-bs-target="#deleteModalVariableCost{{ row[0] }}">#}
-                                {#                                        <i class="bi bi-trash-fill"></i>#}
-                                {#                                    </button>#}
-                                {#                                </th>#}
+
                                 {% for col in row[1:] %}
                                     <th>{{ col }}</th>
                                 {% endfor %}
@@ -174,7 +167,7 @@
                             <tr class="table-success">
                                 <th>
                                     <button class="btn btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#packagingproduct_edit_modal_{{ row [0] }}"
+                                            data-bs-target="#packaging_product_edit_modal_{{ row [0] }}"
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
                                 {% for col in row[1:] %}
@@ -201,7 +194,7 @@
                             <tr class="table-success">
                                 <th>
                                     <button class="btn btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#ingredientproduct_edit_modal_{{ row [0] }}"
+                                            data-bs-target="#ingredient_product_edit_modal_{{ row [0] }}"
                                             type="button"><i class="bi bi-pencil"></i></button>
                                 </th>
                                 {% for col in row[1:] %}
@@ -346,44 +339,60 @@
                                 <input type="number" class="form-control" id="QR{{ row[0] }}" name="QR"
                                        value="{{ row[11] }}">
                             </div>
-                        <div class="mb-3">
-                            <label for="selling_price_lv{{ row[0] }}" class="form-label">selling_price_lv</label>
-                            <input type="number" class="form-control" id="selling_price_lv{{ row[0] }}" name="selling_price_lv"
-                                   value="{{ row[12] }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="criteria_lv{{ row[0] }}" class="form-label">criteria_lv</label>
-                            <input type="number" class="form-control" id="criteria_lv{{ row[0] }}" name="criteria_lv" value="{{ row[13] }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="selling_price_mv{{ row[0] }}" class="form-label">selling_price_mv</label>
-                            <input type="number" class="form-control" id="selling_price_mv{{ row[0] }}" name="selling_price_mv"
-                                   value="{{ row[14] }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="criteria_mv{{ row[0] }}" class="form-label">criteria_mv</label>
-                            <input type="number" class="form-control" id="criteria_mv{{ row[0] }}" name="criteria_mv" value="{{ row[15] }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="selling_price_hv{{ row[0] }}" class="form-label">selling_price_hv</label>
-                            <input type="number" class="form-control" id="selling_price_hv{{ row[0] }}" name="selling_price_hv"
-                                   value="{{ row[16] }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="criteria_hv{{ row[0] }}" class="form-label">criteria_hv</label>
-                            <input type="number" class="form-control" id="criteria_hv{{ row[0] }}" name="criteria_hv" value="{{ row[17] }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="work_time_min{{ row[0] }}" class="form-label">work_time_min</label>
-                            <input type="number" class="form-control" id="work_time_min{{ row[0] }}" name="work_time_min" value="{{ row[18] }}">
-                        </div>
-                        <div class="mb-3"
-                        ><label for="estimated_items{{ row[0] }}" class="form-label">estimated_items</label>
-                            <input type="number" class="form-control" id="estimated_items{{ row[0] }}" name="estimated_items"
-                                   value="{{ row[19] }}">
-                        </div>
+                            <div class="mb-3">
+                                <label for="selling_price_lv{{ row[0] }}" class="form-label">selling_price_lv</label>
+                                <input type="number" class="form-control" id="selling_price_lv{{ row[0] }}"
+                                       name="selling_price_lv"
+                                       value="{{ row[12] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="criteria_lv{{ row[0] }}" class="form-label">criteria_lv</label>
+                                <input type="number" class="form-control" id="criteria_lv{{ row[0] }}"
+                                       name="criteria_lv"
+                                       value="{{ row[13] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="selling_price_mv{{ row[0] }}" class="form-label">selling_price_mv</label>
+                                <input type="number" class="form-control" id="selling_price_mv{{ row[0] }}"
+                                       name="selling_price_mv"
+                                       value="{{ row[14] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="criteria_mv{{ row[0] }}" class="form-label">criteria_mv</label>
+                                <input type="number" class="form-control" id="criteria_mv{{ row[0] }}"
+                                       name="criteria_mv"
+                                       value="{{ row[15] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="selling_price_hv{{ row[0] }}" class="form-label">selling_price_hv</label>
+                                <input type="number" class="form-control" id="selling_price_hv{{ row[0] }}"
+                                       name="selling_price_hv"
+                                       value="{{ row[16] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="criteria_hv{{ row[0] }}" class="form-label">criteria_hv</label>
+                                <input type="number" class="form-control" id="criteria_hv{{ row[0] }}"
+                                       name="criteria_hv"
+                                       value="{{ row[17] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="work_time_min{{ row[0] }}" class="form-label">work_time_min</label>
+                                <input type="number" class="form-control" id="work_time_min{{ row[0] }}"
+                                       name="work_time_min" value="{{ row[18] }}">
+                            </div>
+                            <div class="mb-3"
+                            ><label for="estimated_items{{ row[0] }}" class="form-label">estimated_items</label>
+                                <input type="number" class="form-control" id="estimated_items{{ row[0] }}"
+                                       name="estimated_items"
+                                       value="{{ row[19] }}">
+                            </div>
                         </div>
                         <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalproduct{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary" name="products_edit_button"
                                     value="{{ row[0] }}">Save changes
@@ -394,6 +403,412 @@
             </div>
         </div>
     {% endfor %}
+
+
+    {% for row in data_dictionary['ingredients'] %}
+        <div class="modal fade" id="ingredients_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="ingredients_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ingredients_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputEnglish{{ row[0] }}" class="form-label">English</label>
+                                <input type="text" class="form-control" id="inputEnglish{{ row[0] }}" name="english"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputKorean{{ row[0] }}" class="form-label">Korean</label>
+                                <input type="text" class="form-control" id="inputKorean{{ row[0] }}" name="korean"
+                                       value="{{ row[2] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalingredients{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="ingredients_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for row in data_dictionary['packaging'] %}
+        <div class="modal fade" id="packaging_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="packaging_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="packaging_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputEnglish{{ row[0] }}" class="form-label">English</label>
+                                <input type="text" class="form-control" id="inputEnglish{{ row[0] }}" name="english"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputKorean{{ row[0] }}" class="form-label">Korean</label>
+                                <input type="text" class="form-control" id="inputKorean{{ row[0] }}" name="korean"
+                                       value="{{ row[2] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalpackaging{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="packaging_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for row in data_dictionary['prices_ingredients'] %}
+        <div class="modal fade" id="prices_ingredients_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="prices_ingredients_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="prices_ingredients_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="input_ingredientid{{ row[0] }}" class="form-label">Ingredientid</label>
+                                <input type="number" class="form-control" id="input_ingredientid{{ row[0] }}" name="ingredientid"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_price{{ row[0] }}" class="form-label">Price</label>
+                                <input type="number" class="form-control" id="input_price{{ row[0] }}" name="price"
+                                       value="{{ row[2] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_weight_in_gram{{ row[0] }}" class="form-label">Weight In Gram	</label>
+                                <input type="number" class="form-control" id="input_weight_in_gram{{ row[0] }}" name="weight_in_gram"
+                                       value="{{ row[3] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_date{{ row[0] }}" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="input_date{{ row[0] }}" name="date"
+                                       value="{{ row[4] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalprices_ingredients{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="prices_ingredients_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for row in data_dictionary['prices_packaging'] %}
+        <div class="modal fade" id="prices_packaging_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="prices_packaging_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="prices_packaging_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="input_packagingid{{ row[0] }}" class="form-label">Packagingid</label>
+                                <input type="number" class="form-control" id="input_packagingid{{ row[0] }}" name="packagingid"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_packaging_price{{ row[0] }}" class="form-label">Price Per Unit	</label>
+                                <input type="number" class="form-control" id="input_packaging_price{{ row[0] }}" name="price"
+                                       value="{{ row[2] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_date{{ row[0] }}" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="input_date{{ row[0] }}" name="date"
+                                       value="{{ row[3] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalprices_packaging{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="prices_packaging_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for row in data_dictionary['packagingproduct'] %}
+        <div class="modal fade" id="packaging_product_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="packaging_product_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="packaging_product_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="input_Productid{{ row[0] }}" class="form-label">Productid</label>
+                                <input type="number" class="form-control" id="input_Productid{{ row[0] }}" name="productid"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_Packagingid{{ row[0] }}" class="form-label">Packagingid</label>
+                                <input type="number" class="form-control" id="input_Packagingid{{ row[0] }}" name="packagingid"
+                                       value="{{ row[2] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalpackaging_product{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="packaging_product_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for row in data_dictionary['ingredientproduct'] %}
+        <div class="modal fade" id="ingredient_product_edit_modal_{{ row [0] }}" tabindex="-1" role="dialog"
+             aria-labelledby="ingredient_product_edit_modal_label{{ row [0] }}"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ingredient_product_edit_modal_label{{ row [0] }}">{{ row [1] }}
+                            / {{ row [2] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/edit_cost_calculation">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="input_Productid_{{ row[0] }}" class="form-label">Productid</label>
+                                <input type="number" class="form-control" id="input_Productid_{{ row[0] }}" name="productid"
+                                       value="{{ row[1] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_Ingredientid{{ row[0] }}" class="form-label">Ingredientid</label>
+                                <input type="number" class="form-control" id="input_Ingredientid{{ row[0] }}" name="ingredientid"
+                                       value="{{ row[2] }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="input_weight_in_gram__{{ row[0] }}" class="form-label">Weight In Gram</label>
+                                <input type="number" class="form-control" id="input_weight_in_gram__{{ row[0] }}" name="weight_in_gram"
+                                       value="{{ row[3] }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="button"#}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalingredient_product{{ row[0] }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="ingredient_product_edit_button"
+                                    value="{{ row[0] }}">Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['products'] %}
+        <div class="modal fade" id="deleteModalproduct{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelproduct{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelproduct{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="products_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['ingredients'] %}
+        <div class="modal fade" id="deleteModalingredients{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelingredients{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelingredients{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="ingredients_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['packaging'] %}
+        <div class="modal fade" id="deleteModalpackaging{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelpackaging{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelpackaging{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="packaging_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['prices_ingredients'] %}
+        <div class="modal fade" id="deleteModalprices_ingredients{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelprices_ingredients{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelprices_ingredients{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="prices_ingredients_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['prices_packaging'] %}
+        <div class="modal fade" id="deleteModalprices_packaging{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelprice_packaging{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelprices_packaging{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="prices_packaging_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['packagingproduct'] %}
+        <div class="modal fade" id="deleteModalpackaging_product{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelpackagingproduct{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelpackagingproduct{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="packaging_product_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for row in data_dictionary['ingredientproduct'] %}
+        <div class="modal fade" id="deleteModalingredient_product{{ row[0] }}" tabindex="-1" aria-labelledby="deleteModalLabelingredientproduct{{ row[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabelingredientproduct{{ row[0] }}">Delete {{ row [1] }} ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form method="post" action="/edit_cost_calculation">
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" name="ingredient_product_delete_button" value="{{ row[0] }}">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
     <script>
         $(document).ready(function () {
             $("#productSearch").on("keyup", function () {

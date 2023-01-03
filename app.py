@@ -17,7 +17,7 @@ import logging
 
 import qrcode
 
-from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
+from flask import Flask, render_template, session, redirect, url_for, flash, request, abort, render_template_string
 from flask_mail import Mail, Message
 
 # from flask_compress import Compress
@@ -117,6 +117,7 @@ def postgres_connection(func):
 
     return wrapper
 
+
 @app.after_request
 def add_header(response):
     response.cache_control.max_age = 300
@@ -182,12 +183,12 @@ def get_locale():
 
 # -----------------------RQ-----------------------
 
-@rq.job
+# @rq.job
 def send_sms_in_background(message_str):
     naver_setup.send_message_admin(message=message_str)
 
 
-@rq.job
+# @rq.job
 def send_email_in_background(message_object):
     mail.send(message=message_object)
 
@@ -206,7 +207,9 @@ def index():
     api_kakao_js = main.get_setting_by_name('kakaoAPI')[1]
     best_products = []
     contact_form = ContactForm()
-    for row in main.read_table('products'):
+    news_articles = main.read_table('news')
+    products = main.read_table('products')
+    for row in products:
         if row[8] == True:
             row_list = [x for x in row]
             if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
@@ -222,18 +225,19 @@ def index():
         message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
         admin_msg.html = message
         try:
-            send_email_in_background.queue(admin_msg)
+            send_email_in_background(admin_msg)
         except Exception as e:
             app.logger.error(str(e) + ': Mail couldn\'t be send')
         try:
-            send_sms_in_background.queue(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
-            send_sms_in_background.queue("더보기: https://cdf.herokuapp.com/contact_inquiry")
+            send_sms_in_background(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
+            send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
         except Exception as e:
             app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
         Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
                          phone=contact_form.phone.data, subject=contact_form.subject.data,
                          message=contact_form.message.data).register_contact_query()
-    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products, contact_form=contact_form)
+    return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products, contact_form=contact_form,
+                           news_articles=news_articles)
 
 
 @app.route("/products", methods=['GET', 'POST'])
@@ -243,7 +247,7 @@ def products():
     data_products = main.read_table('products')
     data_allergenproduct = main.read_table('allergenproduct')
     data_allergens = main.read_table('allergens')
-    allergenproduct={}
+    allergenproduct = {}
     for x in data_allergenproduct:
         if x[1] in allergenproduct:
             allergenproduct[x[1]].append({x[2]: x[3]})
@@ -264,7 +268,8 @@ def products():
         if not os.path.exists(os.path.abspath("static/img/products") + "/" + row[5]):
             row_list[5] = "no-image-available.jpg"
         products.append(row_list)
-    return render_template('products.html', products=products, korean_allergens=korean_allergens,english_allergens=english_allergens,
+    return render_template('products.html', products=products, korean_allergens=korean_allergens,
+                           english_allergens=english_allergens,
                            allergenproduct=allergenproduct)
 
 
@@ -281,8 +286,10 @@ def allergens():
     products = main.read_table('products')
     allergens = main.read_table('allergens')
     common_allergens = [2, 3, 5, 8, 9]
-    return render_template('allergens.html', product_list=main.allergen_dict_all_products(), products=products, allergens=allergens,
+    return render_template('allergens.html', product_list=main.allergen_dict_all_products(), products=products,
+                           allergens=allergens,
                            common_allergens=common_allergens)
+
 
 @app.route("/privacy_policy", methods=['GET', 'POST'])
 def privacy_policy():
@@ -397,11 +404,44 @@ def admin_overview():
         if 'btn_delete_comment' in request.form:
             main.delete_row_by_id('comments', request.form['btn_delete_comment'])
             redirect(url_for('admin_overview'))
-        else:
+        elif 'btn_comment' in request.form:
             comment = Database.Comment(request.form['comment'])
             comment.register_comment()
             redirect(url_for('admin_overview'))
-    return render_template('admin_overview.html', comments=main.read_table('comments'))
+        elif 'btn_news' in request.form:
+            news_data = {'1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {}}
+            for input_field in request.form:
+                if '$$$' in input_field:
+                    input_field_sep = input_field.split('$$$')
+                    news_data[input_field_sep[0]].update({input_field_sep[1]: request.form[input_field]})
+            for news_item in news_data:
+                if 'is_published' in news_data[news_item]:
+                    is_published = True
+                else:
+                    is_published = False
+                if 'active' in news_data[news_item]:
+                    active = True
+                else:
+                    active = False
+                Database.News(english_news_title=news_data[news_item]['english_news_title'],
+                              korean_news_title=news_data[news_item]['korean_news_title'],
+                              english_news_subtitle=news_data[news_item]['english_news_subtitle'],
+                              korean_news_subtitle=news_data[news_item]['korean_news_subtitle'],
+                              english_news_details=news_data[news_item]['english_news_details'],
+                              korean_news_details=news_data[news_item]['korean_news_details'],
+                              lightbox_image=news_data[news_item]['lightbox_image'],
+                              display_image=news_data[news_item]['display_image'],
+                              active=active,
+                              bs_interval=news_data[news_item]['bs_interval'],
+                              is_published=is_published,
+                              ).update(int(news_item))
+        else:
+            app.logger.error("Error in admin overview: comment/news is not stored")
+    data = {}
+    data['comments'] = main.read_table('comments')
+    data['news'] = main.read_table('news', order_asc='id')
+    data['news_col'] = main.show_columns('news')
+    return render_template('admin_overview.html', data=data)
 
 
 @app.route('/business_plan', methods=['GET', 'POST'])
@@ -448,18 +488,19 @@ def cost_calculation():
             else:
                 best_product = False
             product_id = Database.Products(request.form['english'], request.form['korean'],
-                              request.form['weight_in_gram_per_product'], request.form['unit'],
-                              request.form['image'], type=request.form['type'],
-                              currently_selling=currently_selling, best=best_product,
-                              korean_description=request.form['Korean_description'],
-                              english_description=request.form['English_description'],
-                              qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
-                              criteria_lv=request.form['criteria_lv'],
-                              selling_price_mv=request.form['selling_price_mv'],
-                              criteria_mv=request.form['criteria_mv'],
-                              selling_price_hv=request.form['selling_price_hv'],
-                              criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
-                              estimated_items=request.form['estimated_items']).register()
+                                           request.form['weight_in_gram_per_product'], request.form['unit'],
+                                           request.form['image'], type=request.form['type'],
+                                           currently_selling=currently_selling, best=best_product,
+                                           korean_description=request.form['Korean_description'],
+                                           english_description=request.form['English_description'],
+                                           qr=request.form['QR'], selling_price_lv=request.form['selling_price_lv'],
+                                           criteria_lv=request.form['criteria_lv'],
+                                           selling_price_mv=request.form['selling_price_mv'],
+                                           criteria_mv=request.form['criteria_mv'],
+                                           selling_price_hv=request.form['selling_price_hv'],
+                                           criteria_hv=request.form['criteria_hv'],
+                                           work_time_min=request.form['work_time_min'],
+                                           estimated_items=request.form['estimated_items']).register()
             allergens_form_list = [x for x in request.form if 'allergen' in x]
             allergen_dict = {}
             for allergen in allergens:
@@ -468,7 +509,8 @@ def cost_calculation():
                 allergen_id = allergen.split("$$$")[1]
                 allergen_dict[allergen_id] = True
             for key in allergen_dict:
-                Database.AllergenProduct(productID=product_id,AllergenID=key,contains_allergen=allergen_dict[key]).register()
+                Database.AllergenProduct(productID=product_id, AllergenID=key,
+                                         contains_allergen=allergen_dict[key]).register()
 
         elif 'price_ingredient_add_button' in request.form:
             if request.form['date'] == '':
@@ -504,7 +546,7 @@ def cost_calculation():
     return render_template('cost_calculation.html', packaging=packaging,
                            ingredients=ingredients, products=products,
                            missing_prices_packaging=missing_prices_packaging,
-                           missing_prices_ingredients=missing_prices_ingredients,allergens=allergens)
+                           missing_prices_ingredients=missing_prices_ingredients, allergens=allergens)
 
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])
@@ -535,6 +577,50 @@ def edit_cost_calculation():
                               criteria_hv=request.form['criteria_hv'], work_time_min=request.form['work_time_min'],
                               estimated_items=request.form['estimated_items']).update(
                 request.form['products_edit_button'])
+        elif 'ingredients_edit_button' in request.form:
+            Database.Ingredients(request.form['english'], request.form['korean']).update_ingredient(
+                request.form['ingredients_edit_button'])
+        elif 'packaging_edit_button' in request.form:
+            Database.Packaging(request.form['english'], request.form['korean']).update(
+                request.form['packaging_edit_button'])
+        elif 'prices_ingredients_edit_button' in request.form:
+            if request.form['date'] == '':
+                date = None
+            else:
+                date = request.form['date']
+            Database.PricesIngredients(request.form['ingredientid'], request.form['price'],
+                                       request.form['weight_in_gram'], date).update(
+                request.form['prices_ingredients_edit_button'])
+        elif 'prices_packaging_edit_button' in request.form:
+            if request.form['date'] == '':
+                date = None
+            else:
+                date = request.form['date']
+            Database.PricesPackaging(request.form['packagingid'], request.form['price'], date).update(
+                request.form['prices_packaging_edit_button'])
+        elif 'packaging_product_edit_button' in request.form:
+            Database.PackagingProduct(request.form['productid'], request.form['packagingid']).update(
+                request.form['packaging_product_edit_button'])
+        elif 'ingredient_product_edit_button' in request.form:
+            Database.IngredientProduct(request.form['productid'], request.form['ingredientid'],
+                                       request.form['weight_in_gram']).update(
+                request.form['ingredient_product_edit_button'])
+        elif 'products_delete_button' in request.form:
+            main.delete_row_by_id('products', request.form['products_delete_button'])
+        elif 'ingredients_delete_button' in request.form:
+            main.delete_row_by_id('ingredients', request.form['ingredients_delete_button'])
+        elif 'packaging_delete_button' in request.form:
+            main.delete_row_by_id('packaging', request.form['packaging_delete_button'])
+        elif 'prices_ingredients_delete_button' in request.form:
+            main.delete_row_by_id('prices_ingredients', request.form['prices_ingredients_delete_button'])
+        elif 'prices_packaging_delete_button' in request.form:
+            main.delete_row_by_id('prices_packaging', request.form['prices_packaging_delete_button'])
+        elif 'packaging_product_delete_button' in request.form:
+            main.delete_row_by_id('packagingproduct', request.form['packaging_product_delete_button'])
+        elif 'ingredient_product_delete_button' in request.form:
+            main.delete_row_by_id('ingredientproduct', request.form['ingredient_product_delete_button'])
+        else:
+            app.logger.error('Minor bug alert. Edit/delete in cost calculation is not performed. ')
     data_dictionary = {}
     data_dictionary['ingredients'] = main.read_table('ingredients')
     data_dictionary['products'] = main.read_table('products')
@@ -701,7 +787,8 @@ def images():
 @postgres_connection
 def contact_inquiry():
     if request.method == 'POST':
-        naver_setup.send_sms_to_receiver(message=request.form['message'], phone_receiver=request.form['phone_number'])
+        naver_setup.send_sms_to_receiver(message=request.form['message'],
+                                         phone_receiver=request.form['phone_number'])
         flash('메시지를 보냈어요!!')
     contact_info = main.read_table('customer_contact_submission', order_desc="time")
     return render_template('contact_inquiry.html', contact_info=contact_info)
@@ -797,10 +884,11 @@ def edit_allergens():
             for key in allergens_check:
                 op = key.split('$$$')
                 Database.AllergenProduct(productID=op[0], AllergenID=op[1],
-                                               contains_allergen=allergens_check[key]).update()
+                                         contains_allergen=allergens_check[key]).update()
     products = main.read_table('products')
     allergens = main.read_table('allergens')
-    return render_template('allergens_edit.html', product_list=main.allergen_dict_all_products(), products=products, allergens=allergens)
+    return render_template('allergens_edit.html', product_list=main.allergen_dict_all_products(), products=products,
+                           allergens=allergens)
 
 
 # ----------------------LOG IN/OUT-----------------------------
@@ -867,4 +955,3 @@ def gone(e):
 def internal_server_error(e):
     e_friendly = "'server problems' To be or not being overloaded. That's the question."
     return render_template('error.html', e=e, e_friendly=e_friendly), 500
-

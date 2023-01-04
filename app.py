@@ -216,26 +216,50 @@ def index():
                 row_list[5] = "no-image-available.jpg"
             best_products.append(row_list)
     if request.method == "POST":
+        input_list = (contact_form.name.data,contact_form.phone.data,contact_form.email.data,contact_form.message.data,contact_form.subject.data)
+        form_error = ""
+        suspicious_request = False
+        for input_item in input_list:
+            if input_item == None:
+                form_error = input_item + ": has None. MESSAGE>>;; " + str(input_list)
+                suspicious_request = True
+                break
+            if "'" in input_item:
+                form_error = "' is mentioned in form. MESSAGE>>;; " + str(input_list)
+                suspicious_request = True
+                break
         # msg.recipients = ["rlatnals3020@naver.com"]
-
-        admin_msg = Message("Coup De Foudre: 문의 주세요!",
-                            sender="from@example.com",
-                            recipients=["to@example.com"])
-        admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-        message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
-        admin_msg.html = message
-        try:
-            send_email_in_background(admin_msg)
-        except Exception as e:
-            app.logger.error(str(e) + ': Mail couldn\'t be send')
-        try:
-            send_sms_in_background(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
-            send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
-        except Exception as e:
-            app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
-        Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
-                         phone=contact_form.phone.data, subject=contact_form.subject.data,
-                         message=contact_form.message.data).register_contact_query()
+        if suspicious_request:
+            admin_msg = Message("Coup De Foudre: 문의 주세요!",
+                                sender="from@example.com",
+                                recipients=["to@example.com"])
+            admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+            message = form_error
+            admin_msg.html = message
+            try:
+                send_email_in_background(admin_msg)
+                app.logger.error('suspicious_request: ' + form_error)
+            except Exception as e:
+                app.logger.error(str(e) + ': Mail couldn\'t be send')
+        else:
+            admin_msg = Message("Coup De Foudre: 문의 주세요!",
+                                sender="from@example.com",
+                                recipients=["to@example.com"])
+            admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+            message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
+            admin_msg.html = message
+            try:
+                send_email_in_background(admin_msg)
+            except Exception as e:
+                app.logger.error(str(e) + ': Mail couldn\'t be send')
+            try:
+                send_sms_in_background(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
+                send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
+            except Exception as e:
+                app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
+            Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
+                             phone=contact_form.phone.data, subject=contact_form.subject.data,
+                             message=contact_form.message.data).register_contact_query()
     return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products, contact_form=contact_form,
                            news_articles=news_articles)
 

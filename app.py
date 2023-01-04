@@ -921,10 +921,6 @@ def unauthorized_handler():
 
 
 # ----------------------ERROR HANDLING-----------------------------
-@app.errorhandler(302)
-def bad_request(e):
-    e_friendly = "The server and client don't seem to have any manners"
-    return render_template('error.html', e=e, e_friendly=e_friendly), 302
 
 @app.errorhandler(400)
 def bad_request(e):

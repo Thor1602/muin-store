@@ -224,10 +224,6 @@ def index():
                 form_error = input_item + ": has None. MESSAGE>>;; " + str(input_list)
                 suspicious_request = True
                 break
-            if "'" in input_item:
-                form_error = "' is mentioned in form. MESSAGE>>;; " + str(input_list)
-                suspicious_request = True
-                break
         # msg.recipients = ["rlatnals3020@naver.com"]
         if suspicious_request:
             admin_msg = Message("Coup De Foudre: 문의 주세요!",
@@ -921,6 +917,20 @@ def edit_allergens():
 def login():
     cform = LoginForm()
     if cform.validate_on_submit():
+        admin_msg = Message("Coup De Foudre: 문의 주세요!",
+                            sender="from@example.com",
+                            recipients=["to@example.com"])
+        admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+        if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+            request_ip = request.environ['REMOTE_ADDR']
+        else:
+            request_ip = request.environ['HTTP_X_FORWARDED_FOR']
+        admin_msg.html = 'login attempt: ' + request_ip
+        try:
+            send_email_in_background(admin_msg)
+        except Exception as e:
+            app.logger.error(str(e) + ': Login attempt mail couldn\'t be send')
+
         email = cform.email.data
         user = User(email)
         app.logger.warning('Validated attempt to login.')

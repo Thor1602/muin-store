@@ -924,9 +924,8 @@ def login():
         if request_ip not in trusted_ip:
             admin_msg = Message("Coup De Foudre: 문의 주세요!",
                                 sender="from@example.com",
-                                recipients=["to@example.com"])
-            admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-            admin_msg.html = 'suspicious login attempt: ' + request_ip
+                                recipients=["thorbendhaenenstd@gmail.com"],
+                                html='suspicious login attempt: ' + request_ip)
             try:
                 send_email_in_background(admin_msg)
             except Exception as e:

@@ -90,7 +90,7 @@ nav_menu_admin = {'/admin_overview': 'Overview',
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
-
+trusted_ip = ('127.0.0.1','211.208.140.83')
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 # -----------------------LOGGING-----------------------
 
@@ -917,24 +917,25 @@ def edit_allergens():
 def login():
     cform = LoginForm()
     if cform.validate_on_submit():
-        admin_msg = Message("Coup De Foudre: 문의 주세요!",
-                            sender="from@example.com",
-                            recipients=["to@example.com"])
-        admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
         if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
             request_ip = request.environ['REMOTE_ADDR']
         else:
             request_ip = request.environ['HTTP_X_FORWARDED_FOR']
-        admin_msg.html = 'login attempt: ' + request_ip
-        try:
-            send_email_in_background(admin_msg)
-        except Exception as e:
-            app.logger.error(str(e) + ': Login attempt mail couldn\'t be send')
-
+        if request_ip in trusted_ip:
+            admin_msg = Message("Coup De Foudre: 문의 주세요!",
+                                sender="from@example.com",
+                                recipients=["to@example.com"])
+            admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+            admin_msg.html = 'suspicious login attempt: ' + request_ip
+            try:
+                send_email_in_background(admin_msg)
+            except Exception as e:
+                app.logger.error(str(e) + ': Login attempt mail couldn\'t be send')
         email = cform.email.data
         user = User(email)
         app.logger.warning('Validated attempt to login.')
         if user in users and main.verify_password(email, cform.password.data):
+
             app.logger.info(email + ' is logged in as admin.')
             flask_login.login_user(user=user, remember=True)
             return redirect(url_for('contact_inquiry'))

@@ -921,7 +921,7 @@ def login():
             request_ip = request.environ['REMOTE_ADDR']
         else:
             request_ip = request.environ['HTTP_X_FORWARDED_FOR']
-        if request_ip in trusted_ip:
+        if request_ip not in trusted_ip:
             admin_msg = Message("Coup De Foudre: 문의 주세요!",
                                 sender="from@example.com",
                                 recipients=["to@example.com"])

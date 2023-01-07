@@ -7,12 +7,19 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <title>{% block title %}{% endblock %}</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
+    <meta name="description"
+          content="구리에서 위치한 저희 베이커리에서는 여러분을 위해 우리의 유명한 초코멜로, 페이스트리, 그리고 다양한 종류의 즐거움을 만들어 드립니다. 11932, 경기도 구리시 원수택로32번길 11-48. 영업시간:수,목,금,토,일,월: 8시-23시휴일: 화요일">
+    <meta name="keywords"
+          content="bakery, bakery near me, cake shop near me, cake box, pastries, cake shop, cake bakery near me, birthday cakes near me, public cakes, french bakery near me, custom cakes near me, best bakery near me, pastries near me, bakery shop near me, Italian bakery near me, bakerhouse, bakers near me, pasty shop near me, custom cakes, the bakery, baked goods, bakery shop, bake rolls, Mr baker, cake box near me, the cake shop, cake places near me, italian bakery, corner bakery near me, cake bake shop, bake my day, boulangerie near me, bread bakery near me,최고의, 베이커리, 맛집을, 찾고, 계십니까?, 당신은, 최고의, 베이커리, 맛집을, 찾기, 위해, 저희, 사이트에, 잘, 방문했습니다., 우리, 브랜드는, 당신이, 원하는, 최고의, 베이커리, 맛집입니다., 부드러우면서도, 달콤하고, 고소한, 최고의, 베이커리, 맛집으로, 다양한, 빵과, 디저트를, 제공하고, 있습니다., 최고의, 베이커리, 맛집,">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="Korean">
+    <meta name="revisit-after" content="30 days">
+    <meta name="author" content="쿠드푸드르 베이커리">
 
     <!-- Favicons -->
-    <link href="/static/img/favicon.ico" rel="icon"  type="image/x-icon">
-    <link href="/static/img/apple-touch-icon.png" rel="apple-touch-icon"  type="image/x-icon">
+    <link href="/static/img/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="/static/img/apple-touch-icon.png" rel="apple-touch-icon" type="image/x-icon">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +58,8 @@
                     class="fa-solid fa-envelope fa-xl d-flex align-items-center"></i></a>
             <a class="short-screen btn" href="tel:00821048878249" data-bs-toggle="tooltip" data-bs-placement="bottom"
                title="Call us"><i class="fa-solid fa-phone fa-xl d-flex align-items-center"></i></a>
-            <a class="short-screen btn" href="https://pf.kakao.com/_xmCxauxj" data-bs-toggle="tooltip" data-bs-placement="bottom"
+            <a class="short-screen btn" href="https://pf.kakao.com/_xmCxauxj" data-bs-toggle="tooltip"
+               data-bs-placement="bottom"
                title="Send a Kakao message"><i class="fa-brands fa-kickstarter fa-xl d-flex align-items-center"></i></a>
         </div>
         <div class="contact-info d-flex align-items-end">
@@ -62,7 +70,7 @@
             {% endif %}
             {% if current_user.is_authenticated %}
                 <a class="btn" href="/logout" data-bs-toggle="tooltip" data-bs-placement="bottom"
-               title="로그아웃"><i class="fa-solid fa-right-from-bracket fa-2xl d-flex align-items-center"></i></a>
+                   title="로그아웃"><i class="fa-solid fa-right-from-bracket fa-2xl d-flex align-items-center"></i></a>
             {% endif %}
         </div>
         {#      <div class="social-links d-none d-md-flex align-items-center">#}
@@ -84,7 +92,7 @@
         <nav id="navbar" class="navbar">
             <ul>
                 {% if current_user.is_authenticated %}
-                     <li><a class="btn" href="/logout"><i class="fa-solid fa-right-from-bracket fa-2xl"></i>로그아웃</a></li>
+                    <li><a class="btn" href="/logout"><i class="fa-solid fa-right-from-bracket fa-2xl"></i>로그아웃</a></li>
                     {% for menu_item in nav_menu_admin %}
                         {% if nav_menu_admin[menu_item] is mapping %}
                             <li class="dropdown"><a href="javascript:void(0)"><span>{{ menu_item }}</span> <i

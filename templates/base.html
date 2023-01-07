@@ -79,7 +79,7 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
         <a href="/" class="logo d-flex align-items-center">
             <!-- Uncomment the line below if you also wish to use an image logo -->
-            <h1>{{ msgid['title'] }}<span>.</span></h1>
+            <h1>{{ msgid['title_brand'] }}<span>.</span></h1>
         </a>
         <nav id="navbar" class="navbar">
             <ul>
@@ -137,10 +137,10 @@
             {{ msgid['business_registration_tag'] }} <a href="#"></a>
         </div>
         <div class="copyright">
-            &copy; Copyright <strong><span>{{ msgid['title'] }}</span></strong>. All Rights Reserved
+            &copy; Copyright <strong><span>{{ msgid['title_brand'] }}</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-            Designed by <a href="#">{{ msgid['title'] }}</a>
+            Designed by <a href="#">{{ msgid['title_brand'] }}</a>
         </div>
     </div>
 
@@ -153,7 +153,6 @@
 {% block modalbody %}{% endblock %}
 
 <!-- Vendor JS Files -->
-{#<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>#}
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
         integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
         crossorigin="anonymous"></script>
@@ -171,7 +170,6 @@
 
 <!-- Template Main JS File -->
 <script src="/static/js/main.js"></script>
-{#<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>#}
 
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

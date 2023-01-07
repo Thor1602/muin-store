@@ -17,10 +17,10 @@ import logging
 
 import qrcode
 
-from flask import Flask, render_template, session, redirect, url_for, flash, request, abort, render_template_string
-from flask_mail import Mail, Message
+from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
 
-# from flask_compress import Compress
+from flask_mail import Mail, Message
+from flask_compress import Compress
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -67,13 +67,13 @@ app.config.update(dict(
 )
 mail = Mail(app)
 rq = RQ(app)
-# Compress(app)
+Compress(app)
+
 # secure_headers = SecureHeaders()
 # toolbar = DebugToolbarExtension(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.session_protection = 'strong'
 
 nav_menu_admin = {'/admin_overview': 'Overview',
                   '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},

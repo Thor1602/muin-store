@@ -72,6 +72,8 @@ Compress(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.session_protection = 'strong'
+
 nav_menu_admin = {'/admin_overview': 'Overview',
                   '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},
                   '제품': {'/recipes': '레시피'

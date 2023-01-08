@@ -14,7 +14,7 @@
             </div>
             <hr>
             <div class="row">
-                {% if session_name == 'ko_KR' %}
+                {% if preferred_language == 'ko_KR' %}
                     {% for allergen in allergens %}
                         {% if allergen[0] in common_allergens %}
                             <div class="col-6 col-sm-6 col-md-4 col-lg-2 form-check form-switch"><input type="checkbox" class="form-check-input allergen-check"
@@ -43,7 +43,7 @@
                     <thead>
                     <tr>
                         <th></th>
-                        {% if session_name == 'ko_KR' %}
+                        {% if preferred_language == 'ko_KR' %}
                             {% for allergen in allergens %}
                                 <th>{{ allergen[2] }}</th>
                             {% endfor %}
@@ -55,7 +55,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% if session_name == 'ko_KR' %}
+                    {% if preferred_language == 'ko_KR' %}
                         {% for product in products %}
                             {% if product[7] == True %}
                             <tr>

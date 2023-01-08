@@ -24,7 +24,7 @@
                             <thead>
                             <tr>
                                 <th></th>
-                                {% if session_name == 'ko_KR' %}
+                                {% if preferred_language == 'ko_KR' %}
                                     {% for allergen in allergens %}
                                         <th>{{ allergen[2] }}</th>
                                     {% endfor %}
@@ -36,7 +36,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% if session_name == 'ko_KR' %}
+                            {% if preferred_language == 'ko_KR' %}
 
                                 {% for product in products %}
                                     <tr>

@@ -14,6 +14,7 @@ more info later
 """
 import datetime
 import logging
+from os.path import exists
 
 import qrcode
 
@@ -114,6 +115,12 @@ def postgres_connection(func):
 
     return wrapper
 
+@app.before_request
+def before_request():
+    if not exists('D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt'):
+        if not request.is_secure:
+            url = request.url.replace('http://', 'https://', 1)
+            return redirect(url, code=301)
 
 @app.after_request
 def add_header(response):

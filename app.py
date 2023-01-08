@@ -917,11 +917,11 @@ def edit_allergens():
 
 
 # ----------------------LOG IN/OUT-----------------------------
-@app.route('/login', methods=['GET', 'POST'])
-@postgres_connection
-def login():
-    cform = LoginForm()
-    if cform.validate_on_submit():
+# @app.route('/login', methods=['GET', 'POST'])
+# @postgres_connection
+# def login():
+#     cform = LoginForm()
+#     if cform.validate_on_submit():
         # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         #     request_ip = request.environ['REMOTE_ADDR']
         # else:
@@ -935,17 +935,32 @@ def login():
         #         send_email_in_background(admin_msg)
         #     except Exception as e:
         #         app.logger.error(str(e) + ': Login attempt mail couldn\'t be send')
+    #     email = cform.email.data
+    #     user = User(email)
+    #     app.logger.warning('Validated attempt to login.')
+    #     if user in users and main.verify_password(email, cform.password.data):
+    #         app.logger.info(email + ' is logged in as admin.')
+    #         flask_login.login_user(user=user, remember=True)
+    #         return redirect(url_for('contact_inquiry'))
+    #     else:
+    #         return redirect(url_for('login'))
+    # return render_template('login.html', form=cform)
+
+@app.route('/login', methods=['GET', 'POST'])
+@postgres_connection
+def login():
+    cform = LoginForm()
+    if cform.validate_on_submit():
         email = cform.email.data
         user = User(email)
         app.logger.warning('Validated attempt to login.')
         if user in users and main.verify_password(email, cform.password.data):
             app.logger.info(email + ' is logged in as admin.')
             flask_login.login_user(user=user, remember=True)
-            return redirect(url_for('contact_inquiry'))
+            return redirect(url_for('admin_overview'))
         else:
             return redirect(url_for('login'))
     return render_template('login.html', form=cform)
-
 
 @app.route("/logout")
 def logout():

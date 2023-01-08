@@ -63,8 +63,6 @@ app.config.update(dict(
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=600
 )
-SESSION_TYPE = 'redis'
-app.config.from_object(__name__)
 mail = Mail(app)
 rq = RQ(app)
 Compress(app)
@@ -922,24 +920,23 @@ def edit_allergens():
 def login():
     cform = LoginForm()
     if cform.validate_on_submit():
-        if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-            request_ip = request.environ['REMOTE_ADDR']
-        else:
-            request_ip = request.environ['HTTP_X_FORWARDED_FOR']
-        if request_ip not in trusted_ip:
-            admin_msg = Message("Coup De Foudre: 문의 주세요!",
-                                sender="from@example.com",
-                                recipients=["thorbendhaenenstd@gmail.com"],
-                                html='suspicious login attempt: ' + request_ip)
-            try:
-                send_email_in_background(admin_msg)
-            except Exception as e:
-                app.logger.error(str(e) + ': Login attempt mail couldn\'t be send')
+        # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        #     request_ip = request.environ['REMOTE_ADDR']
+        # else:
+        #     request_ip = request.environ['HTTP_X_FORWARDED_FOR']
+        # if request_ip not in trusted_ip:
+        #     admin_msg = Message("Coup De Foudre: 문의 주세요!",
+        #                         sender="from@example.com",
+        #                         recipients=["thorbendhaenenstd@gmail.com"],
+        #                         html='suspicious login attempt: ' + request_ip)
+        #     try:
+        #         send_email_in_background(admin_msg)
+        #     except Exception as e:
+        #         app.logger.error(str(e) + ': Login attempt mail couldn\'t be send')
         email = cform.email.data
         user = User(email)
         app.logger.warning('Validated attempt to login.')
         if user in users and main.verify_password(email, cform.password.data):
-
             app.logger.info(email + ' is logged in as admin.')
             flask_login.login_user(user=user, remember=True)
             return redirect(url_for('contact_inquiry'))

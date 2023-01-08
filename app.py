@@ -18,7 +18,6 @@ import logging
 import qrcode
 
 from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
-
 from flask_mail import Mail, Message
 from flask_compress import Compress
 
@@ -47,10 +46,8 @@ encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 app.secret_key = main.get_setting_by_name('secret_key')[1]
 redis_external_url = main.get_setting_by_name('redis_external_url')[1]
 Database.close_connection()
-
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['RQ_REDIS_URL'] = redis_external_url
 app.config.update(dict(
     DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',
@@ -65,6 +62,8 @@ app.config.update(dict(
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=600
 )
+SESSION_TYPE = 'redis'
+app.config.from_object(__name__)
 mail = Mail(app)
 rq = RQ(app)
 Compress(app)
@@ -74,7 +73,6 @@ Compress(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
 nav_menu_admin = {'/admin_overview': 'Overview',
                   '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},
                   '제품': {'/recipes': '레시피'
@@ -104,7 +102,6 @@ app.logger.setLevel(gunicorn_logger.level)
 # app.logger.warning('This is a WARNING log record.')
 # app.logger.error('This is an ERROR log record.')
 # app.logger.critical('This is a CRITICAL log record.')
-
 # -----------------------BEFORE AFTER REQUEST-----------------------
 
 def postgres_connection(func):
@@ -164,7 +161,7 @@ def allowed_file(filename):
 def get_locale():
     homepage = main.get_setting_by_name('is_homepage_session')[0]
     session[main.get_setting_by_name('is_homepage_session')[0]] = False
-    session_name = session.get("preferred_language", default='ko_KR')
+    preferred_language = session.get("preferred_language", default='ko_KR')
     web_translations = main.read_table('web_translations')
     session['url'] = request.url
     korean_translation = {}
@@ -173,13 +170,12 @@ def get_locale():
         key = x[1]
         korean_translation[key] = x[2]
         english_translation[key] = x[3]
-    if session_name == 'ko_KR':
+    if preferred_language == 'ko_KR':
         return dict(msgid=korean_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
-                    homepage=homepage, session_name=session_name)
+                    homepage=homepage, preferred_language=preferred_language)
     else:
         return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
-                    homepage=homepage, session_name=session_name)
-
+                    homepage=homepage, preferred_language=preferred_language)
 
 # -----------------------RQ-----------------------
 
@@ -196,9 +192,11 @@ def send_email_in_background(message_object):
 # -----------------------PUBLIC-----------------------
 @app.route("/lang_<lang>", methods=['GET', 'POST'])
 def set_language(lang):
-    session["preferred_language"] = lang
+    if lang == 'ko_KR' or lang == 'en':
+        session["preferred_language"] = lang
+    else:
+        session["preferred_language"] = 'ko_KR'
     return redirect(session['url'])
-
 
 @app.route("/", methods=['GET', 'POST'])
 @postgres_connection

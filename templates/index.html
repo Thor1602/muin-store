@@ -35,7 +35,7 @@
                             {% set __ = slidenumber.append(1) %} {% endif %}{% endfor %}
                     </div>
                     <div class="carousel-inner">
-                        {% for news_article in news_articles %}{% if news_article[11] %}{% if session_name == 'ko_KR' %}
+                        {% for news_article in news_articles %}{% if news_article[11] %}{% if preferred_language == 'ko_KR' %}
                                     <div class="carousel-item {% if news_article[9] %}active{% endif %}"
                                          data-bs-interval="{{ news_article[10] | safe }}">
                                         <div>
@@ -56,9 +56,9 @@
                                          data-bs-interval="{{ news_article[10] | safe }}">
                                         <div>
                                             <div class="section-header">
-                                                <h2>{{ news_article[2] | safe }}</h2>
-                                                <h4>{{ news_article[4] | safe }}</h4>
-                                                <p>{{ news_article[6] | safe }}</p>
+                                                <h2>{{ news_article[1] | safe }}</h2>
+                                                <h4>{{ news_article[3] | safe }}</h4>
+                                                <p>{{ news_article[5] | safe }}</p>
                                                 {% if msgid['news_image'] != "" %}
                                                     <img src="/static/img/promo/{{ news_article[8] | safe }}"
                                                          alt=""/>{% endif %}
@@ -104,7 +104,7 @@
                                        class="glightbox"><img src="/static/img/products/{{ product[5] }}"
                                                               class="img-fluid"
                                                               alt="{{ product[5] }}"></a>
-                                    <div class="portfolio-info">{% if session_name == 'ko_KR' %}
+                                    <div class="portfolio-info">{% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>{% else %}
                                             <h4>{{ product[1] | safe }}</h4>

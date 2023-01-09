@@ -230,17 +230,17 @@ def index():
         form_error = ""
         suspicious_request = False
         for input_item in input_list:
-            if input_item == None:
+            if input_item == None or input_item == 'None':
                 form_error = input_item + ": has None. MESSAGE>>;; " + str(input_list)
                 suspicious_request = True
                 break
         # msg.recipients = ["rlatnals3020@naver.com"]
         if suspicious_request:
-            admin_msg = Message("Coup De Foudre: 문의 주세요!",
+            admin_msg = Message("Coup De Foudre: Suspicious request",
                                 sender="from@example.com",
                                 recipients=["to@example.com"])
             admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
-            message = form_error
+            message = form_error + str(request.data) + '\n' + str(request.args) + '\n' + str(request.form) + '\n' + str(request.files) + '\n' + str(request.values) + '\n' + str(request.json) + '\n'
             admin_msg.html = message
             try:
                 send_email_in_background(admin_msg)

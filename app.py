@@ -63,6 +63,11 @@ app.config.update(dict(
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=600
 )
+if exists('D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt'):
+    app.debug = True
+else:
+    app.debug = False
+
 mail = Mail(app)
 rq = RQ(app)
 Compress(app)

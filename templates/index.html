@@ -17,9 +17,6 @@
                     </div>
 
                 </div>
-                <div class="col-lg-6 order-1 order-lg-2">
-                    {#          <img src="/static/img/croissant.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">#}
-                </div>
             </div>
         </div>
     </section>
@@ -44,7 +41,7 @@
                                                 <h4>{{ news_article[4] | safe }}</h4>
                                                 <p>{{ news_article[6] | safe }}</p>{% if msgid['news_image'] != "" %}
                                                     <img src="/static/img/promo/{{ news_article[8] | safe }}"
-                                                         alt=""/>{% endif %}
+                                                         alt="'{{ news_article[6] }}'에 대한 설명이 포함된 프로모션 이미지입니다."/>{% endif %}
                                                 <div class="d-flex justify-content-center">
                                                     <a href="/static/img/promo/{{ news_article[7] | safe }}"
                                                        class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
@@ -61,7 +58,7 @@
                                                 <p>{{ news_article[5] | safe }}</p>
                                                 {% if msgid['news_image'] != "" %}
                                                     <img src="/static/img/promo/{{ news_article[8] | safe }}"
-                                                         alt=""/>{% endif %}
+                                                         alt="Promotional image with description: {{ news_article[5] }}"/>{% endif %}
                                                 <div class="d-flex justify-content-center">
                                                     <a href="/static/img/promo/{{ news_article[7] | safe }}"
                                                        class="glightbox btn-see-image d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
@@ -83,7 +80,8 @@
                 </div>
 
             </div>
-        </section><!-- End About Us Section -->
+        </section>
+        <!-- End About Us Section -->
         <!-- ======= Best Product Section ======= -->
         <section id="best-product" class="best-product sections-bg">
             <div class="container" data-aos="fade-up">
@@ -103,7 +101,7 @@
                                        data-gallery="portfolio-gallery-app"
                                        class="glightbox"><img src="/static/img/products/{{ product[5] }}"
                                                               class="img-fluid"
-                                                              alt="{{ product[5] }}"></a>
+                                                              alt="{% if preferred_language == 'ko_KR' %}제품 사진입니다: {{ product[9] }}{% else %}It is a picture of one of our products: {{ product[10] }}{% endif %}"></a>
                                     <div class="portfolio-info">{% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
                                             <p>{{ product[9] | safe }}</p>{% else %}
@@ -119,7 +117,6 @@
                            class="d-flex align-items-center"><span>{{ msgid['view_more'] | safe }}</span></a>
                     </div>
                 </div>
-
             </div>
         </section><!-- End Portfolio Section -->
         <!-- ======= About Us Section ======= -->
@@ -134,7 +131,7 @@
                 <div class="row gy-4">
                     <div class="col-lg-6">
                         <h3>{{ msgid['about_subtitle_one'] | safe }}</h3>
-                        <img src="/static/img/products/logo2.png" class="img-fluid rounded-4 mb-4" alt="">
+                        <img src="/static/img/products/logo2.png" class="img-fluid rounded-4 mb-4" alt="{% if preferred_language == 'ko_KR' %}Coup De Foudre 로고 이미지입니다.{% else %}An image of the Coup De Foudre logo.{% endif %}">
                         <p>{{ msgid['about_subcontent_one'] | safe }} </p>
                         <p>{{ msgid['about_subcontent_two'] | safe }}</p>
                     </div>
@@ -143,19 +140,6 @@
                             <p class="fst-italic">
                                 {{ msgid['about_subcontent_three'] | safe }}
                             </p>
-                            {#                            <ul>#}
-                            {#                                <li><i class="bi bi-check-circle-fill"></i> #}
-                            {#                                </li>#}
-                            {#                                <li><i class="bi bi-check-circle-fill"></i> Duis aute irure dolor in reprehenderit in#}
-                            {#                                    voluptate velit.#}
-                            {#                                </li>#}
-                            {#                                <li><i class="bi bi-check-circle-fill"></i> Ullamco laboris nisi ut aliquip ex ea#}
-                            {#                                    commodo#}
-                            {#                                    consequat. Duis aute irure dolor in reprehenderit in voluptate trideta#}
-                            {#                                    storacalaperda#}
-                            {#                                    mastiro dolore eu fugiat nulla pariatur.#}
-                            {#                                </li>#}
-                            {#                            </ul>#}
                             <p>
                                 {{ msgid['about_subcontent_four'] | safe }}
                             </p>
@@ -163,15 +147,11 @@
                                 {{ msgid['about_subcontent_five'] | safe }}
                             </p>
                             <div class="position-relative mt-4">
-                                <img src="/static/img/products/choco-cake-1.jpg" class="img-fluid rounded-4" alt="">
-                                {#                                <a href="/static/img/products/choco-cake-1.jpg"#}
-                                {#                                   class="glightbox play-btn"></a>#}
-
+                                <img src="/static/img/products/choco-cake-1.jpg" class="img-fluid rounded-4" alt="{% if preferred_language == 'ko_KR' %}가나슈 토핑이 맛있는 부드러운 초코 케이크입니다.{% else %}A soft choco cake with a delicious ganache topping.{% endif %}">
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </section><!-- End About Us Section -->
         <!-- ======= Contact Section ======= -->
@@ -196,7 +176,7 @@
                                 <i class="bi bi-envelope flex-shrink-0"></i>
                                 <div>
                                     <h4>{{ msgid['email'] | safe }}:</h4>
-                                    <p>thorbendhaenenstd@gmail.com</p>
+                                    <p>cdfguri@gmail.com</p>
                                 </div>
                             </div><!-- End Info Item -->
                             <div class="info-item d-flex">
@@ -266,21 +246,21 @@
                 </div>
                 <div class="clients-slider swiper">
                     <div class="swiper-wrapper align-items-center">
-                        <div class="swiper-slide"><img src="/static/img/clients/client-1.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-1.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Callebaut에서 온 것이고 우리는 Callebaut에서 재료를 삽니다.{% else %} This logo is from Callebaut and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-2.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-2.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 서울우유에서 온 것이고 우리는 서울우유에서 재료를 삽니다.{% else %} This logo is from Seoul Milk and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-3.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-3.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Les Verges Boiron에서 온 것이고 우리는 Les Verges Boiron에서 재료를 삽니다.{% else %} This logo is from Les Verges Boiron and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-4.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-4.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Bridor에서 온 것이고 우리는 Bridor에서 재료를 삽니다.{% else %} This logo is from Bridor and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-5.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-5.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Puratos에서 온 것이고 우리는 Puratos에서 재료를 삽니다.{% else %} This logo is from Puratos and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-6.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-6.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Tienen의 설탕 정제소에서 온 것이고 우리는 Tienen의 설탕 정제소에서 재료를 삽니다.{% else %} This logo is from Sugar refinery of Tienen and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-7.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-7.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Lactalis 에서 온 것이고 우리는 Lactalis에서 재료를 삽니다.{% else %} This logo is from Lactalis and we buy our ingredients from them.{% endif %}">
                         </div>
-                        <div class="swiper-slide"><img src="/static/img/clients/client-8.png" class="img-fluid" alt="">
+                        <div class="swiper-slide"><img src="/static/img/clients/client-8.png" class="img-fluid" alt="{% if preferred_language == 'ko_KR' %}이 로고는 Délices des vallées에서 온 것이고 우리는 Délices des vallées에서 재료를 삽니다.{% else %} This logo is from Délices des vallées and we buy our ingredients from them.{% endif %}">
                         </div>
                     </div>
                 </div>
@@ -296,18 +276,9 @@
     <div class="container">
         <div class="row gy-4">
             <div class="col-lg-5 col-md-12 footer-info">
-                <a href="/" class="logo d-flex align-items-center">
-                    <span>Coup De Foudre</span>
-                </a>
+                <a href="/" class="logo d-flex align-items-center"><span>Coup De Foudre</span></a>
                 <p>{{ msgid['footer_content_left_under'] | safe }}</p>
-                {#          <div class="social-links d-flex mt-4">#}
-                {#            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
-                {#            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
-                {#            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
-                {#            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
-                {#          </div>#}
             </div>
-
             <div class="col-lg-2 col-6 footer-links">
                 <h4>{{ msgid['useful_links'] | safe }}</h4>
                 <ul>
@@ -316,7 +287,6 @@
                     <li><a>{{ msgid['terms_of_service'] | safe }}</a></li>
                 </ul>
             </div>
-
             <div class="col-lg-2 col-6 footer-links">
                 <h4>MENU</h4>
                 <ul>
@@ -333,7 +303,7 @@
                 <p>
                     {{ msgid['address'] | safe }}<br>
                     <strong>{{ msgid['phone_number'] | safe }}:</strong> 010-4887-8249<br>
-                    <strong>{{ msgid['email'] | safe }}:</strong> thorbendhaenenstd@gmail.com<br>
+                    <strong>{{ msgid['email'] | safe }}:</strong> cdfguri@gmail.com<br>
                 </p>
 
             </div>

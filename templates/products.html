@@ -1,9 +1,6 @@
 {% extends "base.html" %}
-
 {% block title %}{{ msgid['product_title'] }} - {{ msgid['title'] }}{% endblock %}
-
 {% block body %}
-
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="hero">
         <div class="container position-relative">
@@ -16,10 +13,6 @@
                            class="glightbox btn-watch-video d-flex align-items-center"><i
                                 class="bi bi-geo-alt"></i><span>{{ msgid['open_map'] | safe }}</span></a>
                     </div>
-
-                </div>
-                <div class="col-lg-6 order-1 order-lg-2">
-                    {#          <img src="/static/img/croissant.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">#}
                 </div>
             </div>
         </div>
@@ -28,15 +21,12 @@
     <!-- ======= Portfolio Section ======= -->
     <section id="portfolio" class="portfolio sections-bg">
         <div class="container" data-aos="fade-up">
-
             <div class="section-header">
                 <h2>{{ msgid['product_title'] | safe }}</h2>
                 <p>{{ msgid['product_intro'] | safe }}</p>
             </div>
-
             <div class="portfolio-isotope" data-portfolio-filter="*" data-portfolio-layout="masonry"
                  data-portfolio-sort="original-order" data-aos="fade-up" data-aos-delay="100">
-
                 <div>
                     <ul class="portfolio-flters">
                         <li data-filter="*" class="filter-active">{{ msgid['All'] | safe }}</li>
@@ -47,35 +37,26 @@
                         <li data-filter=".filter-other">{{ msgid['Other_Products'] | safe }}</li>
                     </ul><!-- End Portfolio Filters -->
                 </div>
-
                 <div class="row gy-4 portfolio-container">
-                    {% for product in products %}
-                        {% if product[6] == 'Bread' and product[7] == True %}
+                    {% for product in products %}{% if product[6] == 'Bread' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-app ">
                                 <div class="portfolio-wrap">
                                     <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
-                                            src="/static/img/products/{{ product[5] }}"
-                                            class="img-fluid"
-                                            alt="{{ product[5] }}"></a>
-                                    <div class="portfolio-info">
-                                        {% if preferred_language == 'ko_KR' %}
+                                            src="/static/img/products/{{ product[5] }}" class="img-fluid"
+                                            alt="{% if preferred_language == 'ko_KR' %}제품 사진입니다: {{ product[9] }}{% else %}It is a picture of one of our products: {{ product[10] }}{% endif %}"></a>
+                                    <div class="portfolio-info">{% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
-                                            <p>{{ product[9] | safe }}</p>
-                                        {% else %}
+                                            <p>{{ product[9] | safe }}</p>{% else %}
                                             <h4>{{ product[1] | safe }}</h4>
-                                            <p>{{ product[10] | safe }}</p>
-                                        {% endif %}
+                                            <p>{{ product[10] | safe }}</p>{% endif %}
                                     </div>
                                 </div>
-                            </div><!-- End Portfolio Item -->
-
-                        {% elif product[6] == 'Pastry' and product[7] == True %}
+                            </div><!-- End Portfolio Item --> {% elif product[6] == 'Pastry' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-product ">
                                 <div class="portfolio-wrap">
                                     <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
-                                            src="/static/img/products/{{ product[5] }}"
-                                            class="img-fluid"
-                                            alt="{{ product[5] }}"></a>
+                                            src="/static/img/products/{{ product[5] }}" class="img-fluid"
+                                            alt="{% if preferred_language == 'ko_KR' %}제품 사진입니다: {{ product[9] }}{% else %}It is a picture of one of our products: {{ product[10] }}{% endif %}"></a>
                                     <div class="portfolio-info">
                                         {% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
@@ -86,13 +67,12 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                            </div><!-- End Portfolio Item -->
-                        {% elif product[6] == 'Patisserie' and product[7] == True %}
+                            </div><!-- End Portfolio Item -->{% elif product[6] == 'Patisserie' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-branding ">
                                 <div class="portfolio-wrap">
                                     <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
                                             src="/static/img/products/{{ product[5] }}" class="img-fluid"
-                                            alt="{{ product[5] | safe }}"></a>
+                                            alt="{% if preferred_language == 'ko_KR' %}제품 사진입니다: {{ product[9] }}{% else %}It is a picture of one of our products: {{ product[10] }}{% endif %}"></a>
                                     <div class="portfolio-info">
                                         {% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
@@ -103,13 +83,13 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                            </div><!-- End Portfolio Item -->
-                        {% elif product[6] == 'Cookies' and product[7] == True %}
+                            </div><!-- End Portfolio Item -->{% elif product[6] == 'Cookies' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-books ">
                                 <div class="portfolio-wrap">
                                     <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
                                             src="/static/img/products/{{ product[5] }}"
-                                            class="img-fluid" alt="{{ product[5] }}"></a>
+                                            class="img-fluid"
+                                            alt="{% if preferred_language == 'ko_KR' %}제품 사진입니다: {{ product[9] }}{% else %}It is a picture of one of our products: {{ product[10] }}{% endif %}"></a>
                                     <div class="portfolio-info">
                                         {% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
@@ -120,13 +100,13 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                            </div><!-- End Portfolio Item -->
-                        {% elif product[6] == 'Other' and product[7] == True %}
+                            </div><!-- End Portfolio Item -->{% elif product[6] == 'Other' and product[7] == True %}
                             <div class="col-xl-4 col-md-6 portfolio-item filter-other ">
                                 <div class="portfolio-wrap">
                                     <a data-bs-toggle="modal" data-bs-target="#product_click_{{ product[0] }}"><img
                                             src="/static/img/products/{{ product[5] }}"
-                                            class="img-fluid" alt="{{ product[5] }}"></a>
+                                            class="img-fluid"
+                                            alt="{% if preferred_language == 'ko_KR' %}제품 사진입니다: {{ product[9] }}{% else %}It is a picture of one of our products: {{ product[10] }}{% endif %}"></a>
                                     <div class="portfolio-info">
                                         {% if preferred_language == 'ko_KR' %}
                                             <h4>{{ product[2] | safe }}</h4>
@@ -137,56 +117,37 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                            </div><!-- End Portfolio Item -->
-                        {% endif %}
-                    {% endfor %}
+                            </div><!-- End Portfolio Item -->{% endif %}{% endfor %}
                 </div><!-- End Portfolio Container -->
 
             </div>
 
         </div>
-    </section><!-- End Portfolio Section -->
-
-{% endblock %}
-
-
-{% block modalbody %}
-    {% for product in products %}
+    </section><!-- End Portfolio Section -->{% endblock %}{% block modalbody %}{% for product in products %}
         <div class="modal fade" id="product_click_{{ product[0] }}" tabindex="-1"
              aria-labelledby="exampleModalLabel{{ product[0] }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    {% if preferred_language == 'ko_KR' %}
+                <div class="modal-content">{% if preferred_language == 'ko_KR' %}
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel{{ product[0] }}">{{ msgid['allergenes_title'] }}: {{ product[2] }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            {% for allergen in allergenproduct[product[0]] %}
-                                <p>{% if allergenproduct[product[0]][allergen] %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-x"></i>{% endif %} {{ korean_allergens[allergen] }}</p>
-                            {% endfor %}
+                        <div class="modal-body">{% for allergen in allergenproduct[product[0]] %}
+                                <p>{% if allergenproduct[product[0]][allergen] %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-x"></i>{% endif %} {{ korean_allergens[allergen] }}</p>{% endfor %}
                         </div>
                     {% else %}
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel{{ product[0] }}">{{ msgid['allergenes_title'] }}: {{ product[1] }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            {% for allergen in allergenproduct[product[0]] %}
-                                <p>{% if allergenproduct[product[0]][allergen] %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-x"></i>{% endif %} {{ english_allergens[allergen] }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-
+                        <div class="modal-body">{% for allergen in allergenproduct[product[0]] %}
+                                <p>{% if allergenproduct[product[0]][allergen] %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-x"></i>{% endif %} {{ english_allergens[allergen] }}</p>{% endfor %}
+                        </div>{% endif %}
                 </div>
             </div>
-        </div>
-    {% endfor %}
-{% endblock %}
-{% block endbody %}
+        </div> {% endfor %}{% endblock %}{% block endbody %}
     <script>
         $(document).ready(function () {
 
         });
-    </script>
-{% endblock %}
+    </script>{% endblock %}

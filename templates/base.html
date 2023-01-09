@@ -12,12 +12,12 @@
     <meta name="description"
           content="구리에서 위치한 저희 베이커리에서는 여러분을 위해 우리의 유명한 초코멜로, 페이스트리, 그리고 다양한 종류의 즐거움을 만들어 드립니다. ">
     <meta name="keywords"
-          content="bakery, bakery near me, cake shop near me, cake box, pastries, cake shop, cake bakery near me, birthday cakes near me, public cakes, french bakery near me, custom cakes near me, best bakery near me, pastries near me, bakery shop near me, Italian bakery near me, bakerhouse, bakers near me, pasty shop near me, custom cakes, the bakery, baked goods, bakery shop, bake rolls, Mr baker, cake box near me, the cake shop, cake places near me, italian bakery, corner bakery near me, cake bake shop, bake my day, boulangerie near me, bread bakery near me,최고의, 베이커리, 맛집을, 찾고, 계십니까?, 당신은, 최고의, 베이커리, 맛집을, 찾기, 위해, 저희, 사이트에, 잘, 방문했습니다., 우리, 브랜드는, 당신이, 원하는, 최고의, 베이커리, 맛집입니다., 부드러우면서도, 달콤하고, 고소한, 최고의, 베이커리, 맛집으로, 다양한, 빵과, 디저트를, 제공하고, 있습니다., 최고의, 베이커리, 맛집,">
+          content="{% if preferred_language == 'ko_KR' %}최고의, 베이커리, 맛집을, 찾고, 계십니까?, 당신은, 최고의, 베이커리, 맛집을, 찾기, 위해, 저희, 사이트에, 잘, 방문했습니다., 우리, 브랜드는, 당신이, 원하는, 최고의, 베이커리, 맛집입니다., 부드러우면서도, 달콤하고, 고소한, 최고의, 베이커리, 맛집으로, 다양한, 빵과, 디저트를, 제공하고, 있습니다., 최고의, 베이커리, 맛집{% else %}bakery, bakery near me, cake shop near me, cake box, pastries, cake shop, cake bakery near me, birthday cakes near me, public cakes, french bakery near me, custom cakes near me, best bakery near me, pastries near me, bakery shop near me, Italian bakery near me, bakerhouse, bakers near me, pasty shop near me, custom cakes, the bakery, baked goods, bakery shop, bake rolls, Mr baker, cake box near me, the cake shop, cake places near me, italian bakery, corner bakery near me, cake bake shop, bake my day, boulangerie near me, bread bakery near me{% endif %}">
     <meta name="robots" content="index, follow">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="language" content="Korean">
-    <meta name="revisit-after" content="30 days">
-    <meta name="author" content="쿠드푸드르 베이커리">
+    <meta name="language" content="{% if preferred_language == 'ko_KR' %}Korean{% else %}English{% endif %}">
+    <meta name="revisit-after" content="5 days">
+    <meta name="author" content="{% if preferred_language == 'ko_KR' %}쿠드푸드르 베이커리{% else %}Coup De Foudre Bakery{% endif %}">
 
     <!-- Favicons -->
     <link href="/static/img/favicon.ico" rel="icon" type="image/x-icon">
@@ -50,19 +50,19 @@
     <div class="container d-flex justify-content-center justify-content-md-between">
         <div class="contact-info d-flex align-items-center">
             <span class="full-screen"><i class="fa-solid fa-envelope d-flex align-items-center"><a
-                    href="mailto:coupdefoudre@gmail.com">{{ msgid['email_contact'] }}</a></i></span>
+                    href="mailto:cdfguri@gmail.com">{{ msgid['email_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-solid fa-phone d-flex align-items-center ms-4"><a
                     href="tel:00821048878249">{{ msgid['phone_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-brands fa-kickstarter d-flex align-items-center ms-4"><a
                     href="https://pf.kakao.com/_xmCxauxj">{{ msgid['kakao_contact'] }}</a></i></span>
-            <a class="short-screen btn" href="mailto:coupdefoudre@gmail.com" data-bs-toggle="tooltip"
-               data-bs-placement="bottom" title="Send an email"><i
+            <a class="short-screen btn" href="mailto:cdfguri@gmail.com" data-bs-toggle="tooltip"
+               data-bs-placement="bottom" title="{% if preferred_language == 'ko_KR' %}이메일을 보내기{% else %}Send an email{% endif %}"><i
                     class="fa-solid fa-envelope fa-xl d-flex align-items-center"></i></a>
             <a class="short-screen btn" href="tel:00821048878249" data-bs-toggle="tooltip" data-bs-placement="bottom"
-               title="Call us"><i class="fa-solid fa-phone fa-xl d-flex align-items-center"></i></a>
+               title="{% if preferred_language == 'ko_KR' %}전화기{% else %}Call us{% endif %}"><i class="fa-solid fa-phone fa-xl d-flex align-items-center"></i></a>
             <a class="short-screen btn" href="https://pf.kakao.com/_xmCxauxj" data-bs-toggle="tooltip"
                data-bs-placement="bottom"
-               title="Send a Kakao message"><i class="fa-brands fa-kickstarter fa-xl d-flex align-items-center"></i></a>
+               title="{% if preferred_language == 'ko_KR' %}카카오 메시지를 보내기{% else %}Send a Kakao message{% endif %}"><i class="fa-brands fa-kickstarter fa-xl d-flex align-items-center"></i></a>
         </div>
         <div class="contact-info d-flex align-items-end">
             {% if preferred_language == 'en' %}
@@ -75,12 +75,6 @@
                    title="로그아웃"><i class="fa-solid fa-right-from-bracket fa-2xl d-flex align-items-center"></i></a>
             {% endif %}
         </div>
-        {#      <div class="social-links d-none d-md-flex align-items-center">#}
-        {#        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>#}
-        {#        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>#}
-        {#        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>#}
-        {#        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>#}
-        {#      </div>#}
     </div>
 </section><!-- End Top Bar -->
 
@@ -123,9 +117,6 @@
                         <li><a href="/{{ menu_item }}">{{ msgid[menu_item_home[menu_item]] | safe }}</a></li>
                     {% endfor %}
                 {% endif %}
-                {#    <li><a href="/register_membership">{{ msgid['membership_points_title'] | safe }}</a></li>#}
-                {#    <li><a href="javascript:void(0);" class="check-membership-points">{{ msgid['membership_points_title'] | safe }}</a></li>#}
-
             </ul>
         </nav><!-- .navbar -->
 
@@ -187,8 +178,6 @@
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 </script>
-
-
 {% block endbody %}{% endblock %}
 </body>
 

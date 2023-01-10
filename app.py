@@ -46,6 +46,7 @@ mail_cred = main.get_setting_by_name('main_gmail')
 encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 app.secret_key = main.get_setting_by_name('secret_key')[1]
 redis_external_url = main.get_setting_by_name('redis_external_url')[1]
+path_to_db_credentials=main.get_setting_by_name('path_to_db_credentials')[1]
 Database.close_connection()
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -122,7 +123,7 @@ def postgres_connection(func):
 
 @app.before_request
 def before_request():
-    if not exists('D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt'):
+    if not exists(path_to_db_credentials):
         if not request.is_secure:
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)

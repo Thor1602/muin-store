@@ -18,7 +18,7 @@ from os.path import exists
 
 import qrcode
 
-from flask import Flask, render_template, session, redirect, url_for, flash, request, abort
+from flask import Flask, render_template, session, redirect, url_for, flash, request, abort, send_from_directory
 from flask_mail import Mail, Message
 from flask_compress import Compress
 
@@ -326,7 +326,9 @@ def allergens():
 def privacy_policy():
     return render_template('privacy_policy.html')
 
-
+@app.route('/robots.txt')
+def robot_file():
+    return render_template("Robots.txt")
 #
 # @app.route("/register_membership", methods=['GET', 'POST'])
 # @flask_login.login_required

@@ -410,7 +410,8 @@
                         required: '{{ msgid['validation_phone_message'] | safe }}'
                     },
                     email: {
-                        required: '{{ msgid['validation_email_message'] | safe }}'
+                        required: '{{ msgid['validation_email_message'] | safe }}',
+                        email: '{{ msgid['validation_email_message'] | safe }}',
                     },
                     subject: {
                         required: '{{ msgid['validation_subject_message'] | safe }}'

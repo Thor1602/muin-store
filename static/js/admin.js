@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    // Finanncial plan HTML
     $.fn.digits = function () {
         return this.each(function () {
             $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
@@ -18,6 +19,8 @@ $(document).ready(function () {
         $('#input_weight_in_gram').val('');
 
     });
+
+    // Cost Calculation HTML
     var count_1 = 1;
     $("#packagingProductAdd").click(function () {
         var packaging = $('#packagingid').val();

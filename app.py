@@ -5,7 +5,7 @@ The user can make changes to the text/prolog-text as appropriate.
 This work is licensed under
 a Creative Commons Attribution-ShareAlike 3.0 Unported License.
 ©Thorben, 2021
-email: thorbendhaenenstd@gmail.com
+email: cdfguri@gmail.com
 
 TODO add file handler cloud
 TODO add kakao alert messaging
@@ -42,7 +42,7 @@ app = Flask(__name__)
 main = Database.Main()
 
 Database.open_connection()
-mail_cred = main.get_setting_by_name('main_gmail')
+mail_cred = main.get_setting_by_name('mail_cred_2')
 encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 app.secret_key = main.get_setting_by_name('secret_key')[1]
 redis_external_url = main.get_setting_by_name('redis_external_url')[1]
@@ -240,7 +240,7 @@ def index():
             admin_msg = Message("Coup De Foudre: Suspicious request",
                                 sender="from@example.com",
                                 recipients=["to@example.com"])
-            admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+            admin_msg.recipients = ["cdfguri@gmail.com"]
             message = form_error + str(request.data) + '\n' + str(request.args) + '\n' + str(request.form) + '\n' + str(request.files) + '\n' + str(request.values) + '\n' + str(request.json) + '\n'
             admin_msg.html = message
             try:
@@ -252,7 +252,7 @@ def index():
             admin_msg = Message("Coup De Foudre: 문의 주세요!",
                                 sender="from@example.com",
                                 recipients=["to@example.com"])
-            admin_msg.recipients = ["thorbendhaenenstd@gmail.com"]
+            admin_msg.recipients = ["cdfguri@gmail.com"]
             message = f"<b>띵동! {contact_form.name.data}한테 메시지가 왔어요!! <br> 성명: {contact_form.name.data}<br>주소: {contact_form.address.data}<br>전화번호: {contact_form.phone.data}<br>이메일주소: {contact_form.email.data}<br>제목: {contact_form.subject.data}<br>주요 메시지: {contact_form.message.data} <br> 더보기: https://cdf.herokuapp.com/contact_inquiry</b>"
             admin_msg.html = message
             try:
@@ -937,7 +937,7 @@ def login():
         if request_ip not in trusted_ip:
             admin_msg = Message("Coup De Foudre: 문의 주세요!",
                                 sender="from@example.com",
-                                recipients=["thorbendhaenenstd@gmail.com"],
+                                recipients=["cdfguri@gmail.com"],
                                 html='suspicious login attempt: ' + request_ip)
             try:
                 send_email_in_background(admin_msg)

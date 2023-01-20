@@ -331,7 +331,6 @@ def robot_file():
     return render_template("Robots.txt")
 
 @app.route("/naver_review", methods=['GET', 'POST'])
-@postgres_connection
 def naver_review():
     return redirect("https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=coupdefoudre")
 #

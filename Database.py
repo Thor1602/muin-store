@@ -99,7 +99,10 @@ class Main:
 
     def delete_row_by_id(self, table_name, id):
         SQL = f"DELETE from {table_name} where id = {id};"
-        # parameters = (table_name, id)
+        execute_query(query=SQL, commit=True)
+
+    def delete_row_by_date(self, table_name, date):
+        SQL = f"DELETE from {table_name} where date >= '{date}'::date AND date < ('{date}'::date + '1 day'::interval);"
         execute_query(query=SQL, commit=True)
 
     def verify_password(self, email, pwd):

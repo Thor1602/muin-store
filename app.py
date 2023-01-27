@@ -33,6 +33,7 @@ import Database
 from InputForms import *
 from functools import wraps
 from flask_rq2 import RQ
+import collections
 
 # from secure import SecureHeaders
 
@@ -717,6 +718,12 @@ def financial_plan():
             main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
         elif 'btn_delete_investment' in request.form:
             main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
+
+        elif 'btn_delete_sale' in request.form:
+            main.delete_row_by_id('sales', request.form['btn_delete_sale'])
+        elif 'btn_delete_sale_summary' in request.form:
+            main.delete_row_by_date('sales', request.form['btn_delete_sale_summary'])
+
         elif 'change_products_report' in request.form:
             for x in data['products']:
                 if str(x[0]) in request.form:
@@ -779,6 +786,38 @@ def financial_plan():
         data['vat'][product[0]] = int(product[12] - (product[12] / 1.1))
         data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
         data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+    data['sales'] = {}
+    data['sales_summary'] = {}
+    data['sales_month_summary'] = {}
+    data['sales_columns'] = main.show_columns('sales')
+    data['all_sales'] = main.read_table('sales')
+    for x in data['all_sales']:
+        if x[1].date() in data['sales']:
+            data['sales'][x[1].date()] += [x]
+        else:
+            data['sales'][x[1].date()] = [x]
+        if x[1].date() not in data['sales_summary']:
+            breakeven = x[10] - (x[9] + x[11])
+            data['sales_summary'][x[1].date()] = {"Total Turnover": x[10], "VAT": x[11], "Variable Costs": x[9], 'Break Even': breakeven}
+        else:
+            data['sales_summary'][x[1].date()]["Total Turnover"] += x[10]
+            data['sales_summary'][x[1].date()]['VAT'] += x[11]
+            data['sales_summary'][x[1].date()]['Variable Costs'] += x[9]
+            breakeven = x[10]-(x[9]+x[11])
+            data['sales_summary'][x[1].date()]['Break Even'] += breakeven
+        year_month = str(x[1].year) + "-" + str(x[1].month)
+        if year_month not in data['sales_month_summary']:
+            breakeven = x[10] - (x[9] + x[11])
+            data['sales_month_summary'][year_month] = {"Total Turnover": x[10], "VAT": x[11], "Variable Costs": x[9], 'Break Even': breakeven}
+        else:
+            data['sales_month_summary'][year_month]["Total Turnover"] += x[10]
+            data['sales_month_summary'][year_month]['VAT'] += x[11]
+            data['sales_month_summary'][year_month]['Variable Costs'] += x[9]
+            breakeven = x[10]-(x[9]+x[11])
+            data['sales_month_summary'][year_month]['Break Even'] += breakeven
+    data['sales_summary'] = collections.OrderedDict(sorted(data['sales_summary'].items(), reverse=True))
+    data['sales_month_summary'] = collections.OrderedDict(sorted(data['sales_month_summary'].items(), reverse=True))
+
     return render_template('financial_plan.html', data=data)
 
 

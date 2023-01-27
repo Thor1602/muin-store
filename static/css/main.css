@@ -2586,3 +2586,12 @@ input[type=number] {
     left: 0;
     background-color: white;
 }
+
+
+.modal-dialog-scrollable{
+    overflow-y: initial !important
+}
+.modal-body-scrollable{
+    height: 80vh;
+    overflow-y: auto;
+}

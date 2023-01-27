@@ -803,3 +803,47 @@ class News(Main):
             self.english_news_details, self.korean_news_details, self.lightbox_image, self.display_image, self.active,
             self.bs_interval, self.is_published, news_id,)
         execute_query(query=SQL, parameters=parameters, commit=True)
+
+
+class Sale(Main):
+    def __init__(self, date, amount_low, price_low_amount, amount_medium, price_medium_amount, amount_high,
+                 price_high_amount, product_id, variable_cost, total_income, VAT):
+        self.date = date
+        self.amount_low = amount_low
+        self.price_low_amount = price_low_amount
+        self.amount_medium = amount_medium
+        self.price_medium_amount = price_medium_amount
+        self.amount_high = amount_high
+        self.price_high_amount = price_high_amount
+        self.product_id = product_id
+        self.variable_cost = variable_cost
+        self.total_income = total_income
+        self.VAT = VAT
+
+    def register(self):
+        if self.date == None:
+            SQL = f"INSERT INTO sales (date, amount_low, price_low_amount, amount_medium, price_medium_amount, amount_high, price_high_amount, product_id, variable_cost, total_income, VAT) VALUES (NOW(),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+            parameters = (self.amount_low, self.price_low_amount, self.amount_medium, self.price_medium_amount,
+                self.amount_high, self.price_high_amount, self.product_id, self.variable_cost, self.total_income,
+                self.VAT,)
+        else:
+            SQL = f"INSERT INTO sales (date, amount_low, price_low_amount, amount_medium, price_medium_amount, amount_high, price_high_amount, product_id, variable_cost, total_income, VAT) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+            parameters = (
+                self.date, self.amount_low, self.price_low_amount, self.amount_medium, self.price_medium_amount,
+                self.amount_high, self.price_high_amount, self.product_id, self.variable_cost, self.total_income,
+                self.VAT,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update(self, sale_id):
+        if self.date == None:
+            SQL = "UPDATE sales SET date = NOW(), amount_low = %s, price_low_amount = %s, amount_medium = %s, price_medium_amount = %s, amount_high = %s, price_high_amount = %s, product_id = %s, variable_cost = %s, total_income = %s, VAT = %s  WHERE id = %s;"
+            parameters = (
+                self.amount_low, self.price_low_amount, self.amount_medium, self.price_medium_amount,
+                self.amount_high, self.price_high_amount, self.product_id, self.variable_cost, self.total_income,
+                self.VAT, sale_id,)
+        else:
+            SQL = "UPDATE sales SET date = %s, amount_low = %s, price_low_amount = %s, amount_medium = %s, price_medium_amount = %s, amount_high = %s, price_high_amount = %s, product_id = %s, variable_cost = %s, total_income = %s, VAT = %s  WHERE id = %s;"
+            parameters = (
+                self.date, self.amount_low, self.price_low_amount, self.amount_medium, self.price_medium_amount,
+                self.amount_high, self.price_high_amount, self.product_id, self.variable_cost, self.total_income, self.VAT, sale_id,)
+        execute_query(query=SQL, parameters=parameters, commit=True)

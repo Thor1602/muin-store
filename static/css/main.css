@@ -2534,6 +2534,9 @@ hr {
 .max-height-table {
     max-height: 600px;
 }
+.max-height-table-comments {
+    max-height: 250px;
+}
 
 .kakao-icon {
     height: 55px;

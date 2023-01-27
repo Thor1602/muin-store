@@ -10,8 +10,9 @@
                 <p>overview {{ DATABASE_URL }}</p>
             </div>
             <div class="row gy-4">
+
                 <h3>COMMENTS</h3>
-                <div class="overflow-scroll max-height-table">
+                <div class="overflow-scroll max-height-table-comments">
                     <table class="table">
                         <tbody>{% for comment in data['comments'] %}
                             <tr>

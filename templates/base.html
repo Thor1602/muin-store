@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 {% if preferred_language == 'en' %}
-<html lang="en">
+    <html lang="en">
 {% else %}
-<html lang="ko-KR">
+    <html lang="ko-KR">
 {% endif %}
 <head>
     <meta charset="utf-8">
@@ -17,7 +17,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="language" content="{% if preferred_language == 'ko_KR' %}ko-KR{% else %}en{% endif %}">
     <meta name="revisit-after" content="5 days">
-    <meta name="author" content="{% if preferred_language == 'ko_KR' %}쿠드푸드르 베이커리{% else %}Coup De Foudre Bakery{% endif %}">
+    <meta name="author"
+          content="{% if preferred_language == 'ko_KR' %}쿠드푸드르 베이커리{% else %}Coup De Foudre Bakery{% endif %}">
 
     <!-- Favicons -->
     <link href="/static/img/favicon.ico" rel="icon" type="image/x-icon">
@@ -55,14 +56,23 @@
                     href="tel:00821048878249">{{ msgid['phone_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-brands fa-kickstarter d-flex align-items-center ms-4"><a
                     href="https://pf.kakao.com/_xmCxauxj">{{ msgid['kakao_contact'] }}</a></i></span>
+            <span class="full-screen"><i class="fa-solid fa-n d-flex align-items-center ms-4"><a
+                    href="https://pf.kakao.com/_xmCxauxj">{{ msgid['naver_contact'] }}</a></i></span>
             <a class="short-screen btn" href="mailto:cdfguri@gmail.com" data-bs-toggle="tooltip"
-               data-bs-placement="bottom" title="{% if preferred_language == 'ko_KR' %}이메일을 보내기{% else %}Send an email{% endif %}"><i
+               data-bs-placement="bottom"
+               title="{% if preferred_language == 'ko_KR' %}이메일을 보내기{% else %}Send an email{% endif %}"><i
                     class="fa-solid fa-envelope fa-xl d-flex align-items-center"></i></a>
             <a class="short-screen btn" href="tel:00821048878249" data-bs-toggle="tooltip" data-bs-placement="bottom"
-               title="{% if preferred_language == 'ko_KR' %}전화기{% else %}Call us{% endif %}"><i class="fa-solid fa-phone fa-xl d-flex align-items-center"></i></a>
+               title="{% if preferred_language == 'ko_KR' %}전화기{% else %}Call us{% endif %}"><i
+                    class="fa-solid fa-phone fa-xl d-flex align-items-center"></i></a>
             <a class="short-screen btn" href="https://pf.kakao.com/_xmCxauxj" data-bs-toggle="tooltip"
                data-bs-placement="bottom"
-               title="{% if preferred_language == 'ko_KR' %}카카오 메시지를 보내기{% else %}Send a Kakao message{% endif %}"><i class="fa-brands fa-kickstarter fa-xl d-flex align-items-center"></i></a>
+               title="{% if preferred_language == 'ko_KR' %}카카오 메시지를 보내기{% else %}Send a Kakao message{% endif %}"><i
+                    class="fa-brands fa-kickstarter fa-xl d-flex align-items-center"></i></a>
+            <a class="short-screen btn" href="https://pf.kakao.com/_xmCxauxj" data-bs-toggle="tooltip"
+               data-bs-placement="bottom"
+               title="{{ msgid['naver_contact'] }}">
+                <i class="fa-solid fa-n fa-xl d-flex align-items-center"></i></a>
         </div>
         <div class="contact-info d-flex align-items-end">
             {% if preferred_language == 'en' %}

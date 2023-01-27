@@ -46,7 +46,7 @@ mail_cred = main.get_setting_by_name('mail_cred_2')
 encrypted_login_session = main.get_setting_by_name('logged_in_session')[0]
 app.secret_key = main.get_setting_by_name('secret_key')[1]
 redis_external_url = main.get_setting_by_name('redis_external_url')[1]
-path_to_db_credentials=main.get_setting_by_name('path_to_db_credentials')[1]
+path_to_db_credentials = main.get_setting_by_name('path_to_db_credentials')[1]
 Database.close_connection()
 app.config['DEFAULT_LOCALE'] = 'ko_KR'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -64,7 +64,8 @@ app.config.update(dict(
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=600
 )
-if exists('D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt'):
+if exists(
+        'D:\\Users\\Thorben\\OneDrive - University of the People\\PycharmProjects\\bakery\\gitignore\\database_credentials.txt'):
     app.debug = True
 else:
     app.debug = False
@@ -95,7 +96,7 @@ nav_menu_admin = {'/admin_overview': 'Overview',
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
-trusted_ip = ('127.0.0.1','211.208.140.83')
+trusted_ip = ('127.0.0.1', '211.208.140.83')
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 # -----------------------LOGGING-----------------------
 
@@ -121,12 +122,14 @@ def postgres_connection(func):
 
     return wrapper
 
+
 @app.before_request
 def before_request():
     if not exists(path_to_db_credentials):
         if not request.is_secure:
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)
+
 
 @app.after_request
 def add_header(response):
@@ -190,6 +193,7 @@ def get_locale():
         return dict(msgid=english_translation, nav_menu_admin=nav_menu_admin, menu_item_home=menu_item_home,
                     homepage=homepage, preferred_language=preferred_language)
 
+
 # -----------------------RQ-----------------------
 
 # @rq.job
@@ -211,6 +215,7 @@ def set_language(lang):
         session["preferred_language"] = 'ko_KR'
     return redirect(session['url'])
 
+
 @app.route("/", methods=['GET', 'POST'])
 @postgres_connection
 def index():
@@ -227,7 +232,9 @@ def index():
                 row_list[5] = "no-image-available.jpg"
             best_products.append(row_list)
     if request.method == "POST":
-        input_list = (contact_form.name.data,contact_form.phone.data,contact_form.email.data,contact_form.message.data,contact_form.subject.data)
+        input_list = (
+            contact_form.name.data, contact_form.phone.data, contact_form.email.data, contact_form.message.data,
+            contact_form.subject.data)
         form_error = ""
         suspicious_request = False
         for input_item in input_list:
@@ -241,7 +248,8 @@ def index():
                                 sender="from@example.com",
                                 recipients=["to@example.com"])
             admin_msg.recipients = ["cdfguri@gmail.com"]
-            message = form_error + str(request.data) + '\n' + str(request.args) + '\n' + str(request.form) + '\n' + str(request.files) + '\n' + str(request.values) + '\n' + str(request.json) + '\n'
+            message = form_error + str(request.data) + '\n' + str(request.args) + '\n' + str(request.form) + '\n' + str(
+                request.files) + '\n' + str(request.values) + '\n' + str(request.json) + '\n'
             admin_msg.html = message
             try:
                 send_email_in_background(admin_msg)
@@ -264,7 +272,8 @@ def index():
                 send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
             except Exception as e:
                 app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
-            Database.Contact(name=contact_form.name.data, email=contact_form.email.data, address=contact_form.address.data,
+            Database.Contact(name=contact_form.name.data, email=contact_form.email.data,
+                             address=contact_form.address.data,
                              phone=contact_form.phone.data, subject=contact_form.subject.data,
                              message=contact_form.message.data).register_contact_query()
     return render_template('index.html', api_kakao_js=api_kakao_js, products=best_products, contact_form=contact_form,
@@ -326,13 +335,17 @@ def allergens():
 def privacy_policy():
     return render_template('privacy_policy.html')
 
+
 @app.route('/robots.txt')
 def robot_file():
     return render_template("Robots.txt")
 
+
 @app.route("/naver_review", methods=['GET', 'POST'])
 def naver_review():
     return redirect("https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=coupdefoudre")
+
+
 #
 # @app.route("/register_membership", methods=['GET', 'POST'])
 # @flask_login.login_required
@@ -681,6 +694,8 @@ def edit_cost_calculation():
 @flask_login.login_required
 @postgres_connection
 def financial_plan():
+    data = {}
+    data['products'] = main.read_table('products')
     if request.method == "POST":
         if 'fixed_cost_edit_button' in request.form or 'fixed_cost_add_button' in request.form:
             fixed_cost = Database.FixedCost(request.form['english'], request.form['korean'],
@@ -702,9 +717,48 @@ def financial_plan():
             main.delete_row_by_id('fixed_costs', request.form['btn_delete_fixed_cost'])
         elif 'btn_delete_investment' in request.form:
             main.delete_row_by_id('investments', int(request.form['btn_delete_investment']))
+        elif 'change_products_report' in request.form:
+            for x in data['products']:
+                if str(x[0]) in request.form:
+                    Database.Products(x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10],x[11],
+                                  request.form['price_low_amount_' + str(x[0])], x[13], request.form['price_medium_amount_' + str(x[0])], x[15],
+                                  request.form['price_high_amount_' + str(x[0])], x[17],
+                                  request.form['amount_low_' + str(x[0])],x[19]).update(x[0])
+        elif 'add_financial_report' in request.form:
+            data['vat'] = {}
+            data['turnover-after-vat'] = {}
+            data['variable-costs'] = main.calculate_variable_cost()['total_average']
+            data['breakeven-per-product'] = {}
+            for product in data['products']:
+                data['vat'][product[0]] = int(product[12] - (product[12] / 1.1))
+                data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
+                data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+            if request.form['date'] == '':
+                input_date = None
+            else:
+                input_date = request.form['date']
+            for product in data['products']:
+                if str(product[0]) in request.form:
+                    sold_products = int(request.form['amount_low_' + str(product[0])]) + int(request.form['amount_medium_' + str(product[0])]) + int(request.form['amount_high_' + str(product[0])])
+                    total_variable_cost = sold_products * int(data['variable-costs'][product[0]])
+                    low = int(request.form['price_low_amount_' + str(product[0])])*int(request.form['amount_low_' + str(product[0])])
+                    medium = int(request.form['price_medium_amount_' + str(product[0])])*int(request.form['amount_medium_' + str(product[0])])
+                    high = int(request.form['price_high_amount_' + str(product[0])])*int(request.form['amount_high_' + str(product[0])])
+                    total_income = low + medium + high
+                    vat = int(total_income - (total_income / 1.1))
+                    Database.Sale(input_date, request.form['amount_low_' + str(product[0])],
+                                  request.form['price_low_amount_' + str(product[0])],
+                                  request.form['amount_medium_' + str(product[0])],
+                                  request.form['price_medium_amount_' + str(product[0])],
+                                  request.form['amount_high_' + str(product[0])], request.form['price_high_amount_' + str(product[0])],
+                                  str(product[0]),
+                                  str(total_variable_cost),
+                                  str(total_income),
+                                  str(vat)).register()
         else:
             abort(500)
-    data = {}
+    data['products'] = main.read_table('products')
+    data['products-col'] = main.show_columns('products')
     data['total'] = {'minimum': 0, 'maximum': 0, 'total_cost': 0}
     data['investments'] = []
     for row in main.read_table('investments'):
@@ -717,8 +771,6 @@ def financial_plan():
         row = [row[0], row[1], row[2], row[4], row[5], row[6]]
         data['total']['total_cost'] += row[3]
         data['fixed_costs'].append(row)
-    data['products'] = main.read_table('products')
-    data['products-col'] = main.show_columns('products')
     data['vat'] = {}
     data['turnover-after-vat'] = {}
     data['variable-costs'] = main.calculate_variable_cost()['total_average']
@@ -957,6 +1009,7 @@ def login():
         else:
             return redirect(url_for('login'))
     return render_template('login.html', form=cform)
+
 
 @app.route("/logout")
 def logout():

@@ -593,11 +593,12 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="addFinancialReportLabel">Add Sales</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true"></span>
                     </button>
                 </div>
                 <form method="post" action="/financial_plan">
                     <div class="modal-body">
+                        <btn class="btn btn-warning" id="period-toggle-sales-btn">MONTH</btn>
                         <label for="date_sales" class="form-label">Date</label>
                         <input type="date" class="form-control" id="date_sales" name="date">
                         <div class="row">
@@ -609,47 +610,49 @@
                             <div class="col">HA</div>
                             <div class="col">HP</div>
                         </div>
-                        {% for product in data['products'] %}
-                            {% if product[7] %}
-                                <div class="row">
-                                    <div class="col">
-                                        <span>{{ product[1] }}</span>
-                                        <input class="form-control" name="{{ product[0] }}" aria-label="" hidden>
+                        <div class="sale-toggle-table">
+                            {% for product in data['products'] %}
+                                {% if product[7] %}
+                                    <div class="row">
+                                        <div class="col">
+                                            <span>{{ product[1] }}</span>
+                                            <input class="form-control" name="{{ product[0] }}" aria-label="" hidden>
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control period-toggle-sales"
+                                                   name="amount_low_{{ product[0] }}"
+                                                   value="{{ product[19] }}" aria-label="">
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control"
+                                                   name="price_low_amount_{{ product[0] }}"
+                                                   value="{{ product[12] }}" aria-label="">
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control"
+                                                   name="amount_medium_{{ product[0] }}"
+                                                   value="0" aria-label="">
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control"
+                                                   name="price_medium_amount_{{ product[0] }}"
+                                                   value="{{ product[14] }}" aria-label="">
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control"
+                                                   name="amount_high_{{ product[0] }}"
+                                                   value="0" aria-label="">
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control"
+                                                   name="price_high_amount_{{ product[0] }}"
+                                                   value="{{ product[16] }}" aria-label="">
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <input type="number" class="form-control"
-                                               name="amount_low_{{ product[0] }}"
-                                               value="{{ product[19] }}" aria-label="">
-                                    </div>
-                                    <div class="col">
-                                        <input type="number" class="form-control"
-                                               name="price_low_amount_{{ product[0] }}"
-                                               value="{{ product[12] }}" aria-label="">
-                                    </div>
-                                    <div class="col">
-                                        <input type="number" class="form-control"
-                                               name="amount_medium_{{ product[0] }}"
-                                               value="0" aria-label="">
-                                    </div>
-                                    <div class="col">
-                                        <input type="number" class="form-control"
-                                               name="price_medium_amount_{{ product[0] }}"
-                                               value="{{ product[14] }}" aria-label="">
-                                    </div>
-                                    <div class="col">
-                                        <input type="number" class="form-control"
-                                               name="amount_high_{{ product[0] }}"
-                                               value="0" aria-label="">
-                                    </div>
-                                    <div class="col">
-                                        <input type="number" class="form-control"
-                                               name="price_high_amount_{{ product[0] }}"
-                                               value="{{ product[16] }}" aria-label="">
-                                    </div>
-                                </div>
-                                <hr>
-                            {% endif %}
-                        {% endfor %}
+                                    <hr>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -698,30 +701,30 @@
                             </thead>
                             <tbody>
                             {% for row in data['sales'][sale_date] %}
-                            <tr class="table-success">
-                                <td>
-                                    <button class="btn btn-danger" type="button"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteModalSale{{ row[0] }}">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                </td>
+                                <tr class="table-success">
+                                    <td>
+                                        <button class="btn btn-danger" type="button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModalSale{{ row[0] }}">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
 
-                                <td class="">{{ row[0] }}</td>
-                                <td class="">{{ row[1] }}</td>
-                                <td class="">{{ row[2] }}</td>
-                                <td class="">{{ row[3] }}</td>
-                                <td class="">{{ row[4] }}</td>
-                                <td class="">{{ row[5] }}</td>
-                                <td class="">{{ row[6] }}</td>
-                                <td class="">{{ row[7] }}</td>
-                                <td class="">{{ row[8] }}</td>
-                                <td class="variable-cost-per-sale">{{ row [9] }}</td>
-                                <td class="income-per-sale">{{ row [10] }}</td>
-                                <td class="vat-per-sale">{{ row[11] }}</td>
-                                <td class="breakeven-per-sale"></td>
+                                    <td class="">{{ row[0] }}</td>
+                                    <td class="">{{ row[1] }}</td>
+                                    <td class="">{{ row[2] }}</td>
+                                    <td class="">{{ row[3] }}</td>
+                                    <td class="">{{ row[4] }}</td>
+                                    <td class="">{{ row[5] }}</td>
+                                    <td class="">{{ row[6] }}</td>
+                                    <td class="">{{ row[7] }}</td>
+                                    <td class="">{{ row[8] }}</td>
+                                    <td class="variable-cost-per-sale">{{ row [9] }}</td>
+                                    <td class="income-per-sale">{{ row [10] }}</td>
+                                    <td class="vat-per-sale">{{ row[11] }}</td>
+                                    <td class="breakeven-per-sale"></td>
 
-                            </tr>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
@@ -858,20 +861,41 @@
 
             }
 
+
             $('.sales-table tbody tr').each(function () {
-                    var $tblrow = $(this);
-                    var incomes = $tblrow.find('.income-per-sale').text();
-                    var vats = $tblrow.find('.vat-per-sale').text();
-                    var var_costs = $tblrow.find('.variable-cost-per-sale').text();
-                    if (!isNaN(var_costs) && !isNaN(vats) && !isNaN(incomes)) {
-                        var total = parseInt(incomes)-(parseInt(var_costs) + parseInt(vats));
-                        $tblrow.find('.breakeven-per-sale').text(parseInt(total)).digits();
-                    }
-                });
+                var $tblrow = $(this);
+                var incomes = $tblrow.find('.income-per-sale').text();
+                var vats = $tblrow.find('.vat-per-sale').text();
+                var var_costs = $tblrow.find('.variable-cost-per-sale').text();
+                if (!isNaN(var_costs) && !isNaN(vats) && !isNaN(incomes)) {
+                    var total = parseInt(incomes) - (parseInt(var_costs) + parseInt(vats));
+                    $tblrow.find('.breakeven-per-sale').text(parseInt(total)).digits();
+                }
+            });
 
             $('.unit-product').change(function () {
                 changeTable();
             });
+
+            $('#period-toggle-sales-btn').click(function () {
+                var btnContent = $("#period-toggle-sales-btn").text();
+                if (btnContent === 'DAY') {
+                    $("#period-toggle-sales-btn").html('MONTH');
+                    $('.sale-toggle-table .row .col').each(function () {
+                        var $input_val = $(this);
+                        var input_val_1 = Math.ceil(($input_val.find('.period-toggle-sales').val())*25);
+                        $input_val.find('.period-toggle-sales').val(input_val_1).digits();
+                    });
+                } else {
+                    $("#period-toggle-sales-btn").html('DAY');
+                    $('.sale-toggle-table .row .col').each(function () {
+                        var $input_val = $(this);
+                        var input_val_1 = Math.ceil(($input_val.find('.period-toggle-sales').val())/25);
+                        $input_val.find('.period-toggle-sales').val(input_val_1).digits();
+                    });
+                }
+            });
+
             changeTable();
         });
     </script>

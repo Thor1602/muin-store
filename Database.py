@@ -454,6 +454,39 @@ class FixedCost(Main):
             self.english_name, self.korean_name, self.cost_per_month, self.one_time_cost, self.period_months, id,)
         execute_query(query=SQL, parameters=parameters, commit=True)
 
+class FixedCostReport(Main):
+    def __init__(self, fixed_cost_id, cost_per_month, date):
+        self.fixed_cost_id = fixed_cost_id
+        self.cost_per_month = cost_per_month
+        self.date = date
+
+    def register(self):
+        SQL = "INSERT INTO fixed_costs_report (fixed_cost_id, cost_per_month, date) VALUES (%s,%s,%s);"
+        parameters = (self.fixed_cost_id, self.cost_per_month, self.date,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update(self, id):
+        SQL = "UPDATE fixed_costs_report SET fixed_cost_id = %s, cost_per_month = %s, date = %s WHERE id = %s;"
+        parameters = (self.fixed_cost_id, self.cost_per_month, self.date, id,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+class LossReport(Main):
+    def __init__(self, product_id, amount, variable_cost, date):
+        self.product_id = product_id
+        self.amount = amount
+        self.variable_cost = variable_cost
+        self.date = date
+
+    def register(self):
+        SQL = "INSERT INTO loss_report (product_id, amount, variable_cost, date) VALUES (%s,%s,%s,%s);"
+        parameters = (self.product_id, self.amount, self.variable_cost, self.date,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
+    def update(self, id):
+        SQL = "UPDATE loss_report SET product_id = %s, amount = %s, variable_cost = %s, date = %s WHERE id = %s;"
+        parameters = (self.product_id, self.amount, self.variable_cost, self.date, id,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+
 
 class VariableCost(Main):
     def __init__(self, productid, variable_cost, selling_price_lv, criteria_lv, selling_price_mv, criteria_mv,

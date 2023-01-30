@@ -12,7 +12,7 @@ TODO add kakao alert messaging
 TODO REGULARLY gmail app password, secret_key, postgres, admin
 more info later
 """
-import datetime
+from datetime import datetime as datetimelib
 import logging
 from os.path import exists
 
@@ -706,6 +706,17 @@ def financial_plan():
                 fixed_cost.register_cost()
             elif 'fixed_cost_edit_button' in request.form:
                 fixed_cost.update_cost(request.form['fixed_cost_edit_button'])
+
+        elif 'fixed_cost_report_button' in request.form:
+            if request.form['date'] == '':
+                date = datetimelib.now().strftime("%Y-%m-%d")
+            else:
+                date = request.form['date']
+            for key in request.form:
+                if 'cost_per_month' in key:
+                    values = key.split('$$$')
+                    Database.FixedCostReport(values[1], request.form[key], date).register()
+
         elif 'investment_edit_button' in request.form or 'investment_add_button' in request.form:
 
             investment = Database.Investment(request.form['english'], request.form['korean'],
@@ -727,10 +738,11 @@ def financial_plan():
         elif 'change_products_report' in request.form:
             for x in data['products']:
                 if str(x[0]) in request.form:
-                    Database.Products(x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10],x[11],
-                                  request.form['price_low_amount_' + str(x[0])], x[13], request.form['price_medium_amount_' + str(x[0])], x[15],
-                                  request.form['price_high_amount_' + str(x[0])], x[17],
-                                  request.form['amount_low_' + str(x[0])],x[19]).update(x[0])
+                    Database.Products(x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11],
+                                      request.form['price_low_amount_' + str(x[0])], x[13],
+                                      request.form['price_medium_amount_' + str(x[0])], x[15],
+                                      request.form['price_high_amount_' + str(x[0])], x[17],
+                                      request.form['amount_low_' + str(x[0])], x[19]).update(x[0])
         elif 'add_financial_report' in request.form:
             data['vat'] = {}
             data['turnover-after-vat'] = {}
@@ -739,28 +751,60 @@ def financial_plan():
             for product in data['products']:
                 data['vat'][product[0]] = int(product[12] - (product[12] / 1.1))
                 data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
-                data['breakeven-per-product'][product[0]] = int((product[12] / 1.1) - data['variable-costs'][product[0]])
+                data['breakeven-per-product'][product[0]] = int(
+                    (product[12] / 1.1) - data['variable-costs'][product[0]])
             if request.form['date'] == '':
                 input_date = None
             else:
                 input_date = request.form['date']
             for product in data['products']:
                 if str(product[0]) in request.form:
-                    sold_products = int(request.form['amount_low_' + str(product[0])]) + int(request.form['amount_medium_' + str(product[0])]) + int(request.form['amount_high_' + str(product[0])])
+                    sold_products = int(request.form['amount_low_' + str(product[0])]) + int(
+                        request.form['amount_medium_' + str(product[0])]) + int(
+                        request.form['amount_high_' + str(product[0])])
                     total_variable_cost = sold_products * int(data['variable-costs'][product[0]])
-                    low = int(request.form['price_low_amount_' + str(product[0])])*int(request.form['amount_low_' + str(product[0])])
-                    medium = int(request.form['price_medium_amount_' + str(product[0])])*int(request.form['amount_medium_' + str(product[0])])
-                    high = int(request.form['price_high_amount_' + str(product[0])])*int(request.form['amount_high_' + str(product[0])])
+                    low = int(request.form['price_low_amount_' + str(product[0])]) * int(
+                        request.form['amount_low_' + str(product[0])])
+                    medium = int(request.form['price_medium_amount_' + str(product[0])]) * int(
+                        request.form['amount_medium_' + str(product[0])])
+                    high = int(request.form['price_high_amount_' + str(product[0])]) * int(
+                        request.form['amount_high_' + str(product[0])])
                     total_income = low + medium + high
                     vat = int(total_income - (total_income / 1.1))
                     Database.Sale(input_date, request.form['amount_low_' + str(product[0])],
                                   request.form['price_low_amount_' + str(product[0])],
                                   request.form['amount_medium_' + str(product[0])],
                                   request.form['price_medium_amount_' + str(product[0])],
-                                  request.form['amount_high_' + str(product[0])], request.form['price_high_amount_' + str(product[0])],
+                                  request.form['amount_high_' + str(product[0])],
+                                  request.form['price_high_amount_' + str(product[0])],
                                   str(product[0]),
                                   str(total_variable_cost),
                                   str(total_income),
+                                  str(vat)).register()
+        elif 'add_financial_report_simplified' in request.form:
+            data['vat'] = {}
+            data['turnover-after-vat'] = {}
+            data['variable-costs'] = main.calculate_variable_cost()['total_average']
+            data['breakeven-per-product'] = {}
+            for product in data['products']:
+                data['vat'][product[0]] = int(product[12] - (product[12] / 1.1))
+                data['turnover-after-vat'][product[0]] = int(product[12] / 1.1)
+                data['breakeven-per-product'][product[0]] = int(
+                    (product[12] / 1.1) - data['variable-costs'][product[0]])
+            if request.form['date'] == '':
+                input_date = None
+            else:
+                input_date = request.form['date']
+            for product in data['products']:
+                if str(product[0]) in request.form:
+                    sold_products = int(request.form['amount_low_' + str(product[0])])
+                    total_variable_cost = sold_products * int(data['variable-costs'][product[0]])
+                    total_income = int(request.form['price_low_amount_' + str(product[0])]) * int(
+                        request.form['amount_low_' + str(product[0])])
+                    vat = int(total_income - (total_income / 1.1))
+                    Database.Sale(input_date, request.form['amount_low_' + str(product[0])],
+                                  request.form['price_low_amount_' + str(product[0])],
+                                  0, 0, 0, 0, str(product[0]), str(total_variable_cost), str(total_income),
                                   str(vat)).register()
         else:
             abort(500)
@@ -798,23 +842,27 @@ def financial_plan():
             data['sales'][x[1].date()] = [x]
         if x[1].date() not in data['sales_summary']:
             breakeven = x[10] - (x[9] + x[11])
-            data['sales_summary'][x[1].date()] = {"Total Turnover": x[10], "VAT": x[11], "Variable Costs": x[9], 'Break Even': breakeven}
+            data['sales_summary'][x[1].date()] = {"Total Turnover": x[10], "VAT": x[11], "Variable Costs": x[9],
+                                                  'Break Even': breakeven}
         else:
             data['sales_summary'][x[1].date()]["Total Turnover"] += x[10]
             data['sales_summary'][x[1].date()]['VAT'] += x[11]
             data['sales_summary'][x[1].date()]['Variable Costs'] += x[9]
-            breakeven = x[10]-(x[9]+x[11])
+            breakeven = x[10] - (x[9] + x[11])
             data['sales_summary'][x[1].date()]['Break Even'] += breakeven
         year_month = str(x[1].year) + "-" + str(x[1].month)
         if year_month not in data['sales_month_summary']:
             breakeven = x[10] - (x[9] + x[11])
-            data['sales_month_summary'][year_month] = {"Total Turnover": x[10], "VAT": x[11], "Variable Costs": x[9], 'Break Even': breakeven}
+            data['sales_month_summary'][year_month] = {"Total Turnover": x[10], "VAT": x[11], "Variable Costs": x[9],
+                                                       'Break Even': breakeven}
         else:
             data['sales_month_summary'][year_month]["Total Turnover"] += x[10]
             data['sales_month_summary'][year_month]['VAT'] += x[11]
             data['sales_month_summary'][year_month]['Variable Costs'] += x[9]
-            breakeven = x[10]-(x[9]+x[11])
+            breakeven = x[10] - (x[9] + x[11])
             data['sales_month_summary'][year_month]['Break Even'] += breakeven
+    for month in data['sales_month_summary']:
+        data['sales_month_summary'][month]['Break Even']=data['sales_month_summary'][month]['Break Even']-data['total']['total_cost']
     data['sales_summary'] = collections.OrderedDict(sorted(data['sales_summary'].items(), reverse=True))
     data['sales_month_summary'] = collections.OrderedDict(sorted(data['sales_month_summary'].items(), reverse=True))
 
@@ -854,7 +902,7 @@ def invoices():
                     break
                 extension = file.filename.rsplit('.', 1)[1]
                 if request.form['invoice_date'] == "":
-                    date = datetime.datetime.now().strftime("%Y-%m-%d")
+                    date = datetimelib.now().strftime("%Y-%m-%d")
                 else:
                     date = request.form['invoice_date']
                 file.filename = request.form['supplier_name'] + "_" + date + "." + extension
@@ -880,7 +928,7 @@ def invoices():
                     break
                 extension = file.filename.rsplit('.', 1)[1]
                 if request.form['invoice_date'] == "":
-                    date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    date = datetimelib.now().strftime("%Y%m%d_%H%M%S")
                 else:
                     date = request.form['invoice_date']
                 file.filename = request.form['customer_name'] + "_" + date + "." + extension

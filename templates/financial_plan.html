@@ -49,6 +49,7 @@
                         data-bs-target="#addLossReport"
                         type="button">ADD LOSS REPORT
                 </button>
+            <hr>
                 <h3>PROFIT/INCOME SIMULATOR</h3>
                 <p class="number-format">Minimum investment cost: {{ data['total']['minimum'] }}</p>
                 <p class="number-format">Maximum investment cost: {{ data['total']['maximum'] }}</p>
@@ -56,8 +57,8 @@
                 <p>Turnover after VAT deduction: <span class="total-turnover-after-vat"></span> (Total VAT = <span
                         id="total-vat"></span>)</p>
                 <p>Variable costs: <span class="total-variable-costs"></span></p>
-                <p>Fixed costs per month: <span class="number-format"> <span
-                        id="fixedCostTotal">{{ data['total']['total_cost'] }}</span></span></p>
+                <p>Fixed costs per month: <span class="number-format" id="fixedCostTotal"> <span
+                        >{{ data['total']['total_cost'] }}</span></span></p>
                 <p>Net profit: <span id="net-profit"></span> >> (<span class="total-turnover-after-vat"> </span> -
                     (<span class="total-variable-costs"> </span> + <span
                             class="number-format"> {{ data['total']['total_cost'] }}</span>))</p>
@@ -65,8 +66,6 @@
                     >>>
                     money that goes to our pocket after everyone did 냠냠냠</p>
 
-
-                <hr>
                 <h4>BREAK EVEN CHART</h4>
                 {#                <div>#}
                 {#                    <canvas id="myChart"></canvas>#}
@@ -136,6 +135,7 @@
                 </div>
 
                 <hr>
+                <h3>REPORTS</h3>
                 <h4>SALES PER MONTH</h4>
                 <div class="overflow-scroll max-height-table">
                     <table class="table  table-striped table-hover">
@@ -206,6 +206,103 @@
                     </table>
                 </div>
 
+                <h4>FIXED COSTS PER MONTH</h4>
+                <div class="overflow-scroll max-height-table">
+                    <table class="table  table-striped table-hover">
+                        <thead>
+                        <tr class="keep-all">
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col">MONTH</th>
+                            <th scope="col">Total Cost</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for loss_date in data['loss_report'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#editModalLossReports{{ loss_date }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                <th>
+                                    <button class="btn btn-danger" type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModalLossSummary{{ loss_date }}">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </th>
+                                <th>{{ sale_date }}</th>
+                                <th class="number-format"></th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            <hr>
+                <h4>목표원가계산</h4>
+                <div class="overflow-scroll max-height-table">
+
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr class="keep-all">
+                            <th></th>
+                            <th></th>
+                            <th scope="col">영어</th>
+                            <th scope="col">한국어</th>
+                            <th scope="col">투자금액</th>
+                            <th scope="col">일시불</th>
+                            <th scope="col">개월/년</th>
+                            <th scope="col">ID</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in data['fixed_costs'] %}
+                            <tr class="table-success">
+                                <th>
+                                    <button class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#fixed_cost_modal_{{ row [0] }}"
+                                            type="button"><i class="bi bi-pencil"></i></button>
+                                </th>
+                                <th>
+
+                                    <button class="btn btn-danger" type="button"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModalFixedCost{{ row[0] }}">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </th>
+                                <th>{{ row[1] }}</th>
+                                <th class="keep-all">{{ row[2] }}</th>
+                                <th class="number-format text-end">{{ row[3] }}</th>
+                                <th>{{ row[4] }}</th>
+                                <th>{{ row[5] }}</th>
+                                <th>{{ row[0] }}</th>
+
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class="number-format">{{ data['total']['total_cost'] }}</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#fixed_cost_modal_add"
+                        type="button">ADD FIXED COST
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#fixed_cost_modal_report"
+                        type="button">REPORT MONTHLY FIXED COSTS
+                </button>
                 <hr>
                 <h4>대차대조표</h4>
                 <div class="overflow-scroll max-height-table">
@@ -282,68 +379,7 @@
                         </tbody>
                     </table>
                 </div>
-                <hr>
-                <h4>목표원가계산</h4>
-                <div class="overflow-scroll max-height-table">
 
-                    <table class="table table-striped table-hover">
-                        <thead>
-                        <tr class="keep-all">
-                            <th></th>
-                            <th></th>
-                            <th scope="col">영어</th>
-                            <th scope="col">한국어</th>
-                            <th scope="col">투자금액</th>
-                            <th scope="col">일시불</th>
-                            <th scope="col">개월/년</th>
-                            <th scope="col">ID</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in data['fixed_costs'] %}
-                            <tr class="table-success">
-                                <th>
-                                    <button class="btn btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#fixed_cost_modal_{{ row [0] }}"
-                                            type="button"><i class="bi bi-pencil"></i></button>
-                                </th>
-                                <th>
-
-                                    <button class="btn btn-danger" type="button"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModalFixedCost{{ row[0] }}">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                </th>
-                                <th>{{ row[1] }}</th>
-                                <th class="keep-all">{{ row[2] }}</th>
-                                <th class="number-format text-end">{{ row[3] }}</th>
-                                <th>{{ row[4] }}</th>
-                                <th>{{ row[5] }}</th>
-                                <th>{{ row[0] }}</th>
-
-                            </tr>
-                        {% endfor %}
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th class="number-format">{{ data['total']['total_cost'] }}</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <button class="btn btn-success" data-bs-toggle="modal"
-                        data-bs-target="#fixed_cost_modal_add"
-                        type="button">ADD FIXED COST
-                </button>
-                <button class="btn btn-success" data-bs-toggle="modal"
-                        data-bs-target="#fixed_cost_modal_report"
-                        type="button">REPORT MONTHLY FIXED COSTS
-                </button>
 
             </div>
 

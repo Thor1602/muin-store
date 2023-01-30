@@ -822,6 +822,10 @@ def financial_plan():
         row = [row[0], row[1], row[2], row[4], row[5], row[6]]
         data['total']['total_cost'] += row[3]
         data['fixed_costs'].append(row)
+
+    data['loss_report'] = {}
+
+
     data['vat'] = {}
     data['turnover-after-vat'] = {}
     data['variable-costs'] = main.calculate_variable_cost()['total_average']

@@ -43,7 +43,6 @@ $(document).ready(function () {
     }
 
     function changeTable() {
-        var totalBreakeven = 0;
         var turnoverTotal = 0;
         var turnoverAfterVat = 0;
         var totalNetProfitAfterVariableCosts = 0;
@@ -75,13 +74,13 @@ $(document).ready(function () {
                 totalVariableCosts += subTotalVariableCosts;
             }
         });
-        var totalFixedCost = $("#fixedCostTotal").text();
-        alert(parseInt(totalFixedCost));
+        var totalFixedCost = $('#fixedCostTotal').text().replace(/[^\d.]/g, '');
+        alert(totalFixedCost);
         $('.total-turnover-after-vat').text(parseInt(turnoverAfterVat)).digits();
         $('.total-variable-costs').text(parseInt(totalVariableCosts)).digits();
         $('#total-turnover').text(parseInt(turnoverTotal)).digits();
         $('#total-vat').text(parseInt(totalVAT)).digits();
-        var netProfit = turnoverAfterVat - (totalVariableCosts + totalFixedCost);
+        var netProfit = turnoverAfterVat - (totalVariableCosts + parseInt(totalFixedCost));
         $('#net-profit').text(netProfit).digits();
         var netProfitAfterCTax;
         if (netProfit > 0) {
@@ -111,7 +110,7 @@ $(document).ready(function () {
     });
 
     $('#period-toggle-sales-btn').click(function () {
-        var $btnContent = $("#period-toggle-sales-btn").text();
+        var $btnContent = $('#period-toggle-sales-btn').text();
         if ($btnContent === 'DAY') {
             $("#period-toggle-sales-btn").html('MONTH');
             $('.sale-toggle-table .row .col').each(function () {

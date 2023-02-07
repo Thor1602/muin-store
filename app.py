@@ -344,7 +344,7 @@ def robot_file():
 
 @app.route("/naver_review", methods=['GET', 'POST'])
 def naver_review():
-    return redirect("https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=coupdefoudre")
+    return redirect("https://search.naver.com/")
 
 
 #

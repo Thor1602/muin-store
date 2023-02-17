@@ -53,7 +53,7 @@
             <span class="full-screen"><i class="fa-solid fa-envelope d-flex align-items-center"><a
                     href="mailto:cdfguri@gmail.com">{{ msgid['email_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-solid fa-phone d-flex align-items-center ms-4"><a
-                    href="tel:00821048878249">{{ msgid['phone_contact'] }}</a></i></span>
+                    href="tel:{{ msgid['phone_number_number'] }}">{{ msgid['phone_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-brands fa-kickstarter d-flex align-items-center ms-4"><a
                     href="https://pf.kakao.com/_xmCxauxj">{{ msgid['kakao_contact'] }}</a></i></span>
             <span class="full-screen"><i class="fa-solid fa-n d-flex align-items-center ms-4"><a
@@ -62,7 +62,7 @@
                data-bs-placement="bottom"
                title="{% if preferred_language == 'ko_KR' %}이메일을 보내기{% else %}Send an email{% endif %}"><i
                     class="fa-solid fa-envelope fa-xl d-flex align-items-center"></i></a>
-            <a class="short-screen btn" href="tel:00821048878249" data-bs-toggle="tooltip" data-bs-placement="bottom"
+            <a class="short-screen btn" href="tel:{{ msgid['phone_number_number'] }}" data-bs-toggle="tooltip" data-bs-placement="bottom"
                title="{% if preferred_language == 'ko_KR' %}전화기{% else %}Call us{% endif %}"><i
                     class="fa-solid fa-phone fa-xl d-flex align-items-center"></i></a>
             <a class="short-screen btn" href="https://pf.kakao.com/_xmCxauxj" data-bs-toggle="tooltip"

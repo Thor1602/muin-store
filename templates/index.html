@@ -209,7 +209,7 @@
                                 <i class="bi bi-phone flex-shrink-0"></i>
                                 <div>
                                     <h4>{{ msgid['phone_number'] | safe }}:</h4>
-                                    <p>010-4887-8249</p>
+                                    <p>{{ msgid['phone_number_number'] }}</p>
                                 </div>
                             </div><!-- End Info Item -->
                             <div class="info-item d-flex">
@@ -336,7 +336,7 @@
                 <h4>{{ msgid['contact_title'] | safe }}: </h4>
                 <p>
                     {{ msgid['address'] | safe }}<br>
-                    <strong>{{ msgid['phone_number'] | safe }}:</strong> 010-4887-8249<br>
+                    <strong>{{ msgid['phone_number'] | safe }}:</strong> {{ msgid['phone_number_number'] }}<br>
                     <strong>{{ msgid['email'] | safe }}:</strong> cdfguri@gmail.com<br>
                 </p>
 
@@ -517,14 +517,14 @@
                         <li>성명 :Thorben Dhaenens</li>
                         <li>직책 :사장님</li>
                         <li>직급 :사장님</li>
-                        <li>연락처 :01048878249, thorbendhaenenstd@gmail.com, -</li>
+                        <li>연락처 :{{ msgid['phone_number_number'] }}, thorbendhaenenstd@gmail.com, -</li>
                     </ul>
                     <p class='sub_p'>※ 개인정보 보호 담당부서로 연결됩니다.</p>
                     <ul class='list_indent2 mgt10'>
                         <li class='tt'>▶ 개인정보 보호 담당부서</li>
                         <li>부서명 :사장님</li>
                         <li>담당자 :Thorben Dhaenens</li>
-                        <li>연락처 :01048878249, thorbendhaenenstd@gmail.com,</li>
+                        <li>연락처 :{{ msgid['phone_number_number'] }}, thorbendhaenenstd@gmail.com,</li>
                     </ul>
                     <p class='sub_p'>② 정보주체께서는 Coup De Foudre 의 서비스(또는 사업)을 이용하시면서 발생한 모든 개인정보 보호 관련 문의, 불만처리, 피해구제 등에
                         관한
@@ -556,7 +556,7 @@
                         <li class='tt'>▶ 개인정보 열람청구 접수·처리 부서</li>
                         <li>부서명 :</li>
                         <li>담당자 : thorbendhaenenstd@gmail.com</li>
-                        <li>연락처 : 01048878249, thorbendhaenenstd@gmail.com,</li>
+                        <li>연락처 : {{ msgid['phone_number_number'] }}, thorbendhaenenstd@gmail.com,</li>
                     </ul>
                     <p class='lh6 bs4'><strong>제16조(정보주체의 권익침해에 대한 구제방법)<em class="emphasis"></em></strong>
                     </p>

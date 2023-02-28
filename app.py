@@ -344,7 +344,7 @@ def robot_file():
 
 @app.route("/naver_review", methods=['GET', 'POST'])
 def naver_review():
-    return redirect("https://search.naver.com/")
+    return redirect("https://map.naver.com/v5/entry/place/1691961955?c=18.87,0,0,0,dh")
 
 
 #

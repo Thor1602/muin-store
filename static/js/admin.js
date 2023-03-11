@@ -75,7 +75,6 @@ $(document).ready(function () {
             }
         });
         var totalFixedCost = $('#fixedCostTotal').text().replace(/[^\d.]/g, '');
-        alert(totalFixedCost);
         $('.total-turnover-after-vat').text(parseInt(turnoverAfterVat)).digits();
         $('.total-variable-costs').text(parseInt(totalVariableCosts)).digits();
         $('#total-turnover').text(parseInt(turnoverTotal)).digits();

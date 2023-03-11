@@ -83,6 +83,7 @@ def send_message_admin(message):
 
 def send_sms_to_receiver(message, phone_receiver):
     main = Main()
+
     sid = main.get_setting_by_name('naver_sid_sms')[0]
     sms_uri = "/sms/v2/services/{}/messages".format(sid)
     sms_url = "https://sens.apigw.ntruss.com{}".format(sms_uri)
@@ -102,10 +103,11 @@ def send_sms_to_receiver(message, phone_receiver):
         'countryCode': '82',
         'from': "{}".format('01048878249'),
         'contentType': 'COMM',
+        # 'contentType': 'AD',
         'content': "{}".format(message),
-        'messages': [{'to': "{}".format(str(phone_receiver))}]
+        'messages': [{'to': "{}".format(phone_receiver)}]
     }
-
+    print(msg_data)
     response = requests.post(
         sms_url, data=json.dumps(msg_data),
         headers={"Content-Type": "application/json; charset=utf-8",
@@ -114,8 +116,7 @@ def send_sms_to_receiver(message, phone_receiver):
                  "x-ncp-apigw-signature-v2": d_hash
                  }
     )
-
+    print(response.text)
     return response.text
 if __name__ == '__main__':
-    # send_notification_code("01048108249", '123456', 'KO-kr')
     pass

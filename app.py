@@ -97,7 +97,7 @@ nav_menu_admin = {'/admin_overview': 'Overview',
 
 menu_item_home = {'#hero': 'home_title', '#best-product': 'best_product_title_nav', '#about': 'about_title',
                   '#contact': 'contact_title', '#clients': 'suppliers_title'}
-trusted_ip = ('127.0.0.1', '211.208.140.83')
+trusted_ip = ('127.0.0.1', '211.208.140.83', '183.97.25.196')
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 # -----------------------LOGGING-----------------------
 

@@ -26,7 +26,6 @@ from flask_compress import Compress
 
 import flask_login
 import googledrive_connector
-import naver_setup
 import os.path
 import os
 import Database
@@ -197,10 +196,6 @@ def get_locale():
 
 # -----------------------RQ-----------------------
 
-# @rq.job
-def send_sms_in_background(message_str):
-    naver_setup.send_message_admin(message=message_str)
-
 
 # @rq.job
 def send_email_in_background(message_object):
@@ -268,11 +263,6 @@ def index():
                 send_email_in_background(admin_msg)
             except Exception as e:
                 app.logger.error(str(e) + ': Mail couldn\'t be send')
-            try:
-                send_sms_in_background(f"문의 주세요! ({contact_form.phone.data}) {contact_form.name.data}")
-                send_sms_in_background("더보기: https://cdf.herokuapp.com/contact_inquiry")
-            except Exception as e:
-                app.logger.error(str(e) + ': Naver SMS couldn\'t be send')
             Database.Contact(name=contact_form.name.data, email=contact_form.email.data,
                              address=contact_form.address.data,
                              phone=contact_form.phone.data, subject=contact_form.subject.data,
@@ -966,10 +956,6 @@ def images():
 @flask_login.login_required
 @postgres_connection
 def contact_inquiry():
-    if request.method == 'POST':
-        naver_setup.send_sms_to_receiver(message=request.form['message'],
-                                         phone_receiver=request.form['phone_number'])
-        flash('메시지를 보냈어요!!')
     contact_info = main.read_table('customer_contact_submission', order_desc="time")
     return render_template('contact_inquiry.html', contact_info=contact_info)
 

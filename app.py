@@ -5,7 +5,7 @@ The user can make changes to the text/prolog-text as appropriate.
 This work is licensed under
 a Creative Commons Attribution-ShareAlike 3.0 Unported License.
 ©Thorben, 2021
-email: cdfguri@gmail.com
+email: thorbendhaenenstd@gmail.com
 
 TODO add file handler cloud
 TODO add kakao alert messaging
@@ -240,7 +240,7 @@ def index():
                 break
         # msg.recipients = ["rlatnals3020@naver.com"]
         if suspicious_request:
-            admin_msg = Message("Coup De Foudre: Suspicious request",
+            admin_msg = Message("CDF: Suspicious request",
                                 sender="from@example.com",
                                 recipients=["to@example.com"])
             admin_msg.recipients = ["cdfguri@gmail.com"]
@@ -253,7 +253,7 @@ def index():
             except Exception as e:
                 app.logger.error(str(e) + ': Mail couldn\'t be send')
         else:
-            admin_msg = Message("Coup De Foudre: 문의 주세요!",
+            admin_msg = Message("CDF: 문의 주세요!",
                                 sender="from@example.com",
                                 recipients=["to@example.com"])
             admin_msg.recipients = ["cdfguri@gmail.com"]
@@ -1068,7 +1068,7 @@ def login():
         else:
             request_ip = request.environ['HTTP_X_FORWARDED_FOR']
         if request_ip not in trusted_ip:
-            admin_msg = Message("Coup De Foudre: 문의 주세요!",
+            admin_msg = Message("CDF: 문의 주세요!",
                                 sender="from@example.com",
                                 recipients=["cdfguri@gmail.com"],
                                 html='suspicious login attempt: ' + request_ip)

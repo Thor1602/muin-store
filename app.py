@@ -303,6 +303,12 @@ def products():
                            english_allergens=english_allergens,
                            allergenproduct=allergenproduct)
 
+@app.route("/product/<barcode>", methods=['GET', 'POST'])
+@postgres_connection
+def product(barcode):
+    products = main.read_table('products')
+
+    return render_template('product.html')
 
 @app.route('/large_order_price', methods=['GET', 'POST'])
 @postgres_connection

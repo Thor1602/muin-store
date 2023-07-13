@@ -27,17 +27,27 @@
         <div class="container" data-aos="fade-up">
             <div class="section-header">
 
-                <h2>{% if preferred_language == 'ko_KR' %}{{ chosen_product[2] | safe }}{% else %}
-                    {{ chosen_product[1] | safe }}{% endif %}</h2>
+                <h2>{% if chosen_product == "SEARCH" %}{% if preferred_language == 'ko_KR' %}검색{% else %}SEARCH
+                {% endif %}
+                    {% else %}{% if preferred_language == 'ko_KR' %}{{ chosen_product[2] | safe }}{% else %}
+                        {{ chosen_product[1] | safe }}{% endif %}{% endif %}</h2>
 
 
             </div>
             <div class="row gy-4">
-                <canvas id="barcode"></canvas>
-                <p>{{ chosen_product | safe }}</p>
-            </div>
+                <canvas class="barcode" id="barcode"></canvas>
+{#                <p>{% if chosen_product != "SEARCH" %}{{ chosen_product | safe }}{% endif %}</p>#}
+                <div class="row">
+                    {% for allergen in allergen_data[chosen_product[0]] %}
+                        <div class="col-sm-6 col-md-3">
+                            <h4>{% if preferred_language == 'ko_KR' %}{{ allergens[allergen][1] }}: {% else %}{{ allergens[allergen][0] }}:
+                {% endif %}<span>{% if allergen_data[chosen_product[0]][allergen] %}V{% else %}X{% endif %}</span></h4>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
 
-        </div>
+            </div>
     </section><!-- End Portfolio Section -->{% endblock %}{% block endbody %}
     <script>
         // Generate the barcode

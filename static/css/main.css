@@ -2534,6 +2534,7 @@ hr {
 .max-height-table {
     max-height: 600px;
 }
+
 .max-height-table-comments {
     max-height: 250px;
 }
@@ -2581,6 +2582,7 @@ input[type=number] {
     top: 0;
     background-color: white;
 }
+
 #edit-allergen-table th:first-child {
     position: sticky;
     left: 0;
@@ -2588,10 +2590,20 @@ input[type=number] {
 }
 
 
-.modal-dialog-scrollable{
+.modal-dialog-scrollable {
     overflow-y: initial !important
 }
-.modal-body-scrollable{
+
+.modal-body-scrollable {
     height: 80vh;
     overflow-y: auto;
 }
+
+.barcode {
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    width: 400px;
+        height: 200px;
+}
+

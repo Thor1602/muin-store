@@ -308,16 +308,20 @@ def products():
 @postgres_connection
 def product(barcode):
     products = main.read_table('products')
-    allergens = main.read_table('allergens')
     chosen_product = None
     for product in products:
         if product[19] == barcode:
             chosen_product = product
             break
+    if barcode == "search":
+        chosen_product = "SEARCH"
     if chosen_product is None:
         abort(404)
+    allergens = {}
+    for product in main.read_table('allergens'):
+        allergens[product[0]] = product[1:]
     return render_template('product.html', chosen_product=chosen_product, allergens=allergens, products=products,
-                           product_list=main.allergen_dict_all_products())
+                           allergen_data=main.allergen_dict_all_products())
 
 
 @app.route('/large_order_price', methods=['GET', 'POST'])

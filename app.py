@@ -303,12 +303,22 @@ def products():
                            english_allergens=english_allergens,
                            allergenproduct=allergenproduct)
 
+
 @app.route("/product/<barcode>", methods=['GET', 'POST'])
 @postgres_connection
 def product(barcode):
     products = main.read_table('products')
+    allergens = main.read_table('allergens')
+    chosen_product = None
+    for product in products:
+        if product[19] == barcode:
+            chosen_product = product
+            break
+    if chosen_product is None:
+        abort(404)
+    return render_template('product.html', chosen_product=chosen_product, allergens=allergens, products=products,
+                           product_list=main.allergen_dict_all_products())
 
-    return render_template('product.html')
 
 @app.route('/large_order_price', methods=['GET', 'POST'])
 @postgres_connection
@@ -821,7 +831,6 @@ def financial_plan():
 
     data['loss_report'] = {}
 
-
     data['vat'] = {}
     data['turnover-after-vat'] = {}
     data['variable-costs'] = main.calculate_variable_cost()['total_average']
@@ -862,7 +871,8 @@ def financial_plan():
             breakeven = x[10] - (x[9] + x[11])
             data['sales_month_summary'][year_month]['Break Even'] += breakeven
     for month in data['sales_month_summary']:
-        data['sales_month_summary'][month]['Break Even']=data['sales_month_summary'][month]['Break Even']-data['total']['total_cost']
+        data['sales_month_summary'][month]['Break Even'] = data['sales_month_summary'][month]['Break Even'] - \
+                                                           data['total']['total_cost']
     data['sales_summary'] = collections.OrderedDict(sorted(data['sales_summary'].items(), reverse=True))
     data['sales_month_summary'] = collections.OrderedDict(sorted(data['sales_month_summary'].items(), reverse=True))
 

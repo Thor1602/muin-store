@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ msgid['product_title'] }} - {{ msgid['title'] }}{% endblock %}
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"
+            integrity="sha512-QEAheCz+x/VkKtxeGoDq6nsGyzTx/0LMINTgQjqZ0h3+NjP+bCsPYz3hn0HnBkGmkIFSr7QcEZT+KyEM7lbLPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>{% endblock %}
 {% block body %}
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="hero">
@@ -22,17 +26,27 @@
     <section id="about" class="about">
         <div class="container" data-aos="fade-up">
             <div class="section-header">
-                <h2>{{ msgid['product_title'] | safe }}</h2>
-                <p>{{ msgid['product_intro'] | safe }}</p>
+
+                <h2>{% if preferred_language == 'ko_KR' %}{{ chosen_product[2] | safe }}{% else %}
+                    {{ chosen_product[1] | safe }}{% endif %}</h2>
+
+
             </div>
             <div class="row gy-4">
-                <p>{{ chosen_product }}</p>
+                <canvas id="barcode"></canvas>
+                <p>{{ chosen_product | safe }}</p>
             </div>
 
         </div>
-    </section><!-- End Portfolio Section -->{% endblock %}
+    </section><!-- End Portfolio Section -->{% endblock %}{% block endbody %}
     <script>
-        $(document).ready(function () {
+        // Generate the barcode
 
+        // Optional: Change barcode options
+        JsBarcode("#barcode", "{{ chosen_product[19] }}", {
+            format: "CODE128",
+            width: 3,
+            height: 100,
+            displayValue: true
         });
     </script>{% endblock %}

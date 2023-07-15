@@ -336,7 +336,7 @@ class Main:
         return product_list
 
     def update_origin(self, origin_id, ingredient_id):
-        SQL = "UPDATE ingredients SET origin = %s WHERE id = %s;"
+        SQL = "UPDATE ingredients SET origin_id = %s WHERE id = %s;"
         parameters = (origin_id, ingredient_id, )
         execute_query(query=SQL, parameters=parameters, commit=True)
 

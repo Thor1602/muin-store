@@ -1083,7 +1083,8 @@ def origins_edit():
     if request.method == "POST":
         if 'submit_ingredient_origin_edit' in request.form:
             for ingredient_id in request.form:
-                main.update_origin(ingredient_id=ingredient_id, origin_id=request.form[ingredient_id])
+                if ingredient_id != '':
+                    main.update_origin(ingredient_id=ingredient_id, origin_id=request.form[ingredient_id])
         elif 'add_origins' in request.form:
             Database.Origin(request.form['English'], request.form['Korean']).register()
         elif 'edit_origins' in request.form:

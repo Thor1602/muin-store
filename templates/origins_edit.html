@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ msgid['allergenes_title'] }} - {{ msgid['title'] }}{% endblock %}
+{% block body %}
+    <!-- Start main content Section -->
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-header">
+                <h2>{{ msgid['allergenes_title'] }}</h2>
+            </div>
+            <hr>
+            <form method="POST" action="/origins_edit" id="origins_edit">
+                <div class="row">
+                    <button class="btn btn-warning" name="submit_ingredient_origin_edit" type="submit"
+                            id="submit_ingredient_origin_edit">
+                        SUBMIT
+                    </button>
+                </div>
+                <div class="row">
+
+                    <div class="table-responsive" id="edit-allergen-table">
+                        <table class="table table-hover text-center">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            {% if preferred_language == 'ko_KR' %}
+                                {% for ingredient in ingredients %}
+                                    <tr>
+                                        <th class="keep-all "> {{ ingredient[2] }}</th>
+                                        <th class="keep-all "> {{ countries[ingredient[3]]['Korean'] }}</th>
+                                        <td class="keep-all ">
+                                            <select class="form-select" aria-label="Select item" name="{{ ingredient[0] }}">
+                                                {% for country in countries %}
+                                                {% if country == ingredient[3] %}
+                                                <option selected value="{{ country }}">{{ countries[country]['Korean'] }}</option>
+                                                {% else %}
+                                                    <option value="{{ country }}">{{ countries[country]['Korean'] }}</option>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                {% for ingredient in ingredients %}
+                                    <tr>
+                                        <th class="keep-all "> {{ ingredient[1] }}</th>
+                                        <th class="keep-all "> {{ countries[ingredient[3]]['English'] }}</th>
+                                        <td class="keep-all ">
+                                            <select class="form-select" aria-label="Select item" name="{{ ingredient[0] }}">
+                                                {% for country in countries %}
+                                                {% if country == ingredient[3] %}
+                                                <option selected value="{{ country }}">{{ countries[country]['English'] }}</option>
+                                                {% else %}
+                                                    <option value="{{ country }}">{{ countries[country]['English'] }}</option>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </section>
+    <!-- End main content Section -->
+{% endblock %}
+{% block endbody %}
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+{% endblock %}
+
+

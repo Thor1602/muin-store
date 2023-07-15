@@ -135,9 +135,7 @@ class Main:
         # main.add_column(tablename='products', columname='type', type='VARCHAR', default_value='pastry')
 
     def get_setting_by_name(self, name):
-        return \
-            execute_query(query="SELECT key, value FROM settings where name = '{}';".format(name), fetchAll=True)[
-                0]
+        return execute_query(query="SELECT key, value FROM settings where name = '{}';".format(name), fetchAll=True)[0]
 
     def get_cloud_images(self):
         return googledrive_connector.list_all_files(parent='images')
@@ -336,6 +334,11 @@ class Main:
                 prod_list.update(a)
             product_list[p] = prod_list
         return product_list
+
+    def update_origin(self, origin_id, ingredient_id):
+        SQL = "UPDATE ingredients SET origin = %s WHERE id = %s;"
+        parameters = (origin_id, ingredient_id, )
+        execute_query(query=SQL, parameters=parameters, commit=True)
 
 
 class User(Main):
@@ -806,8 +809,18 @@ class AllergenProduct(Main):
         SQL = "UPDATE allergenproduct SET contains_allergen= %s WHERE productID = %s AND AllergenID = %s;"
         parameters = (self.contains_allergen, self.productID, self.AllergenID,)
         execute_query(query=SQL, parameters=parameters, commit=True)
-
-
+class Origin(Main):
+    def __init__(self, English, Korean):
+        self.English = English
+        self.Korean = Korean
+    def register(self):
+        SQL = f"INSERT INTO origin (English, Korean) VALUES (%s,%s);"
+        parameters = (self.English, self.Korean,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
+    def update(self, id):
+        SQL = "UPDATE origin SET English= %s, Korean = %s WHERE id = %s;"
+        parameters = (self.English, self.Korean, id,)
+        execute_query(query=SQL, parameters=parameters, commit=True)
 class News(Main):
     def __init__(self, english_news_title, korean_news_title, english_news_subtitle, korean_news_subtitle,
                  english_news_details, korean_news_details, lightbox_image, display_image, active, bs_interval,

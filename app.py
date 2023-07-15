@@ -1076,7 +1076,24 @@ def edit_allergens():
     return render_template('allergens_edit.html', product_list=main.allergen_dict_all_products(), products=products,
                            allergens=allergens)
 
+@app.route("/origins_edit", methods=['GET', 'POST'])
+@flask_login.login_required
+@postgres_connection
+def origins_edit():
+    if request.method == "POST":
+        if 'submit_ingredient_origin_edit' in request.form:
+            for ingredient_id in request.form:
+                main.update_origin(ingredient_id=ingredient_id, origin_id=request.form[ingredient_id])
+        elif 'add_origins' in request.form:
+            Database.Origin(request.form['English'], request.form['Korean']).register()
+        elif 'edit_origins' in request.form:
+            Database.Origin(request.form['English'], request.form['Korean']).update(request.form['id'])
+    countries = {}
+    for x in main.read_table('origin'):
+        countries[x[0]] = {'English': x[1], 'Korean': x[2]}
+    ingredients = main.read_table('ingredients')
 
+    return render_template('origins_edit.html', countries=countries, ingredients=ingredients)
 # ----------------------LOG IN/OUT-----------------------------
 @app.route('/login', methods=['GET', 'POST'])
 @postgres_connection

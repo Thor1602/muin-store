@@ -1,14 +1,50 @@
 {% extends "base.html" %}
 
-{% block title %}{{ msgid['allergenes_title'] }} - {{ msgid['title'] }}{% endblock %}
+{% block title %}{{ msgid['origins_title'] }} - {{ msgid['title'] }}{% endblock %}
 {% block body %}
     <!-- Start main content Section -->
     <section id="about" class="about">
         <div class="container" data-aos="fade-up">
 
             <div class="section-header">
-                <h2>{{ msgid['allergenes_title'] }}</h2>
+                <h2>{{ msgid['origins_title'] }}</h2>
             </div>
+
+            <hr>
+            <form method="post" action="/origins_edit">
+
+                <div class="mb-3">
+                    <label for="input_english" class="form-label">English</label>
+                    <input type="text" class="form-control" id="input_english" name="english"
+                           value="">
+                </div>
+                <div class="mb-3">
+                    <label for="input_korean" class="form-label">Korean</label>
+                    <input type="text" class="form-control" id="input_korean" name="korean"
+                           value="">
+                </div>
+                <button type="submit" class="btn btn-primary" name="add_origins"
+                        value="">ADD
+                </button>
+            </form>
+            <hr>
+            <form method="post" action="/origins_edit">
+            {% for countryid in countries %}
+                <div class="mb-3">
+                    <label for="input_english" class="form-label">English</label>
+                    <input type="text" class="form-control" id="input_english" name="english{{ countryid }}"
+                           value="{{ countries[countryid]["English"] }}">
+                </div>
+                <div class="mb-3">
+                    <label for="input_korean" class="form-label">Korean</label>
+                    <input type="text" class="form-control" id="input_korean" name="korean{{ countryid }}"
+                           value="{{ countries[countryid]["Korean"] }}">
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary" name="edit_origins"
+                        value="">EDIT
+                </button>
+            </form>
             <hr>
             <form method="POST" action="/origins_edit" id="origins_edit">
                 <div class="row">
@@ -30,24 +66,32 @@
                                         <td class="keep-all "> {{ ingredient[2] }}</td>
                                         <td class="keep-all "> {{ countries[ingredient[3]]['Korean'] }}</td>
                                         <td class="keep-all ">
-                                            <select class="form-select" aria-label="Select item" name="ing{{ ingredient[0] }}">
+                                            <select class="form-select" aria-label="Select item"
+                                                    name="ing{{ ingredient[0] }}">
                                                 {% for countryid in countries %}
-                                                {% if countryid == ingredient[3] %}
-                                                <option selected value="{{ countryid }}">{{ countries[countryid]['Korean'] }}</option>
-                                                {% else %}
-                                                    <option value="{{ countryid }}">{{ countries[countryid]['Korean'] }}</option>
-                                                {% endif %}
+                                                    {% if countryid == ingredient[3] %}
+                                                        <option selected
+                                                                value="{{ countryid }}">{{ countries[countryid]['Korean'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ countryid }}">{{ countries[countryid]['Korean'] }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </td>
-                                        {% if ingredient[4] == 'True' %}
-                                            <td><div class="form-check form-switch">
-                                                <input type="checkbox" class="form-check-input"  aria-label="" name="pub{{ ingredient[0] }}" checked>
-                                            </div></td>
-                                            {% else %}
-                                            <td><div class="form-check form-switch">
-                                                <input type="checkbox" class="form-check-input"  aria-label="" name="pub{{ ingredient[0] }}">
-                                            </div></td>
+                                        {% if ingredient[4] %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" aria-label=""
+                                                           name="pub{{ ingredient[0] }}" checked>
+                                                </div>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" aria-label=""
+                                                           name="pub{{ ingredient[0] }}">
+                                                </div>
+                                            </td>
                                         {% endif %}
 
                                     </tr>
@@ -58,16 +102,33 @@
                                         <th class="keep-all "> {{ ingredient[1] }}</th>
                                         <th class="keep-all "> {{ countries[ingredient[3]]['English'] }}</th>
                                         <td class="keep-all ">
-                                            <select class="form-select" aria-label="Select item" name="{{ ingredient[0] }}">
+                                            <select class="form-select" aria-label="Select item"
+                                                    name="ing{{ ingredient[0] }}">
                                                 {% for country in countries %}
-                                                {% if country == ingredient[3] %}
-                                                <option selected value="{{ country }}">{{ countries[country]['English'] }}</option>
-                                                {% else %}
-                                                    <option value="{{ country }}">{{ countries[country]['English'] }}</option>
-                                                {% endif %}
+                                                    {% if country == ingredient[3] %}
+                                                        <option selected
+                                                                value="{{ country }}">{{ countries[country]['English'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ country }}">{{ countries[country]['English'] }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </td>
+                                    {% if ingredient[4] %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" aria-label=""
+                                                           name="pub{{ ingredient[0] }}" checked>
+                                                </div>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" aria-label=""
+                                                           name="pub{{ ingredient[0] }}">
+                                                </div>
+                                            </td>
+                                        {% endif %}
 
                                     </tr>
                                 {% endfor %}

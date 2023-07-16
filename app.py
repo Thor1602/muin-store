@@ -84,7 +84,7 @@ login_manager.session_protection = 'strong'
 nav_menu_admin = {'/admin_overview': 'Overview',
                   '고객': {'/contact_inquiry': '연락처 문의', '/qr_info': 'QR 정보', '/large_order_price': '대량 주문 목록'},
                   '제품': {'/recipes': '레시피'
-                                     '', '/products': '다 제품'},
+                                     '', '/products': '다 제품','/origins_edit': 'origins'},
                   '경리': {'/invoices': '송장', '/business_plan': '비즈니스 계획',
                          '/financial_plan': '재무 계획'},
                   '사이트 관리자': {'/translations': '번역', '/images': '이미지',
@@ -1082,22 +1082,22 @@ def edit_allergens():
 def origins_edit():
     if request.method == "POST":
         if 'submit_ingredient_origin_edit' in request.form:
-            print(request.form.keys())
             for ingredient_id in request.form:
                 origin = "1"
-                ispublic = "False"
                 ingr_id = ingredient_id.replace('ing','')
                 if ingredient_id == 'submit_ingredient_origin_edit':
                     continue
                 elif ingredient_id[0:3] == 'ing':
                     origin = request.form[ingredient_id]
                     if 'pub' + ingr_id in request.form:
-                        ispublic = 'True'
+                        ispublic = True
+                    else:
+                        ispublic = False
                     main.update_origin(ingredient_id=ingr_id, origin_id=origin, ispublic=ispublic)
         elif 'add_origins' in request.form:
-            Database.Origin(request.form['English'], request.form['Korean']).register()
+            Database.Origin(request.form['english'], request.form['korean']).register()
         elif 'edit_origins' in request.form:
-            Database.Origin(request.form['English'], request.form['Korean']).update(request.form['id'])
+            Database.Origin(request.form['english'], request.form['korean']).update(request.form['id'])
     countries = {}
     for x in main.read_table('origin'):
         countries[x[0]] = {'English': x[1], 'Korean': x[2]}

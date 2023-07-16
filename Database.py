@@ -338,6 +338,7 @@ class Main:
     def update_origin(self, origin_id, ispublic, ingredient_id):
         SQL = "UPDATE ingredients SET origin_id = %s, ispublic = %s WHERE id = %s;"
         parameters = (origin_id, ispublic, ingredient_id, )
+
         execute_query(query=SQL, parameters=parameters, commit=True)
 
 

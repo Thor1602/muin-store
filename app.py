@@ -1082,9 +1082,18 @@ def edit_allergens():
 def origins_edit():
     if request.method == "POST":
         if 'submit_ingredient_origin_edit' in request.form:
+            print(request.form.keys())
             for ingredient_id in request.form:
-                if ingredient_id != 'submit_ingredient_origin_edit':
-                    main.update_origin(ingredient_id=ingredient_id, origin_id=request.form[ingredient_id])
+                origin = "1"
+                ispublic = "False"
+                ingr_id = ingredient_id.replace('ing','')
+                if ingredient_id == 'submit_ingredient_origin_edit':
+                    continue
+                elif ingredient_id[0:3] == 'ing':
+                    origin = request.form[ingredient_id]
+                    if 'pub' + ingr_id in request.form:
+                        ispublic = 'True'
+                    main.update_origin(ingredient_id=ingr_id, origin_id=origin, ispublic=ispublic)
         elif 'add_origins' in request.form:
             Database.Origin(request.form['English'], request.form['Korean']).register()
         elif 'edit_origins' in request.form:

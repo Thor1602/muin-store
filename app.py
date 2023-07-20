@@ -309,9 +309,11 @@ def products():
 def product(barcode):
     products = main.read_table('products')
     chosen_product = None
+    product_id = None
     for product in products:
         if product[19] == barcode:
             chosen_product = product
+            product_id = product[0]
             break
     if barcode == "search":
         chosen_product = "SEARCH"
@@ -320,8 +322,12 @@ def product(barcode):
     allergens = {}
     for product in main.read_table('allergens'):
         allergens[product[0]] = product[1:]
+    countries = {}
+    for x in main.read_table('origin'):
+        countries[x[0]] = {'English': x[1], 'Korean': x[2]}
+    origin_per_product = main.origin_per_product(product_id)
     return render_template('product.html', chosen_product=chosen_product, allergens=allergens, products=products,
-                           allergen_data=main.allergen_dict_all_products())
+                           allergen_data=main.allergen_dict_all_products(),origin_per_product=origin_per_product)
 
 
 @app.route('/large_order_price', methods=['GET', 'POST'])
@@ -607,7 +613,8 @@ def cost_calculation():
     return render_template('cost_calculation.html', packaging=packaging,
                            ingredients=ingredients, products=products,
                            missing_prices_packaging=missing_prices_packaging,
-                           missing_prices_ingredients=missing_prices_ingredients, allergens=allergens)
+                           missing_prices_ingredients=missing_prices_ingredients, allergens=allergens, products_with_x_ingredients = main.products_with_x_ingredients())
+
 
 
 @app.route('/edit_cost_calculation', methods=['GET', 'POST'])

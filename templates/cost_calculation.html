@@ -65,6 +65,9 @@
                         data-bs-target="#recipe_modal_add"
                         type="button">ADD RECIPE
                 </button>
+            {% for counting in products_with_x_ingredients %}
+                <p>{{ counting[0] }} - {{ counting[1] }}</p>
+            {% endfor %}
             </div>
         </div>
     </section>

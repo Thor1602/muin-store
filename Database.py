@@ -341,6 +341,22 @@ class Main:
 
         execute_query(query=SQL, parameters=parameters, commit=True)
 
+    def products_without_recipe(self):
+        q = "SELECT p.english FROM products AS p JOIN ingredientproduct AS mip ON p.id = mip.productid WHERE mip.productid IS NULL;"
+        return execute_query(q, fetchAll=True)
+
+    def products_with_x_ingredients(self):
+        q = "SELECT p.english FROM ingredientproduct AS mip JOIN products AS p ON mip.productid = p.id;"
+        count_dict = {}
+        for element in execute_query(q, fetchAll=True):
+            count_dict[element[0]] = count_dict.get(element[0], 0) + 1
+        count_dict = sorted(count_dict.items(), key=lambda x: x[1], reverse=False)
+        return count_dict
+    def origin_per_product(self,productid):
+        q1 = "SELECT i.english, i.korean, o.english, o.korean FROM ingredientproduct AS mid JOIN ingredients AS i ON mid.ingredientid = i.id JOIN origin AS o ON i.origin_id = o.id WHERE i.ispublic IS TRUE AND mid.productid=%s;"
+        p = (productid,)
+        return execute_query(query=q1,parameters=p, fetchAll=True)
+
 
 class User(Main):
     def __init__(self, nickname, password, role, first_name, last_name, email, last_login):

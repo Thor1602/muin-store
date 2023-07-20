@@ -44,7 +44,15 @@
                 {% endif %}<span>{% if allergen_data[chosen_product[0]][allergen] %}V{% else %}X{% endif %}</span></h4>
                         </div>
                     {% endfor %}
-                    </div>
+                </div>
+            <hr>
+                <div class="row">
+                    {% for product in origin_per_product %}
+                        <div class="col-sm-6 col-md-3">
+                            <h4>{% if preferred_language == 'ko_KR' %}{{ product[1] }}: {{ product[3] }} {% else %}{{ product[0] }}: {{ product[2] }} {% endif %}</h4>
+                        </div>
+                    {% endfor %}
+                </div>
                 </div>
 
             </div>
